@@ -197,7 +197,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .rotation-strip{
   display:none;align-items:center;flex-wrap:wrap;gap:5px 12px;
   margin-bottom:10px;padding:6px 12px;border-radius:10px;
-  background:linear-gradient(155deg,var(--signal-tint),var(--surface) 82%);
+  background:linear-gradient(155deg,var(--rotation-tint,var(--signal-tint)),var(--surface) 82%);
 }
 .rotation-strip:not(.hidden){display:flex}
 .rotation-item{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
@@ -2449,6 +2449,12 @@ function renderRotationWidget(){
   const next=nextShiftPointer(now);
   const nowData=rotationBlockData(now);
   const nextData=rotationBlockData(next);
+
+  // Le dégradé de fond reprend la couleur du code actuellement en poste
+  // (RM/RA/RN), au lieu d'une teinte fixe.
+  const TINT_VAR_BY_CODE={RM:'--c-rm-bg',RA:'--c-ra-bg',RN:'--c-rn-bg'};
+  const tintVar=TINT_VAR_BY_CODE[nowData.code];
+  card.style.setProperty('--rotation-tint', tintVar ? `var(${tintVar})` : 'var(--signal-tint)');
 
   const namesHTML=names=>names.length
     ? escapeHTML(names.join(', '))
