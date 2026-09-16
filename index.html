@@ -1291,7 +1291,8 @@ function showError(error){
   $('loading').classList.add('hidden');
   $('planningUI').classList.add('hidden');
   $('errorBox').classList.remove('hidden');
-  $('errorBox').innerHTML=`<strong>Impossible d’afficher le planning.</strong><br>${escapeHTML(error.message)}<br><br>Vérifie que <strong>planning.json</strong> a bien été publié depuis Excel.`;
+  const fichiersAttendus=neededPublicationYears().map(y=>`${DATA_FILE_PREFIX}${y}${DATA_FILE_SUFFIX}`).join(', ');
+  $('errorBox').innerHTML=`<strong>Impossible d’afficher le planning.</strong><br>${escapeHTML(error.message)}<br><br>Vérifie que <strong>${escapeHTML(fichiersAttendus)}</strong> a bien été publié depuis Excel, dans le bon dépôt GitHub.`;
   $('sourceStatus').textContent='Erreur';
   $('updateStatus').textContent='';
 }
