@@ -10,17 +10,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script>
-(function(){
-  try{
-    var saved=localStorage.getItem('planningTheme');
-    var theme=(saved==='light'||saved==='dark')
-      ? saved
-      : ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', theme);
-  }catch(e){}
-})();
-</script>
 <style>
 :root{
   /* Couleurs de base — identité Tridel : vert forêt + accent orange/or du logo */
@@ -63,42 +52,6 @@
   --ease:cubic-bezier(.2,.7,.3,1);
 }
 
-html[data-theme="dark"]{
-  --ink:#EAF3EC;--ink-soft:#B9D3C0;--muted:#7FA08C;
-  --paper:#0C1613;--surface:#101E19;
-  --line:#1E322A;--line-strong:#2C473C;
-  --accent:#4CAF6E;--accent-ink:#7ECB98;--accent-tint:#123322;
-  --accent-solid:#1F7A4D;--accent-solid-hover:#175C3A;
-  --signal:#F0923A;--signal-tint:#3D2712;--signal-ink:#FFB273;
-  --danger:#FF6B7A;--danger-bg:#3A1319;--danger-line:#5C2530;
-  --warn-bg:#3A2E0A;--warn-ink:#E8C55A;
-  --ok-bg:#0F3320;--ok-ink:#6FDB9B;
-  --tint-overlay:rgba(255,255,255,.14);
-  --outside-bg:#0E1D16;--empty-ink:#4E5F7D;
-  --rotation-sep:#5C4726;
-
-  --c-rm-bg:#241F42;--c-rm-ink:#B8AEFF;
-  --c-ra-bg:#12283F;--c-ra-ink:#8FC4FF;
-  --c-rn-bg:#3A2A0E;--c-rn-ink:#FFCB80;
-  --c-piq-bg:#12312D;--c-piq-ink:#7FE0D2;
-  --c-va-bg:#3A121E;--c-va-ink:#FF9EB3;
-  --c-hor-bg:#332A05;--c-hor-ink:#F0DA7A;
-  --c-rf-bg:#33170F;--c-rf-ink:#FFAE93;
-  --c-ca-bg:#332405;--c-ca-ink:#F5C978;
-  --c-gr-bg:#101F30;--c-gr-ink:#8FBEE0;
-  --c-en-bg:#16290F;--c-en-ink:#A9DD8C;
-  --c-r-bg:#0E2A1C;--c-r-ink:#7FE0AC;
-  --c-off-bg:#1B2434;--c-off-ink:#94A3BC;
-  --c-misc-bg:#1B2434;--c-misc-ink:#94A3BC;
-
-  --shadow-card:0 1px 2px rgba(0,0,0,.24), 0 14px 30px -10px rgba(0,0,0,.45);
-  --shadow-modal:0 28px 70px -14px rgba(0,0,0,.6);
-  --shadow-pop:0 16px 40px -8px rgba(0,0,0,.5);
-}
-
-html[data-theme="dark"] .upcoming-calendar-btn.calendar-opening{border-color:#1F5C3F}
-html[data-theme="dark"] .employee-picker-search-icon,
-html[data-theme="dark"] .employee-picker-chevron{color:var(--accent)}
 
 
 *{box-sizing:border-box}
@@ -154,17 +107,6 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
   text-align:right;font-size:10px;color:#D3E8DB
 }
 .update-chip strong{display:block;color:#fff;font-size:11.5px;font-weight:700;margin-bottom:2px}
-.theme-toggle{
-  flex:0 0 auto;width:34px;height:34px;display:grid;place-items:center;
-  border:1px solid rgba(255,255,255,.18);border-radius:10px;
-  background:rgba(255,255,255,.08);color:#fff;
-  transition:background-color .15s var(--ease);
-}
-.theme-toggle:hover{background:rgba(255,255,255,.16)}
-.theme-icon{display:none}
-.theme-icon-dark{display:block}
-html[data-theme="dark"] .theme-icon-dark{display:none}
-html[data-theme="dark"] .theme-icon-light{display:block}
 
 .journal-access{
   position:absolute;left:2px;bottom:-6px;
@@ -349,7 +291,8 @@ body.view-year .stats-grid{display:grid}
 .week-board{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
 .week-row{border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;background:var(--surface)}
 .week-row.is-current-day{box-shadow:0 0 0 2px var(--accent);border-color:transparent}
-.week-day{display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:var(--paper);font-size:11px;color:var(--muted)}
+.week-day{position:relative;display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:var(--paper);font-size:11px;color:var(--muted)}
+.week-holiday-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--danger);margin-left:4px;vertical-align:middle}
 .week-day.today{background:var(--accent-tint);color:var(--accent-ink)}
 .week-day.today span{color:var(--accent-ink);font-weight:800}
 .week-shift{position:relative;padding:11px 9px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center}
@@ -502,7 +445,6 @@ body.view-year .stats-grid{display:grid}
   .hero p{font-size:10.5px}
   .update-chip{padding:6px 8px;max-width:150px;font-size:8.5px;border-radius:9px}
   .update-chip strong{font-size:9.5px}
-  .theme-toggle{width:30px;height:30px;border-radius:9px}
 
   .controls{padding:9px;margin-bottom:9px}
   .today-btn{height:44px;padding:0 12px;font-size:11px}
@@ -586,10 +528,6 @@ body.view-year .stats-grid{display:grid}
         <strong id="sourceStatus">Chargement…</strong>
         <span id="updateStatus"></span>
       </div>
-      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Changer de thème">
-        <svg class="theme-icon theme-icon-dark" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12.79A8 8 0 1 1 11.21 4a6.5 6.5 0 0 0 8.79 8.79Z"/></svg>
-        <svg class="theme-icon theme-icon-light" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      </button>
       <button id="journalAccessBtn" class="journal-access" type="button" aria-label="Journal des publications">
         <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="12"/></svg>
       </button>
@@ -2599,7 +2537,8 @@ function renderWeek(e){
   for(let i=0;i<7;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
     const isToday=isoDate(d)===todayISO();
-    const dISO=isoDate(d); h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
+    const isHoliday=!!swissHolidayName(isoDate(d));
+    const dISO=isoDate(d); h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${isHoliday?'<span class="week-holiday-dot" aria-hidden="true"></span>':''}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
   }
   h+='</div>';
   $('viewContainer').innerHTML=h;
@@ -2711,14 +2650,6 @@ $('periodJump').addEventListener('change',event=>{
   state.date=new Date(y,m-1,d);
   render();
 });
-
-function toggleTheme(){
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  const next=isDark?'light':'dark';
-  document.documentElement.setAttribute('data-theme',next);
-  try{ localStorage.setItem('planningTheme',next); }catch(e){}
-}
-$('themeToggle').addEventListener('click',toggleTheme);
 
 function isViewingCurrentPeriod(){
   const today=new Date();
