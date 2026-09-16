@@ -293,6 +293,7 @@ body.view-year .stats-grid{display:grid}
 .week-row.is-current-day{box-shadow:0 0 0 2px var(--accent);border-color:transparent}
 .week-day{position:relative;display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:var(--paper);font-size:11px;color:var(--muted)}
 .week-holiday-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--danger);margin-left:4px;vertical-align:middle}
+.week-holiday-name{padding:5px 8px;background:var(--danger-bg);color:var(--danger);font:700 9.5px/1.3 var(--font-body);text-align:center}
 .week-day.today{background:var(--accent-tint);color:var(--accent-ink)}
 .week-day.today span{color:var(--accent-ink);font-weight:800}
 .week-shift{position:relative;padding:11px 9px;min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center}
@@ -423,7 +424,7 @@ body.view-year .stats-grid{display:grid}
 .code-CA{background:var(--c-ca-bg);color:var(--c-ca-ink)}
 .code-GR{background:var(--c-gr-bg);color:var(--c-gr-ink)}
 .code-EN{background:var(--c-en-bg);color:var(--c-en-ink)}
-.code-FE,.code-PO,.code-MI,.code-PI,.code-PC,.code-EM,.code-AN,.code-AP,.code-PR,.code-MS,.code-MC,.code-NS,.code-PA,.code-DE{background:var(--c-misc-bg);color:var(--c-misc-ink)}
+.code-FE,.code-PO,.code-MI,.code-PI,.code-PC,.code-EM,.code-AN,.code-AP,.code-PR,.code-MS,.code-MC,.code-NS,.code-PA,.code-DE,.code-DL,.code-DC,.code-JT{background:var(--c-misc-bg);color:var(--c-misc-ink)}
 
 
 
@@ -667,7 +668,8 @@ const CODE_INFO={
   CA:['Cours / activité','Affectation'],GR:['Groupe','Affectation'],EN:['Entretien','Affectation'],FE:['Formation externe','Formation'],
   PO:['Portes','Affectation'],MI:['Militaire','Absence'],PI:['Reprise de piquet','Absence planifiée'],PC:['Protection civile','Absence planifiée'],EM:['Enfant malade','Absence planifiée'],AN:['Ancienneté','Absence'],
   AP:['Accident professionnel','Absence'],PR:['Personnel','Absence'],MS:['Maladie','Absence'],MC:['Maladie / certificat','Absence'],
-  NS:['Naissance','Absence planifiée'],PA:['Congé parental','Absence planifiée'],DE:['Congé pour décès','Absence planifiée']
+  NS:['Naissance','Absence planifiée'],PA:['Congé parental','Absence planifiée'],DE:['Congé déménagement','Absence planifiée'],
+  DL:['Délégation','Absence planifiée'],DC:['Congé décès','Absence planifiée'],JT:['Congé','Absence']
 };
 
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0};
@@ -683,7 +685,7 @@ const classFor=code=>code?`code-${code.replace(/[^A-Z0-9_-]/g,'')}`:'code-off';
 
 const ROTATION_CODES=['RM','RA','RN'];
 const LEGEND_ORDER=[
-  'RM','RA','RN','PIQ','R','VA','VJ','HOR','HSR','FE','PC','PI','EM','RF','PO','CA','GR','EN','MI','AN','AP','PR','MS','MC','NS','PA','DE'
+  'RM','RA','RN','PIQ','R','VA','VJ','HOR','HSR','FE','PC','PI','EM','RF','PO','CA','GR','EN','MI','AN','AP','PR','MS','MC','NS','PA','DE','DL','DC','JT'
 ];
 const OFFICIAL_CODES=new Set(LEGEND_ORDER);
 const AUTHENTICATED_EMAIL_KEY='planningTridelAuthenticatedEmail';
@@ -2537,8 +2539,10 @@ function renderWeek(e){
   for(let i=0;i<7;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
     const isToday=isoDate(d)===todayISO();
-    const isHoliday=!!swissHolidayName(isoDate(d));
-    const dISO=isoDate(d); h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${isHoliday?'<span class="week-holiday-dot" aria-hidden="true"></span>':''}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
+    const dISO=isoDate(d);
+    const holidayName=swissHolidayName(dISO);
+    const isHoliday=!!holidayName;
+    h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${isHoliday?'<span class="week-holiday-dot" aria-hidden="true"></span>':''}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}${isHoliday?`<div class="week-holiday-name">${escapeHTML(holidayName)}</div>`:''}</div>`;
   }
   h+='</div>';
   $('viewContainer').innerHTML=h;
