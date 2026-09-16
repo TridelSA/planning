@@ -411,7 +411,7 @@ body.view-year .stats-grid{display:grid}
 .legend-summary::-webkit-details-marker{display:none}
 .legend-summary::after{content:"⌄";color:var(--accent);font-size:14px;transition:transform .16s var(--ease)}
 .legend-details[open] .legend-summary::after{transform:rotate(180deg)}
-.legend-content{margin-top:6px;width:min(620px,calc(100vw - 32px));padding:9px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);box-shadow:var(--shadow-card)}
+.legend-content{margin-top:6px;width:fit-content;max-width:min(620px,calc(100vw - 32px));padding:9px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);box-shadow:var(--shadow-card)}
 .legend{display:flex;flex-wrap:wrap;gap:6px}
 .legend-item{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:8px;font-size:10.5px}
 .legend-code{font-weight:900}
@@ -480,7 +480,7 @@ body.view-year .stats-grid{display:grid}
 .code-CA{background:var(--c-ca-bg);color:var(--c-ca-ink)}
 .code-GR{background:var(--c-gr-bg);color:var(--c-gr-ink)}
 .code-EN{background:var(--c-en-bg);color:var(--c-en-ink)}
-.code-FE,.code-PO,.code-MI,.code-PI,.code-PC,.code-EM,.code-AN,.code-AP,.code-PR,.code-MS,.code-MC{background:var(--c-misc-bg);color:var(--c-misc-ink)}
+.code-FE,.code-PO,.code-MI,.code-PI,.code-PC,.code-EM,.code-AN,.code-AP,.code-PR,.code-MS,.code-MC,.code-NS,.code-PA,.code-DE{background:var(--c-misc-bg);color:var(--c-misc-ink)}
 
 
 
@@ -728,7 +728,8 @@ const CODE_INFO={
   HSR:['Récupération d\'heure supplémentaire','Absence planifiée'],PIQ:['Piquet','Service de piquet'],RF:['Repos férié','Jour férié'],
   CA:['Cours / activité','Affectation'],GR:['Groupe','Affectation'],EN:['Entretien','Affectation'],FE:['Formation externe','Formation'],
   PO:['Portes','Affectation'],MI:['Militaire','Absence'],PI:['Reprise de piquet','Absence planifiée'],PC:['Protection civile','Absence planifiée'],EM:['Enfant malade','Absence planifiée'],AN:['Ancienneté','Absence'],
-  AP:['Accident professionnel','Absence'],PR:['Personnel','Absence'],MS:['Maladie','Absence'],MC:['Maladie / certificat','Absence']
+  AP:['Accident professionnel','Absence'],PR:['Personnel','Absence'],MS:['Maladie','Absence'],MC:['Maladie / certificat','Absence'],
+  NS:['Naissance','Absence planifiée'],PA:['Congé parental','Absence planifiée'],DE:['Congé pour décès','Absence planifiée']
 };
 
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0};
@@ -744,7 +745,7 @@ const classFor=code=>code?`code-${code.replace(/[^A-Z0-9_-]/g,'')}`:'code-off';
 
 const ROTATION_CODES=['RM','RA','RN'];
 const LEGEND_ORDER=[
-  'RM','RA','RN','PIQ','R','VA','VJ','HOR','HSR','FE','PC','PI','EM','RF','PO','CA','GR','EN','MI','AN','AP','PR','MS','MC'
+  'RM','RA','RN','PIQ','R','VA','VJ','HOR','HSR','FE','PC','PI','EM','RF','PO','CA','GR','EN','MI','AN','AP','PR','MS','MC','NS','PA','DE'
 ];
 const OFFICIAL_CODES=new Set(LEGEND_ORDER);
 const AUTHENTICATED_EMAIL_KEY='planningTridelAuthenticatedEmail';
