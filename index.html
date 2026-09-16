@@ -1068,8 +1068,15 @@ async function loadPlanning(preserve=true){
     }));
 
     const valid=fetched.filter(Boolean).sort((a,b)=>a.year-b.year);
-    if(!valid.length){
-      throw new Error('Aucun planning publié trouvé.');
+
+    // Une année suivante pas encore publiée (ex. 2027 avant que le fichier
+    // existe) ne doit jamais générer d'erreur -- seule l'absence de l'année
+    // EN COURS en est une : c'est elle qui doit toujours être disponible.
+    const anneeEnCours=new Date().getFullYear();
+    const anneeEnCoursTrouvee=valid.some(v=>v.year===anneeEnCours);
+
+    if(!anneeEnCoursTrouvee){
+      throw new Error(`Aucun planning publié trouvé pour ${anneeEnCours}.`);
     }
 
     const next=combinePlannings(valid.map(v=>({year:v.year,data:v.data})));
@@ -1291,8 +1298,9 @@ function showError(error){
   $('loading').classList.add('hidden');
   $('planningUI').classList.add('hidden');
   $('errorBox').classList.remove('hidden');
-  const fichiersAttendus=neededPublicationYears().map(y=>`${DATA_FILE_PREFIX}${y}${DATA_FILE_SUFFIX}`).join(', ');
-  $('errorBox').innerHTML=`<strong>Impossible d’afficher le planning.</strong><br>${escapeHTML(error.message)}<br><br>Vérifie que <strong>${escapeHTML(fichiersAttendus)}</strong> a bien été publié depuis Excel, dans le bon dépôt GitHub.`;
+  const anneeEnCours=new Date().getFullYear();
+  const fichierAttendu=`${DATA_FILE_PREFIX}${anneeEnCours}${DATA_FILE_SUFFIX}`;
+  $('errorBox').innerHTML=`<strong>Impossible d’afficher le planning.</strong><br>${escapeHTML(error.message)}<br><br>Vérifie que <strong>${escapeHTML(fichierAttendu)}</strong> a bien été publié depuis Excel, dans le bon dépôt GitHub.`;
   $('sourceStatus').textContent='Erreur';
   $('updateStatus').textContent='';
 }
