@@ -1366,21 +1366,25 @@ function inferOrganizationFromEventText(text,location=''){
   return words.slice(0,5).join(' ');
 }
 
-function removeEmployeePrefix(text,employee){
-  let value=normalizeEventText(text);
+function stripEmployeeNamePrefix(text,employee){
+  let value=String(text||'');
   const employeeName=cleanEmployeeName(employee?.name||'');
   const parts=employeeName.split(/\s+/).filter(Boolean);
 
-  // Enlève en début de commentaire un prénom/nom ou un nom d'employé connu,
-  // sans toucher au reste du texte.
   const candidates=[employeeName,...parts]
     .filter(Boolean)
     .sort((a,b)=>b.length-a.length);
 
   for(const candidate of candidates){
     const escaped=candidate.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    value=value.replace(new RegExp(`^${escaped}\\s*[-–—,:;]*\\s*`,'i'),'');
+    value=value.replace(new RegExp(`^\\s*${escaped}\\s*[-–—,:;]*\\s*`,'i'),'');
   }
+
+  return value.trim();
+}
+
+function removeEmployeePrefix(text,employee){
+  let value=stripEmployeeNamePrefix(normalizeEventText(text),employee);
 
   // Cas fréquent : "Prénom Nom - Visite médicale..." alors que la liste ne contient que le nom.
   value=value.replace(/^[A-Za-zÀ-ÿ'’\-]+\s+[A-Za-zÀ-ÿ'’\-]+\s*[-–—,:;]\s*(?=visite|médecin|medecin|unisant[eé])/i,'');
@@ -2233,7 +2237,8 @@ function render(){
 
 function commentFor(employee,dateISO){
   if(!employee || !employee.comments)return '';
-  return String(employee.comments[dateISO]||'').trim();
+  const raw=String(employee.comments[dateISO]||'').trim();
+  return stripEmployeeNamePrefix(raw,employee);
 }
 
 
