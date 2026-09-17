@@ -1366,35 +1366,47 @@ function inferOrganizationFromEventText(text,location=''){
   return words.slice(0,5).join(' ');
 }
 
+function foldAccents(value){
+  return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
 function stripEmployeeNamePrefix(text,employee){
   const original=String(text||'').trim();
   if(!original)return original;
 
-  // Pour un nom à deux parties, essaie aussi l'ordre inversé (prénom nom
-  // ou nom prénom, selon comment il est stocké) -- un commentaire écrit
-  // "Théophile Umuhire: ..." doit être reconnu même si la liste stocke
-  // "UMUHIRE Théophile".
-  const candidatesFor=emp=>{
-    const employeeName=cleanEmployeeName(emp?.name||'');
-    if(!employeeName)return [];
-    const parts=employeeName.split(/\s+/).filter(Boolean);
-    const combos=[employeeName];
-    if(parts.length===2)combos.push(`${parts[1]} ${parts[0]}`);
-    return combos;
-  };
+  // Comparaison insensible aux accents ET à la casse : un nom stocké sans
+  // accent ("Umuhire Theophile") doit être reconnu même si le commentaire
+  // l'écrit avec ("Théophile Umuhire: ..."). Le repliage des accents ne
+  // change pas la longueur du texte, donc la position trouvée dans le
+  // texte "replié" reste valable pour découper le texte d'origine intact.
+  const foldedOriginal=foldAccents(original).toLocaleLowerCase('fr');
+  const escapeRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+');
 
-  // Vérifie contre TOUS les employés de la liste, pas seulement celui sur
-  // la ligne duquel se trouve ce commentaire -- un commentaire peut porter
-  // le nom d'une autre personne (ex. sur le jour d'un·e collègue). On
-  // commence par la personne concernée (cas le plus fréquent).
   const allEmployees=Array.isArray(planning?.employees)?planning.employees:[];
   const ordered=employee?[employee,...allEmployees.filter(e=>e!==employee)]:allEmployees;
 
   for(const emp of ordered){
-    for(const candidate of candidatesFor(emp)){
-      const escaped=candidate.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s+');
-      const stripped=original.replace(new RegExp(`^${escaped}\\s*[-–—,:;]+\\s*`,'i'),'');
-      if(stripped!==original)return stripped.trim();
+    const employeeName=cleanEmployeeName(emp?.name||'');
+    if(!employeeName)continue;
+    const parts=employeeName.split(/\s+/).filter(Boolean);
+
+    // Nom complet, dans les deux ordres possibles (prénom nom / nom prénom).
+    const fullCombos=[employeeName];
+    if(parts.length===2)fullCombos.push(`${parts[1]} ${parts[0]}`);
+    for(const candidate of fullCombos){
+      const foldedCandidate=foldAccents(candidate).toLocaleLowerCase('fr');
+      const match=foldedOriginal.match(new RegExp(`^${escapeRe(foldedCandidate)}\\s*[-–—,:;]+\\s*`));
+      if(match)return original.slice(match[0].length).trim();
+    }
+
+    // Le prénom n'a pas besoin d'être présent : si une seule des parties du
+    // nom (typiquement le nom de famille) est suivie d'un ":", ça suffit à
+    // reconnaître une étiquette de nom -- ex. "Umuhire: Formation ...".
+    for(const part of parts){
+      if(part.length<2)continue;
+      const foldedPart=foldAccents(part).toLocaleLowerCase('fr');
+      const match=foldedOriginal.match(new RegExp(`^${escapeRe(foldedPart)}\\s*:\\s*`));
+      if(match)return original.slice(match[0].length).trim();
     }
   }
 
