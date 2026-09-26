@@ -202,6 +202,8 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .travaux-section:not(.hidden){display:block;margin-top:8px;margin-bottom:10px}
 .travaux-section .upcoming-item{border-color:var(--signal-tint);background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%)}
 .travaux-section .upcoming-copy strong{color:var(--signal-ink)}
+.travaux-copy-centered{display:flex;align-items:center;min-height:32px}
+.travaux-copy-centered strong{margin:0}
 .travaux-section .upcoming-copy small{color:var(--signal-ink);opacity:.85}
 
 /* ==========================================================
@@ -596,9 +598,8 @@ body.view-year .stats-grid{display:grid}
     <div id="travauxSection" class="travaux-section hidden">
       <div class="upcoming-item upcoming-travaux">
         <div class="upcoming-icon" aria-hidden="true">🚧</div>
-        <div class="upcoming-copy">
+        <div class="upcoming-copy travaux-copy-centered">
           <strong id="travauxSectionTitle"></strong>
-          <small id="travauxSectionNote"></small>
         </div>
         <button
           id="travauxCalendarBtn"
@@ -2444,8 +2445,7 @@ function attachDayClickHandlers(){
 function renderTravauxSection(){
   const el=$('travauxSection');
   const titleEl=$('travauxSectionTitle');
-  const noteEl=$('travauxSectionNote');
-  if(!el || !titleEl || !noteEl)return;
+  if(!el || !titleEl)return;
 
   const t=travauxPeriod();
   // La section ne reste affichée que tant que la période n'est pas terminée --
@@ -2458,7 +2458,6 @@ function renderTravauxSection(){
   const startD=parseISODateOnly(t.start);
   const endD=parseISODateOnly(t.end);
   titleEl.textContent=`Travaux du ${formatDateWithYear(startD)} au ${formatDateWithYear(endD)}`;
-  noteEl.textContent='Pas de congés durant cette période.';
   el.classList.remove('hidden');
 }
 
