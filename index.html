@@ -19,6 +19,7 @@
   --accent:#1F7A4D;--accent-ink:#155C39;--accent-tint:#E7F4EC;
   --accent-solid:#1F7A4D;--accent-solid-hover:#155C39;
   --signal:#E8770F;--signal-tint:#FFEEDD;--signal-ink:#9E4C0A;
+  --school-dot:#6C63B5;--school-tint:#EFEDFA;
   --danger:#C62838;--danger-bg:#FDECEE;--danger-line:#F3CBD1;
   --warn-bg:#FFF3D6;--warn-ink:#8A5A00;
   --ok-bg:#E7F6EC;--ok-ink:#1C6E3E;
@@ -192,6 +193,19 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .employee-results-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:11px}
 
 /* ==========================================================
+   Bandeau travaux (période sans congés)
+   ========================================================== */
+.travaux-banner{
+  display:none;align-items:center;gap:8px;
+  margin:12px 0 0;padding:8px 13px;border-radius:10px;
+  background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%);
+  border:1px solid var(--signal-tint);
+  color:var(--signal-ink);font:600 11.5px/1.4 var(--font-body);
+}
+.travaux-banner:not(.hidden){display:flex}
+.travaux-banner-icon{flex:0 0 auto;font-size:13px;line-height:1}
+
+/* ==========================================================
    Rotation en cours / suivante — bande compacte
    ========================================================== */
 .rotation-strip{
@@ -229,6 +243,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .upcoming-training{background:var(--c-ra-bg)}
 .upcoming-medical{background:var(--c-en-bg)}
 .upcoming-piquet{background:var(--c-piq-bg)}
+.upcoming-travaux{background:var(--signal-tint)}
 .upcoming-comment{background:var(--paper)}
 .upcoming-calendar-btn{
   width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;
@@ -293,8 +308,11 @@ body.view-year .stats-grid{display:grid}
 .week-row.is-current-day{box-shadow:0 0 0 2px var(--accent);border-color:transparent}
 .week-day{position:relative;display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:var(--paper);font-size:11px;color:var(--muted)}
 .week-holiday-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--danger);margin-left:4px;vertical-align:middle}
+.week-travaux-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--signal);margin-left:4px;vertical-align:middle}
+.week-school-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--school-dot);margin-left:4px;vertical-align:middle}
 .week-shift{position:relative;padding:11px 9px;height:132px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;overflow:hidden}
 .week-shift-holiday{margin-top:auto;padding-top:5px;color:var(--danger);font:700 9px/1.25 var(--font-body)}
+.week-shift-travaux{margin-top:auto;padding-top:5px;color:var(--signal-ink);font:700 9px/1.25 var(--font-body)}
 .week-day.today{background:var(--accent-tint);color:var(--accent-ink)}
 .week-day.today span{color:var(--accent-ink);font-weight:800}
 .week-shift:not([class*="code-"]){background:var(--paper);color:var(--ink-soft)}
@@ -326,6 +344,9 @@ body.view-year .stats-grid{display:grid}
 .month-cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
 .month-cell.today .day-num{color:var(--accent-ink);font-weight:800}
 .month-cell.is-holiday::before{content:'';position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--danger)}
+.month-cell.is-travaux::after{content:'';position:absolute;top:6px;left:6px;width:6px;height:6px;border-radius:50%;background:var(--signal)}
+.month-cell.is-schoolholiday{box-shadow:inset 3px 0 0 var(--school-dot)}
+.month-cell.is-schoolholiday.today{box-shadow:inset 0 0 0 2px var(--accent),inset 3px 0 0 var(--school-dot)}
 
 /* ==========================================================
    Vue Année
@@ -335,13 +356,14 @@ body.view-year .stats-grid{display:grid}
 .mini-month h3{margin:0;padding:7px;text-align:center;background:var(--paper);font:700 12px/1 var(--font-body);color:var(--ink)}
 .mini-head,.mini-grid{display:grid;grid-template-columns:repeat(7,1fr)}
 .mini-head span{text-align:center;padding:3px 0;color:var(--muted);font:700 7.5px/1 var(--font-body)}
-.mini-cell{aspect-ratio:1/1;display:grid;place-items:center;font:600 8.5px/1 var(--font-body);border-radius:4px;margin:1px;cursor:pointer}
+.mini-cell{position:relative;aspect-ratio:1/1;display:grid;place-items:center;font:600 8.5px/1 var(--font-body);border-radius:4px;margin:1px;cursor:pointer}
 .mini-cell.today{outline:2px solid var(--accent);outline-offset:-1px;font-weight:800}
 .mini-empty{background:var(--paper);color:var(--empty-ink);cursor:default}
-.mini-cell.has-comment{position:relative}
 .mini-cell.has-comment::after{content:'';position:absolute;right:4px;bottom:4px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7}
-.mini-cell.is-holiday{position:relative}
 .mini-cell.is-holiday::before{content:'';position:absolute;left:3px;top:3px;width:4px;height:4px;border-radius:50%;background:var(--danger)}
+.mini-cell.is-travaux::before{content:'';position:absolute;right:3px;top:3px;width:4px;height:4px;border-radius:50%;background:var(--signal)}
+.mini-cell.is-schoolholiday{box-shadow:inset 2px 0 0 var(--school-dot)}
+.mini-cell.is-schoolholiday.today{outline:2px solid var(--accent);outline-offset:-1px;box-shadow:inset 2px 0 0 var(--school-dot)}
 
 /* ==========================================================
    Légende
@@ -535,6 +557,11 @@ body.view-year .stats-grid{display:grid}
     </div>
   </header>
 
+  <div id="travauxBanner" class="travaux-banner hidden" role="status">
+    <span class="travaux-banner-icon" aria-hidden="true">🚧</span>
+    <span id="travauxBannerText"></span>
+  </div>
+
   <section id="rotationCard" class="rotation-strip hidden"></section>
 
   <section class="card controls">
@@ -672,7 +699,7 @@ const CODE_INFO={
   DL:['Délégation','Absence planifiée'],DC:['Congé décès','Absence planifiée'],JT:['Congé','Absence']
 };
 
-let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0};
+let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
 let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date()};
@@ -746,6 +773,69 @@ function swissHolidaysForYear(year){
 function swissHolidayName(dISO){
   const year=Number(dISO.slice(0,4));
   return swissHolidaysForYear(year)[dISO]||null;
+}
+
+// ==========================================================
+// Période de travaux (source : onglet "jours fériés" du fichier Excel,
+// cellule "Travaux" suivie de 2 dates — voir normalizeTravaux()).
+// ==========================================================
+
+// APERÇU TEMPORAIRE — uniquement pour visualiser le rendu avant que le
+// fichier Excel ne publie de vraies dates de travaux. Dès qu'une période
+// valide est publiée (planning.travaux), elle prend systématiquement le
+// dessus sur cette liste (voir travauxPeriod() ci-dessous). Si l'aperçu
+// de l'année en cours est dépassé, on passe automatiquement à celui de
+// l'année suivante listé ici ; si aucun n'est encore disponible, rien ne
+// s'affiche. À retirer une fois les vraies dates publiées par Excel.
+const TRAVAUX_APERCU=[
+  {start:'2026-05-17', end:'2026-06-17'},
+  {start:'2027-05-23', end:'2027-06-28'}
+];
+
+function travauxApercu(){
+  const todayIso=todayISO();
+  return TRAVAUX_APERCU.find(t=>t.end>=todayIso)||null;
+}
+
+function travauxPeriod(){
+  const t=planning.travaux;
+  if(t && t.start && t.end)return t;
+  return travauxApercu();
+}
+
+function isInTravaux(dISO){
+  const t=travauxPeriod();
+  return !!t && dISO>=t.start && dISO<=t.end;
+}
+
+function parseISODateOnly(v){
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v||'').trim());
+  if(!m)return null;
+  const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
+  if(isNaN(d.getTime()))return null;
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+// ==========================================================
+// Vacances scolaires vaudoises — source : État de Vaud,
+// vd.ch/formation/jours-feries-et-vacances-scolaires (dates officielles).
+// Affichage volontairement discret (voir CSS .is-schoolholiday / .week-school-dot).
+// ==========================================================
+const VD_SCHOOL_HOLIDAYS=[
+  ["Vacances d'automne",'2026-10-10','2026-10-25'],
+  ['Vacances de Noël','2026-12-24','2027-01-10'],
+  ['Relâches',        '2027-02-06','2027-02-14'],
+  ['Vacances de Pâques','2027-03-26','2027-04-11'],
+  ["Pont de l'Ascension",'2027-05-06','2027-05-09'],
+  ["Vacances d'été",  '2027-07-03','2027-08-22'],
+  ["Vacances d'automne",'2027-10-09','2027-10-24'],
+  ['Vacances de Noël','2027-12-24','2028-01-09']
+];
+
+function schoolHolidayName(dISO){
+  const found=VD_SCHOOL_HOLIDAYS.find(([,start,end])=>dISO>=start && dISO<=end);
+  return found?found[0]:null;
 }
 
 function codeMatchesFilter(code){return true;}
@@ -883,8 +973,24 @@ function combinePlannings(perYearData){
     publicationId:perYearData.map(p=>p.data.publicationId).filter(Boolean).join('+'),
     schemaVersion:perYearData.length?Math.max(...perYearData.map(p=>p.data.schemaVersion)):0,
     dateCount:perYearData.reduce((sum,p)=>sum+p.data.dateCount,0),
+    // La période de travaux est une donnée globale (pas propre à une année) :
+    // on prend la première publication qui en contient une.
+    travaux:perYearData.map(p=>p.data.travaux).find(Boolean)||null,
     employees
   };
+}
+
+// Lit la période de travaux publiée (cellule "Travaux" + 2 dates dans l'onglet
+// "jours fériés" de l'Excel). Absence ou dates invalides => aucune période
+// n'est affichée (exigence explicite : ne rien afficher plutôt qu'une donnée
+// partielle ou incohérente).
+function normalizeTravaux(rawTravaux){
+  if(!rawTravaux || typeof rawTravaux!=='object')return null;
+  const start=String(rawTravaux.debut||rawTravaux.start||'').trim();
+  const end=String(rawTravaux.fin||rawTravaux.end||'').trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(start) || !/^\d{4}-\d{2}-\d{2}$/.test(end))return null;
+  if(end<start)return null;
+  return {start,end};
 }
 
 function normalizeData(raw){
@@ -984,6 +1090,7 @@ function normalizeData(raw){
     publicationId,
     schemaVersion,
     dateCount:declaredDateCount,
+    travaux:normalizeTravaux(raw.travaux),
     employees
   };
 }
@@ -1623,6 +1730,25 @@ function buildUpcomingEvents(employee){
     events.push(event);
   };
 
+  // PÉRIODE DE TRAVAUX — information globale (pas propre à l'employé) :
+  // affichée tant qu'elle n'est pas terminée, pour pouvoir être ajoutée
+  // au calendrier personnel comme n'importe quel autre événement.
+  const travaux=travauxPeriod();
+  if(travaux && travaux.end>=todayISO()){
+    const travauxStart=parseISODateOnly(travaux.start);
+    const travauxEnd=parseISODateOnly(travaux.end);
+    if(travauxStart && travauxEnd){
+      pushUnique({
+        type:'travaux',
+        date:travauxStart,
+        endDate:travauxEnd,
+        allDay:true,
+        title:'Période de travaux',
+        detail:`Pas de congés du ${formatShortDate(travauxStart)} au ${formatShortDate(travauxEnd)}`
+      },`travaux-${travaux.start}-${travaux.end}`);
+    }
+  }
+
   const isVacationCode=code=>code==='VA' || code==='VJ';
 
   // Jours qui peuvent relier deux blocs de vacances :
@@ -2061,7 +2187,7 @@ function renderUpcomingEvents(employee){
     return;
   }
 
-  const iconFor=type=>type==='vacation'?'🏖️':type==='piquet'?'📞':type==='training'?'🎓':type==='medical'?'🩺':type==='comment'?'📝':'•';
+  const iconFor=type=>type==='vacation'?'🏖️':type==='piquet'?'📞':type==='training'?'🎓':type==='medical'?'🩺':type==='travaux'?'🚧':type==='comment'?'📝':'•';
 
   list.innerHTML=events.map((ev,index)=>`
     <div class="upcoming-item upcoming-${ev.type}">
@@ -2237,6 +2363,24 @@ function attachDayClickHandlers(){
   });
 }
 
+function renderTravauxBanner(){
+  const el=$('travauxBanner');
+  const textEl=$('travauxBannerText');
+  if(!el || !textEl)return;
+
+  const t=travauxPeriod();
+  // Le bandeau ne reste affiché que tant que la période n'est pas terminée.
+  if(!t || t.end<todayISO()){
+    el.classList.add('hidden');
+    return;
+  }
+
+  const startD=parseISODateOnly(t.start);
+  const endD=parseISODateOnly(t.end);
+  textEl.textContent=`Période de travaux du ${formatShortDate(startD)} au ${formatShortDate(endD)} — pas de congés durant cette période.`;
+  el.classList.remove('hidden');
+}
+
 function render(){
   document.body.classList.remove('view-week','view-month','view-year','view-team');
   document.body.classList.add(`view-${state.view}`);
@@ -2244,6 +2388,8 @@ function render(){
   document.querySelectorAll('.tab').forEach(
     b=>b.classList.toggle('active',b.dataset.view===state.view)
   );
+
+  renderTravauxBanner();
 
   const e=selectedEmployee();
 
@@ -2444,6 +2590,7 @@ function codeHTML(code,dateISO,currentId){
   const secondary=feComment||info[1];
   const mates=colleaguesFor(dateISO,c,currentId);
   const holidayName=swissHolidayName(dateISO);
+  const inTravaux=isInTravaux(dateISO);
 
   const teamHTML=ROTATION_CODES.includes(c)
     ? `<div class="shift-team compact-team ${mates.length?'has-mates':'no-mates'}">
@@ -2457,7 +2604,7 @@ function codeHTML(code,dateISO,currentId){
     <div class="shift-mainline"><b>${escapeHTML(c||'—')}</b>${displayLabel?`<span>${escapeHTML(displayLabel)}</span>`:''}</div>
     <div class="shift-time ${feComment?'fe-comment':''}">${escapeHTML(secondary)}</div>
     ${teamHTML}
-    ${holidayName?`<div class="week-shift-holiday">${escapeHTML(holidayName)}</div>`:''}
+    ${holidayName?`<div class="week-shift-holiday">${escapeHTML(holidayName)}</div>`:(inTravaux?`<div class="week-shift-travaux">🚧 Travaux</div>`:'')}
   </div>`;
 }
 
@@ -2603,7 +2750,13 @@ function renderWeek(e){
     const isToday=isoDate(d)===todayISO();
     const dISO=isoDate(d);
     const isHoliday=!!swissHolidayName(dISO);
-    h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${isHoliday?'<span class="week-holiday-dot" aria-hidden="true"></span>':''}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
+    const inTravaux=isInTravaux(dISO);
+    const schoolName=schoolHolidayName(dISO);
+    const dots=
+      (isHoliday?'<span class="week-holiday-dot" aria-hidden="true"></span>':'')+
+      (inTravaux?'<span class="week-travaux-dot" aria-hidden="true"></span>':'')+
+      (schoolName?`<span class="week-school-dot" aria-hidden="true" title="${escapeHTML(schoolName)}"></span>`:'');
+    h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${dots}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
   }
   h+='</div>';
   $('viewContainer').innerHTML=h;
@@ -2621,11 +2774,14 @@ function renderMonth(e){
     const c=safeCode(e.schedule[dISO]);
     const isToday=dISO===todayISO();
     const isHoliday=!!swissHolidayName(dISO);
+    const inTravaux=isInTravaux(dISO);
+    const schoolName=schoolHolidayName(dISO);
     const inMonth=d.getMonth()===m;
     const visible=codeMatchesFilter(c);
     const colorClass=(inMonth&&visible)?classFor(c):'outside';
     const showLabel=inMonth&&visible&&c;
-    h+=`<div class="month-cell ${colorClass} ${isToday?'today':''} ${isHoliday?'is-holiday':''}" data-date="${dISO}" tabindex="0" role="button"><span class="day-num">${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
+    const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
+    h+=`<div class="month-cell ${colorClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num">${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
   }
   h+='</div></div>';$('viewContainer').innerHTML=h;
 }
@@ -2647,7 +2803,10 @@ function renderYear(e){
       const visible=codeMatchesFilter(c);
       const hasComment=d.getMonth()===m && !!commentFor(e,dISO);
       const isHoliday=d.getMonth()===m && !!swissHolidayName(dISO);
-      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?classFor(c):'mini-empty')} ${isToday?'today':''} ${hasComment?'has-comment':''} ${isHoliday?'is-holiday':''}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''}>${d.getMonth()===m?d.getDate():''}</span>`;
+      const inTravaux=d.getMonth()===m && isInTravaux(dISO);
+      const schoolName=d.getMonth()===m ? schoolHolidayName(dISO) : null;
+      const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
+      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?classFor(c):'mini-empty')} ${isToday?'today':''} ${hasComment?'has-comment':''} ${markClasses}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''} ${schoolName?`title="${escapeHTML(schoolName)}"`:''}>${d.getMonth()===m?d.getDate():''}</span>`;
     }
     h+='</div></div>';
   }
