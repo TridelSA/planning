@@ -193,17 +193,19 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .employee-results-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:11px}
 
 /* ==========================================================
-   Bandeau travaux (période sans congés)
+   Section travaux (dans la carte "Prochains événements")
    ========================================================== */
-.travaux-banner{
-  display:none;align-items:center;gap:8px;
-  margin:12px 0 0;padding:8px 13px;border-radius:10px;
+.travaux-section{
+  display:none;align-items:center;gap:10px;
+  margin-bottom:11px;padding:9px 10px;border-radius:var(--radius-md);
   background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%);
   border:1px solid var(--signal-tint);
-  color:var(--signal-ink);font:600 11.5px/1.4 var(--font-body);
 }
-.travaux-banner:not(.hidden){display:flex}
-.travaux-banner-icon{flex:0 0 auto;font-size:13px;line-height:1}
+.travaux-section:not(.hidden){display:flex}
+.travaux-section-icon{flex:0 0 auto;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:14px;background:var(--surface)}
+.travaux-section-copy{min-width:0}
+.travaux-section-copy strong{display:block;font:700 11.5px/1.3 var(--font-body);color:var(--signal-ink)}
+.travaux-section-copy small{display:block;margin-top:2px;color:var(--signal-ink);opacity:.85;font:500 10px/1.4 var(--font-body)}
 
 /* ==========================================================
    Rotation en cours / suivante — bande compacte
@@ -557,11 +559,6 @@ body.view-year .stats-grid{display:grid}
     </div>
   </header>
 
-  <div id="travauxBanner" class="travaux-banner hidden" role="status">
-    <span class="travaux-banner-icon" aria-hidden="true">🚧</span>
-    <span id="travauxBannerText"></span>
-  </div>
-
   <section id="rotationCard" class="rotation-strip hidden"></section>
 
   <section class="card controls">
@@ -594,6 +591,21 @@ body.view-year .stats-grid{display:grid}
 
 
   <section id="upcomingEventsCard" class="card upcoming-card hidden">
+    <div id="travauxSection" class="travaux-section hidden">
+      <div class="travaux-section-icon" aria-hidden="true">🚧</div>
+      <div class="travaux-section-copy">
+        <strong id="travauxSectionTitle"></strong>
+        <small id="travauxSectionNote"></small>
+      </div>
+      <button
+        class="upcoming-calendar-btn"
+        type="button"
+        onclick="addTravauxToCalendar()"
+        aria-label="Ajouter au calendrier"
+        title="Ajouter au calendrier"
+      ><span aria-hidden="true">📅</span></button>
+    </div>
+
     <div class="upcoming-head">
       <div>
         <span class="upcoming-kicker">Prochains événements</span>
@@ -1366,6 +1378,10 @@ function daysBetweenInclusive(a,b){
 
 function formatShortDate(d){
   return d.toLocaleDateString('fr-CH',{day:'2-digit',month:'2-digit'});
+}
+
+function formatDateWithYear(d){
+  return d.toLocaleDateString('fr-CH',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
 
 function formatLongDate(d){
