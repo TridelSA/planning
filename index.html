@@ -197,7 +197,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
    ========================================================== */
 .travaux-section{
   display:none;align-items:center;gap:10px;
-  margin-bottom:11px;padding:9px 10px;border-radius:var(--radius-md);
+  margin-top:11px;padding:9px 10px;border-radius:var(--radius-md);
   background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%);
   border:1px solid var(--signal-tint);
 }
@@ -314,6 +314,7 @@ body.view-year .stats-grid{display:grid}
 .week-school-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--school-dot);margin-left:4px;vertical-align:middle}
 .week-shift{position:relative;padding:11px 9px;height:132px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;overflow:hidden}
 .week-shift-holiday{margin-top:auto;padding-top:5px;color:var(--danger);font:700 9px/1.25 var(--font-body)}
+.week-shift-schoolholiday{margin-top:auto;padding-top:5px;color:var(--school-dot);font:700 9px/1.25 var(--font-body)}
 .week-shift-travaux{margin-top:auto;padding-top:5px;color:var(--signal-ink);font:700 9px/1.25 var(--font-body)}
 .week-day.today{background:var(--accent-tint);color:var(--accent-ink)}
 .week-day.today span{color:var(--accent-ink);font-weight:800}
@@ -422,6 +423,7 @@ body.view-year .stats-grid{display:grid}
 .journal-stats{margin-top:4px;color:var(--muted);font:600 10.5px/1.4 var(--font-body)}
 .journal-details{margin-top:6px;padding:7px 9px;border-radius:8px;background:var(--surface);font:600 10.5px/1.5 var(--font-body);color:var(--ink-soft);white-space:pre-wrap}
 .day-detail-holiday{margin-bottom:10px;padding:8px 11px;border-radius:9px;background:var(--danger-bg);color:var(--danger);font:700 11px/1.4 var(--font-body)}
+.day-detail-schoolholiday{margin-bottom:10px;padding:8px 11px;border-radius:9px;background:var(--school-tint);color:var(--school-dot);font:700 11px/1.4 var(--font-body)}
 .day-detail-service{border-radius:var(--radius-md);padding:14px}
 .day-detail-top{display:flex;align-items:center;gap:11px}
 .day-detail-code{min-width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font:800 15px/1 var(--font-display);background:var(--tint-overlay)}
@@ -591,21 +593,6 @@ body.view-year .stats-grid{display:grid}
 
 
   <section id="upcomingEventsCard" class="card upcoming-card hidden">
-    <div id="travauxSection" class="travaux-section hidden">
-      <div class="travaux-section-icon" aria-hidden="true">🚧</div>
-      <div class="travaux-section-copy">
-        <strong id="travauxSectionTitle"></strong>
-        <small id="travauxSectionNote"></small>
-      </div>
-      <button
-        class="upcoming-calendar-btn"
-        type="button"
-        onclick="addTravauxToCalendar()"
-        aria-label="Ajouter au calendrier"
-        title="Ajouter au calendrier"
-      ><span aria-hidden="true">📅</span></button>
-    </div>
-
     <div class="upcoming-head">
       <div>
         <span class="upcoming-kicker">Prochains événements</span>
@@ -614,6 +601,22 @@ body.view-year .stats-grid{display:grid}
       <span id="upcomingCount" class="upcoming-count"></span>
     </div>
     <div id="upcomingEvents" class="upcoming-list"></div>
+
+    <div id="travauxSection" class="travaux-section hidden">
+      <div class="travaux-section-icon" aria-hidden="true">🚧</div>
+      <div class="travaux-section-copy">
+        <strong id="travauxSectionTitle"></strong>
+        <small id="travauxSectionNote"></small>
+      </div>
+      <button
+        id="travauxCalendarBtn"
+        class="upcoming-calendar-btn"
+        type="button"
+        onclick="addTravauxToCalendar()"
+        aria-label="Ajouter au calendrier"
+        title="Ajouter au calendrier"
+      ><span aria-hidden="true">📅</span></button>
+    </div>
   </section>
 
   <main class="card main-card">
@@ -1746,24 +1749,10 @@ function buildUpcomingEvents(employee){
     events.push(event);
   };
 
-  // PÉRIODE DE TRAVAUX — information globale (pas propre à l'employé) :
-  // affichée tant qu'elle n'est pas terminée, pour pouvoir être ajoutée
-  // au calendrier personnel comme n'importe quel autre événement.
-  const travaux=travauxPeriod();
-  if(travaux && travaux.end>=todayISO()){
-    const travauxStart=parseISODateOnly(travaux.start);
-    const travauxEnd=parseISODateOnly(travaux.end);
-    if(travauxStart && travauxEnd){
-      pushUnique({
-        type:'travaux',
-        date:travauxStart,
-        endDate:travauxEnd,
-        allDay:true,
-        title:'Période de travaux',
-        detail:`Pas de congés du ${formatShortDate(travauxStart)} au ${formatShortDate(travauxEnd)}`
-      },`travaux-${travaux.start}-${travaux.end}`);
-    }
-  }
+  // La période de travaux a sa propre section, en dehors de la fenêtre
+  // "30 prochains jours" (voir renderTravauxSection / addTravauxToCalendar) --
+  // elle n'apparaît volontairement pas dans la liste ci-dessous, aussi
+  // lointaine soit-elle.
 
   const isVacationCode=code=>code==='VA' || code==='VJ';
 
@@ -1774,6 +1763,53 @@ function buildUpcomingEvents(employee){
     return c==='' || c==='R';
   };
 
+  // Si une période (vacances, piquet…) est déjà en cours au tout premier
+  // jour de la fenêtre (aujourd'hui), il faut remonter dans le temps pour
+  // retrouver sa VRAIE date de début -- sinon l'événement affiché se
+  // raccourcit artificiellement d'un jour à chaque nouvelle journée qui
+  // passe, jusqu'à sembler avoir commencé "aujourd'hui".
+  const backProbeLimit=new Date(start);
+  backProbeLimit.setDate(backProbeLimit.getDate()-400);
+
+  const findRealStart=(fromDate,matchFn,bridgeFn)=>{
+    let realStart=new Date(fromDate);
+    let probe=new Date(fromDate);
+    probe.setDate(probe.getDate()-1);
+
+    while(probe>=backProbeLimit){
+      const probeCode=safeCode(employee.schedule[isoDate(probe)]);
+
+      if(matchFn(probeCode)){
+        realStart=new Date(probe);
+        probe.setDate(probe.getDate()-1);
+        continue;
+      }
+
+      if(bridgeFn(probeCode)){
+        let bridgeStart=new Date(probe);
+        let gapDays=0;
+        let exceededLimit=false;
+
+        while(bridgeStart>=backProbeLimit && bridgeFn(safeCode(employee.schedule[isoDate(bridgeStart)]))){
+          bridgeStart.setDate(bridgeStart.getDate()-1);
+          gapDays++;
+          if(gapDays>MAX_BRIDGE_DAYS){ exceededLimit=true; break; }
+        }
+
+        if(!exceededLimit && bridgeStart>=backProbeLimit && matchFn(safeCode(employee.schedule[isoDate(bridgeStart)]))){
+          realStart=new Date(bridgeStart);
+          probe=new Date(bridgeStart);
+          probe.setDate(probe.getDate()-1);
+          continue;
+        }
+      }
+
+      break;
+    }
+
+    return realStart;
+  };
+
   // VACANCES
   // Fusionne les périodes quand les jours intermédiaires sont uniquement des repos / cellules vides.
   let cursor=new Date(start);
@@ -1782,7 +1818,9 @@ function buildUpcomingEvents(employee){
     const code=safeCode(employee.schedule[isoDate(cursor)]);
 
     if(isVacationCode(code)){
-      const vacStart=new Date(cursor);
+      const vacStart = cursor.getTime()===start.getTime()
+        ? findRealStart(cursor,isVacationCode,isVacationBridgeCode)
+        : new Date(cursor);
       let vacEnd=new Date(cursor);
 
       let probe=new Date(cursor);
@@ -1850,7 +1888,9 @@ function buildUpcomingEvents(employee){
     const code=safeCode(employee.schedule[isoDate(cursor)]);
 
     if(code==='PIQ'){
-      const piqStart=new Date(cursor);
+      const piqStart = cursor.getTime()===start.getTime()
+        ? findRealStart(cursor,c=>c==='PIQ',isVacationBridgeCode)
+        : new Date(cursor);
       let piqEnd=new Date(cursor);
 
       let probe=new Date(cursor);
@@ -2188,6 +2228,44 @@ function addUpcomingEventToCalendar(index){
 
 window.addUpcomingEventToCalendar=addUpcomingEventToCalendar;
 
+function addTravauxToCalendar(){
+  const t=travauxPeriod();
+  if(!t)return;
+
+  const startD=parseISODateOnly(t.start);
+  const endD=parseISODateOnly(t.end);
+  if(!startD || !endD)return;
+
+  const ev={
+    type:'travaux',
+    date:startD,
+    endDate:endD,
+    allDay:true,
+    title:'Période de travaux',
+    detail:`Merci de prévoir vos congés en dehors de cette période (${formatDateWithYear(startD)} – ${formatDateWithYear(endD)})`
+  };
+
+  const button=$('travauxCalendarBtn');
+  if(button){
+    const span=button.querySelector('span');
+    const previous=span?.textContent||'📅';
+    button.classList.add('calendar-opening');
+    if(span)span.textContent='✓';
+    window.setTimeout(()=>{
+      button.classList.remove('calendar-opening');
+      if(span)span.textContent=previous;
+    },1300);
+  }
+
+  if(isMobileCalendarDevice()){
+    downloadCalendarICS(ev);
+  }else{
+    openOutlookCalendar(ev);
+  }
+}
+
+window.addTravauxToCalendar=addTravauxToCalendar;
+
 function renderUpcomingEvents(employee){
   const card=$('upcomingEventsCard');
   const list=$('upcomingEvents');
@@ -2280,6 +2358,7 @@ function openDayModal(dateObj,employee=selectedEmployee()){
   const detailText=comment||info[1];
   const mates=ROTATION_CODES.includes(code)?colleaguesFor(dISO,code,employee.id):[];
   const holidayName=swissHolidayName(dISO);
+  const schoolName=schoolHolidayName(dISO);
 
   $('dayModalTitle').textContent=cleanEmployeeName(employee.name);
   $('dayModalDate').textContent=d.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -2297,7 +2376,11 @@ function openDayModal(dateObj,employee=selectedEmployee()){
     ? `<div class="day-detail-holiday">${escapeHTML(holidayName)}</div>`
     : '';
 
-  $('dayModalBody').innerHTML=`${holidayHTML}<div class="day-detail-service ${classFor(code)}">
+  const schoolHTML=schoolName
+    ? `<div class="day-detail-schoolholiday">Vacances scolaires VD — ${escapeHTML(schoolName)}</div>`
+    : '';
+
+  $('dayModalBody').innerHTML=`${holidayHTML}${schoolHTML}<div class="day-detail-service ${classFor(code)}">
     <div class="day-detail-top">
       <div class="day-detail-code">${escapeHTML(code||'—')}</div>
       <div class="day-detail-info"><strong>${escapeHTML(info[0])}</strong><small>${escapeHTML(detailText)}</small></div>
@@ -2379,13 +2462,15 @@ function attachDayClickHandlers(){
   });
 }
 
-function renderTravauxBanner(){
-  const el=$('travauxBanner');
-  const textEl=$('travauxBannerText');
-  if(!el || !textEl)return;
+function renderTravauxSection(){
+  const el=$('travauxSection');
+  const titleEl=$('travauxSectionTitle');
+  const noteEl=$('travauxSectionNote');
+  if(!el || !titleEl || !noteEl)return;
 
   const t=travauxPeriod();
-  // Le bandeau ne reste affiché que tant que la période n'est pas terminée.
+  // La section ne reste affichée que tant que la période n'est pas terminée --
+  // volontairement indépendante de la fenêtre "30 prochains jours".
   if(!t || t.end<todayISO()){
     el.classList.add('hidden');
     return;
@@ -2393,7 +2478,8 @@ function renderTravauxBanner(){
 
   const startD=parseISODateOnly(t.start);
   const endD=parseISODateOnly(t.end);
-  textEl.textContent=`Période de travaux du ${formatShortDate(startD)} au ${formatShortDate(endD)} — pas de congés durant cette période.`;
+  titleEl.textContent=`Travaux du ${formatDateWithYear(startD)} au ${formatDateWithYear(endD)}`;
+  noteEl.textContent='Merci de prévoir vos congés en dehors de cette période 😊';
   el.classList.remove('hidden');
 }
 
@@ -2405,7 +2491,7 @@ function render(){
     b=>b.classList.toggle('active',b.dataset.view===state.view)
   );
 
-  renderTravauxBanner();
+  renderTravauxSection();
 
   const e=selectedEmployee();
 
@@ -2606,6 +2692,7 @@ function codeHTML(code,dateISO,currentId){
   const secondary=feComment||info[1];
   const mates=colleaguesFor(dateISO,c,currentId);
   const holidayName=swissHolidayName(dateISO);
+  const schoolName=schoolHolidayName(dateISO);
   const inTravaux=isInTravaux(dateISO);
 
   const teamHTML=ROTATION_CODES.includes(c)
@@ -2620,7 +2707,11 @@ function codeHTML(code,dateISO,currentId){
     <div class="shift-mainline"><b>${escapeHTML(c||'—')}</b>${displayLabel?`<span>${escapeHTML(displayLabel)}</span>`:''}</div>
     <div class="shift-time ${feComment?'fe-comment':''}">${escapeHTML(secondary)}</div>
     ${teamHTML}
-    ${holidayName?`<div class="week-shift-holiday">${escapeHTML(holidayName)}</div>`:(inTravaux?`<div class="week-shift-travaux">🚧 Travaux</div>`:'')}
+    ${holidayName
+      ? `<div class="week-shift-holiday">${escapeHTML(holidayName)}</div>`
+      : (schoolName
+        ? `<div class="week-shift-schoolholiday">${escapeHTML(schoolName)}</div>`
+        : (inTravaux?`<div class="week-shift-travaux">🚧 Travaux</div>`:''))}
   </div>`;
 }
 
