@@ -193,13 +193,13 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .employee-results-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:11px}
 
 /* ==========================================================
-   Section travaux (dans la carte "Prochains événements")
+   Section travaux — carte à part entière, sous "Prochains événements"
    ========================================================== */
 .travaux-section{
   display:none;align-items:center;gap:10px;
-  margin-top:11px;padding:9px 10px;border-radius:var(--radius-md);
+  margin-bottom:12px;padding:11px 13px;
   background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%);
-  border:1px solid var(--signal-tint);
+  border-color:var(--signal-tint);
 }
 .travaux-section:not(.hidden){display:flex}
 .travaux-section-icon{flex:0 0 auto;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:14px;background:var(--surface)}
@@ -314,7 +314,7 @@ body.view-year .stats-grid{display:grid}
 .week-school-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--school-dot);margin-left:4px;vertical-align:middle}
 .week-shift{position:relative;padding:11px 9px;height:132px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;overflow:hidden}
 .week-shift-holiday{margin-top:auto;padding-top:5px;color:var(--danger);font:700 9px/1.25 var(--font-body)}
-.week-shift-schoolholiday{margin-top:auto;padding-top:5px;color:var(--school-dot);font:700 9px/1.25 var(--font-body)}
+.week-shift-school-badge{position:absolute;top:5px;right:5px;max-width:64%;padding:1px 4px;border-radius:4px;background:var(--school-tint);color:var(--school-dot);font:700 7px/1.35 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .week-shift-travaux{margin-top:auto;padding-top:5px;color:var(--signal-ink);font:700 9px/1.25 var(--font-body)}
 .week-day.today{background:var(--accent-tint);color:var(--accent-ink)}
 .week-day.today span{color:var(--accent-ink);font-weight:800}
@@ -601,22 +601,22 @@ body.view-year .stats-grid{display:grid}
       <span id="upcomingCount" class="upcoming-count"></span>
     </div>
     <div id="upcomingEvents" class="upcoming-list"></div>
+  </section>
 
-    <div id="travauxSection" class="travaux-section hidden">
-      <div class="travaux-section-icon" aria-hidden="true">🚧</div>
-      <div class="travaux-section-copy">
-        <strong id="travauxSectionTitle"></strong>
-        <small id="travauxSectionNote"></small>
-      </div>
-      <button
-        id="travauxCalendarBtn"
-        class="upcoming-calendar-btn"
-        type="button"
-        onclick="addTravauxToCalendar()"
-        aria-label="Ajouter au calendrier"
-        title="Ajouter au calendrier"
-      ><span aria-hidden="true">📅</span></button>
+  <section id="travauxSection" class="card travaux-section hidden">
+    <div class="travaux-section-icon" aria-hidden="true">🚧</div>
+    <div class="travaux-section-copy">
+      <strong id="travauxSectionTitle"></strong>
+      <small id="travauxSectionNote"></small>
     </div>
+    <button
+      id="travauxCalendarBtn"
+      class="upcoming-calendar-btn"
+      type="button"
+      onclick="addTravauxToCalendar()"
+      aria-label="Ajouter au calendrier"
+      title="Ajouter au calendrier"
+    ><span aria-hidden="true">📅</span></button>
   </section>
 
   <main class="card main-card">
@@ -2242,7 +2242,7 @@ function addTravauxToCalendar(){
     endDate:endD,
     allDay:true,
     title:'Période de travaux',
-    detail:`Merci de prévoir vos congés en dehors de cette période (${formatDateWithYear(startD)} – ${formatDateWithYear(endD)})`
+    detail:`Pas de congés sur cette période, merci 😊 (${formatDateWithYear(startD)} – ${formatDateWithYear(endD)})`
   };
 
   const button=$('travauxCalendarBtn');
@@ -2479,7 +2479,7 @@ function renderTravauxSection(){
   const startD=parseISODateOnly(t.start);
   const endD=parseISODateOnly(t.end);
   titleEl.textContent=`Travaux du ${formatDateWithYear(startD)} au ${formatDateWithYear(endD)}`;
-  noteEl.textContent='Merci de prévoir vos congés en dehors de cette période 😊';
+  noteEl.textContent='Pas de congés sur cette période, merci 😊';
   el.classList.remove('hidden');
 }
 
@@ -2704,14 +2704,13 @@ function codeHTML(code,dateISO,currentId){
     : `<div class="shift-team compact-team no-mates"><span class="shift-team-inline placeholder">&nbsp;</span></div>`;
 
   return `<div class="week-shift ${classFor(c)}">
+    ${schoolName?`<div class="week-shift-school-badge" title="${escapeHTML(schoolName)}">${escapeHTML(schoolName)}</div>`:''}
     <div class="shift-mainline"><b>${escapeHTML(c||'—')}</b>${displayLabel?`<span>${escapeHTML(displayLabel)}</span>`:''}</div>
     <div class="shift-time ${feComment?'fe-comment':''}">${escapeHTML(secondary)}</div>
     ${teamHTML}
     ${holidayName
       ? `<div class="week-shift-holiday">${escapeHTML(holidayName)}</div>`
-      : (schoolName
-        ? `<div class="week-shift-schoolholiday">${escapeHTML(schoolName)}</div>`
-        : (inTravaux?`<div class="week-shift-travaux">🚧 Travaux</div>`:''))}
+      : (inTravaux?`<div class="week-shift-travaux">🚧 Travaux</div>`:'')}
   </div>`;
 }
 
@@ -2858,11 +2857,12 @@ function renderWeek(e){
     const dISO=isoDate(d);
     const isHoliday=!!swissHolidayName(dISO);
     const inTravaux=isInTravaux(dISO);
-    const schoolName=schoolHolidayName(dISO);
+    // Les vacances scolaires sont maintenant affichées directement sur la
+    // case du jour (badge en haut à droite, voir codeHTML) -- plus besoin
+    // du petit point ici, pour éviter un indicateur en double.
     const dots=
       (isHoliday?'<span class="week-holiday-dot" aria-hidden="true"></span>':'')+
-      (inTravaux?'<span class="week-travaux-dot" aria-hidden="true"></span>':'')+
-      (schoolName?`<span class="week-school-dot" aria-hidden="true" title="${escapeHTML(schoolName)}"></span>`:'');
+      (inTravaux?'<span class="week-travaux-dot" aria-hidden="true"></span>':'');
     h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${dots}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
   }
   h+='</div>';
