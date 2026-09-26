@@ -193,12 +193,13 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .employee-results-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:11px}
 
 /* ==========================================================
-   Section travaux — carte à part entière, sous "Prochains événements"
+   Ligne travaux — intégrée dans la carte "Prochains événements",
+   sous le libellé et au-dessus de "30 prochains jours"
    (réutilise exactement la structure/l'alignement de .upcoming-item
    pour que le bouton calendrier tombe au même endroit que les autres)
    ========================================================== */
 .travaux-section{display:none}
-.travaux-section:not(.hidden){display:block}
+.travaux-section:not(.hidden){display:block;margin-top:8px;margin-bottom:10px}
 .travaux-section .upcoming-item{border-color:var(--signal-tint);background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%)}
 .travaux-section .upcoming-copy strong{color:var(--signal-ink)}
 .travaux-section .upcoming-copy small{color:var(--signal-ink);opacity:.85}
@@ -227,7 +228,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
    ========================================================== */
 .upcoming-card{margin-bottom:12px;padding:12px 13px}
 .upcoming-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
-.upcoming-kicker{display:block;color:var(--accent);font:800 9px/1 var(--font-body);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.upcoming-kicker{display:block;color:var(--accent);font:800 9px/1 var(--font-body);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
 .upcoming-head strong{font:700 13px/1 var(--font-body)}
 .upcoming-count{flex:0 0 auto;min-width:25px;height:25px;padding:0 7px;border-radius:999px;background:var(--accent-tint);color:var(--accent-ink);display:grid;place-items:center;font:800 10px/1 var(--font-body)}
 .upcoming-list{display:grid;gap:7px}
@@ -590,32 +591,31 @@ body.view-year .stats-grid{display:grid}
 
 
   <section id="upcomingEventsCard" class="card upcoming-card hidden">
-    <div class="upcoming-head">
-      <div>
-        <span class="upcoming-kicker">Prochains événements</span>
-        <strong id="upcomingTitle">30 prochains jours</strong>
+    <span class="upcoming-kicker">Prochains événements</span>
+
+    <div id="travauxSection" class="travaux-section hidden">
+      <div class="upcoming-item upcoming-travaux">
+        <div class="upcoming-icon" aria-hidden="true">🚧</div>
+        <div class="upcoming-copy">
+          <strong id="travauxSectionTitle"></strong>
+          <small id="travauxSectionNote"></small>
+        </div>
+        <button
+          id="travauxCalendarBtn"
+          class="upcoming-calendar-btn"
+          type="button"
+          onclick="addTravauxToCalendar()"
+          aria-label="Ajouter au calendrier"
+          title="Ajouter au calendrier"
+        ><span aria-hidden="true">📅</span></button>
       </div>
+    </div>
+
+    <div class="upcoming-head">
+      <strong id="upcomingTitle">30 prochains jours</strong>
       <span id="upcomingCount" class="upcoming-count"></span>
     </div>
     <div id="upcomingEvents" class="upcoming-list"></div>
-  </section>
-
-  <section id="travauxSection" class="card upcoming-card travaux-section hidden">
-    <div class="upcoming-item upcoming-travaux">
-      <div class="upcoming-icon" aria-hidden="true">🚧</div>
-      <div class="upcoming-copy">
-        <strong id="travauxSectionTitle"></strong>
-        <small id="travauxSectionNote"></small>
-      </div>
-      <button
-        id="travauxCalendarBtn"
-        class="upcoming-calendar-btn"
-        type="button"
-        onclick="addTravauxToCalendar()"
-        aria-label="Ajouter au calendrier"
-        title="Ajouter au calendrier"
-      ><span aria-hidden="true">📅</span></button>
-    </div>
   </section>
 
   <main class="card main-card">
@@ -1645,10 +1645,14 @@ function enrichEventForCalendar(ev){
 
   // Si l'événement n'a pas déjà une heure explicite mais que le texte en contient une,
   // on transforme automatiquement l'événement "journée entière" en rendez-vous horaire.
+  // Un événement explicitement marqué allDay:true (ex. la période de travaux, dont le
+  // texte contient des dates au format "23.05.2027" qu'une regex d'heure pourrait
+  // confondre avec "23h05") ne doit JAMAIS être réinterprété comme un rendez-vous horaire.
   const alreadyTimed=
     start.getHours()!==0 ||
     start.getMinutes()!==0 ||
-    allDay===false;
+    allDay===false ||
+    allDay===true;
 
   if(!alreadyTimed && times){
     start=new Date(ev.date);
