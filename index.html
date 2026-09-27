@@ -123,7 +123,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
    ========================================================== */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card)}
 .controls{padding:12px;margin-bottom:12px}
-.controls-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:end}
+.controls-grid{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:end}
 .field label{display:block;font:800 10px/1 var(--font-body);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 7px}
 
 .today-btn{
@@ -193,18 +193,32 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .employee-results-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:11px}
 
 /* ==========================================================
-   Ligne travaux — intégrée dans la carte "Prochains événements",
-   sous le libellé et au-dessus de "30 prochains jours"
-   (réutilise exactement la structure/l'alignement de .upcoming-item
-   pour que le bouton calendrier tombe au même endroit que les autres)
+   Badge travaux — discret, dans l'en-tête à côté d'"Aujourd'hui".
+   N'occupe de la place que si on clique dessus (info consultée de
+   temps en temps, pas besoin d'être visible en permanence).
    ========================================================== */
-.travaux-section{display:none}
-.travaux-section:not(.hidden){display:block;margin-top:8px;margin-bottom:10px}
-.travaux-section .upcoming-item{border-color:var(--signal-tint);background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%)}
-.travaux-section .upcoming-copy strong{color:var(--signal-ink)}
+.travaux-badge{position:relative}
+.travaux-badge.hidden{display:none}
+.travaux-badge-btn{
+  height:48px;width:48px;flex:0 0 auto;display:grid;place-items:center;
+  border:1px solid var(--signal-tint);background:var(--signal-tint);color:var(--signal-ink);
+  border-radius:var(--radius-sm);font-size:18px;line-height:1;
+  transition:background-color .15s var(--ease),border-color .15s var(--ease),transform .1s var(--ease);
+}
+.travaux-badge-btn:hover{background:var(--surface);border-color:var(--signal)}
+.travaux-badge-btn:active{transform:scale(.95)}
+.travaux-badge.open .travaux-badge-btn{background:var(--surface);border-color:var(--signal)}
+.travaux-badge-panel{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:20;
+  width:min(300px,80vw);padding:6px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);
+  box-shadow:var(--shadow-card);
+}
+.travaux-badge.open .travaux-badge-panel{display:block}
+.travaux-badge-panel .upcoming-item{border-color:var(--signal-tint);background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%)}
+.travaux-badge-panel .upcoming-copy strong{color:var(--signal-ink)}
 .travaux-copy-centered{display:flex;align-items:center;min-height:32px}
 .travaux-copy-centered strong{margin:0}
-.travaux-section .upcoming-copy small{color:var(--signal-ink);opacity:.85}
 
 /* ==========================================================
    Rotation en cours / suivante — bande compacte
@@ -315,7 +329,7 @@ body.view-year .stats-grid{display:grid}
 .week-shift-badge-stack{position:absolute;top:5px;right:5px;max-width:64%;display:flex;flex-direction:column;align-items:flex-end;gap:2px;pointer-events:none}
 .week-shift-holiday-badge{padding:1px 4px;border-radius:4px;background:var(--danger-bg);color:var(--danger);font:700 7px/1.35 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .week-shift-school-badge{padding:1px 4px;border-radius:4px;background:var(--school-tint);color:var(--school-dot);font:700 7px/1.35 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.week-shift-travaux{margin-top:auto;padding-top:5px;color:var(--signal-ink);font:700 9px/1.25 var(--font-body)}
+.week-shift-travaux-badge{padding:1px 4px;border-radius:4px;background:var(--signal-tint);color:var(--signal-ink);font:700 7px/1.35 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .week-day.today{background:var(--accent-tint);color:var(--accent-ink)}
 .week-day.today span{color:var(--accent-ink);font-weight:800}
 .week-shift:not([class*="code-"]){background:var(--paper);color:var(--ink-soft)}
@@ -424,6 +438,7 @@ body.view-year .stats-grid{display:grid}
 .journal-details{margin-top:6px;padding:7px 9px;border-radius:8px;background:var(--surface);font:600 10.5px/1.5 var(--font-body);color:var(--ink-soft);white-space:pre-wrap}
 .day-detail-holiday{margin-bottom:10px;padding:8px 11px;border-radius:9px;background:var(--danger-bg);color:var(--danger);font:700 11px/1.4 var(--font-body)}
 .day-detail-schoolholiday{margin-bottom:10px;padding:8px 11px;border-radius:9px;background:var(--school-tint);color:var(--school-dot);font:700 11px/1.4 var(--font-body)}
+.day-detail-travaux{margin-bottom:10px;padding:8px 11px;border-radius:9px;background:var(--signal-tint);color:var(--signal-ink);font:700 11px/1.4 var(--font-body)}
 .day-detail-service{border-radius:var(--radius-md);padding:14px}
 .day-detail-top{display:flex;align-items:center;gap:11px}
 .day-detail-code{min-width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font:800 15px/1 var(--font-display);background:var(--tint-overlay)}
@@ -528,6 +543,8 @@ body.view-year .stats-grid{display:grid}
 @media(max-width:390px){
   .controls-grid{grid-template-columns:1fr}
   .today-btn{width:100%}
+  .travaux-badge{width:100%}
+  .travaux-badge-btn{width:100%}
   .hero p{display:none}
   .update-chip{max-width:128px}
   .week-row{grid-template-columns:60px 1fr}
@@ -587,6 +604,33 @@ body.view-year .stats-grid{display:grid}
           </div>
         </div>
       </div>
+      <div id="travauxBadge" class="travaux-badge hidden">
+        <button
+          id="travauxBadgeBtn"
+          class="travaux-badge-btn"
+          type="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-label="Informations période de travaux"
+          title="Période de travaux"
+        >⚒️</button>
+        <div id="travauxBadgePanel" class="travaux-badge-panel">
+          <div class="upcoming-item upcoming-travaux">
+            <div class="upcoming-icon" aria-hidden="true">⚒️</div>
+            <div class="upcoming-copy travaux-copy-centered">
+              <strong id="travauxSectionTitle"></strong>
+            </div>
+            <button
+              id="travauxCalendarBtn"
+              class="upcoming-calendar-btn"
+              type="button"
+              onclick="addTravauxToCalendar()"
+              aria-label="Ajouter au calendrier"
+              title="Ajouter au calendrier"
+            ><span aria-hidden="true">📅</span></button>
+          </div>
+        </div>
+      </div>
       <button id="todayBtn" class="today-btn" type="button">Aujourd’hui</button>
     </div>
   </section>
@@ -594,23 +638,6 @@ body.view-year .stats-grid{display:grid}
 
   <section id="upcomingEventsCard" class="card upcoming-card hidden">
     <span class="upcoming-kicker">Prochains événements</span>
-
-    <div id="travauxSection" class="travaux-section hidden">
-      <div class="upcoming-item upcoming-travaux">
-        <div class="upcoming-icon" aria-hidden="true">🚧</div>
-        <div class="upcoming-copy travaux-copy-centered">
-          <strong id="travauxSectionTitle"></strong>
-        </div>
-        <button
-          id="travauxCalendarBtn"
-          class="upcoming-calendar-btn"
-          type="button"
-          onclick="addTravauxToCalendar()"
-          aria-label="Ajouter au calendrier"
-          title="Ajouter au calendrier"
-        ><span aria-hidden="true">📅</span></button>
-      </div>
-    </div>
 
     <div class="upcoming-head">
       <strong id="upcomingTitle">30 prochains jours</strong>
@@ -1729,10 +1756,9 @@ function buildUpcomingEvents(employee){
     events.push(event);
   };
 
-  // La période de travaux a sa propre section, en dehors de la fenêtre
-  // "30 prochains jours" (voir renderTravauxSection / addTravauxToCalendar) --
-  // elle n'apparaît volontairement pas dans la liste ci-dessous, aussi
-  // lointaine soit-elle.
+  // La période de travaux a son propre badge discret dans l'en-tête
+  // (voir renderTravauxBadge / addTravauxToCalendar) -- elle n'apparaît
+  // volontairement pas dans la liste ci-dessous, aussi lointaine soit-elle.
 
   const isVacationCode=code=>code==='VA' || code==='VJ';
 
@@ -2261,7 +2287,7 @@ function renderUpcomingEvents(employee){
     return;
   }
 
-  const iconFor=type=>type==='vacation'?'🏖️':type==='piquet'?'📞':type==='training'?'🎓':type==='medical'?'🩺':type==='travaux'?'🚧':type==='comment'?'📝':'•';
+  const iconFor=type=>type==='vacation'?'🏖️':type==='piquet'?'📞':type==='training'?'🎓':type==='medical'?'🩺':type==='travaux'?'⚒️':type==='comment'?'📝':'•';
 
   list.innerHTML=events.map((ev,index)=>`
     <div class="upcoming-item upcoming-${ev.type}">
@@ -2339,6 +2365,7 @@ function openDayModal(dateObj,employee=selectedEmployee()){
   const mates=ROTATION_CODES.includes(code)?colleaguesFor(dISO,code,employee.id):[];
   const holidayName=swissHolidayName(dISO);
   const schoolName=schoolHolidayName(dISO);
+  const dayInTravaux=isInTravaux(dISO);
 
   $('dayModalTitle').textContent=cleanEmployeeName(employee.name);
   $('dayModalDate').textContent=d.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
@@ -2360,7 +2387,11 @@ function openDayModal(dateObj,employee=selectedEmployee()){
     ? `<div class="day-detail-schoolholiday">Vacances scolaires VD — ${escapeHTML(schoolName)}</div>`
     : '';
 
-  $('dayModalBody').innerHTML=`${holidayHTML}${schoolHTML}<div class="day-detail-service ${classFor(code)}">
+  const travauxHTML=dayInTravaux
+    ? `<div class="day-detail-travaux">⚒️ Période de travaux</div>`
+    : '';
+
+  $('dayModalBody').innerHTML=`${holidayHTML}${schoolHTML}${travauxHTML}<div class="day-detail-service ${classFor(code)}">
     <div class="day-detail-top">
       <div class="day-detail-code">${escapeHTML(code||'—')}</div>
       <div class="day-detail-info"><strong>${escapeHTML(info[0])}</strong><small>${escapeHTML(detailText)}</small></div>
@@ -2442,23 +2473,38 @@ function attachDayClickHandlers(){
   });
 }
 
-function renderTravauxSection(){
-  const el=$('travauxSection');
+function renderTravauxBadge(){
+  const badge=$('travauxBadge');
   const titleEl=$('travauxSectionTitle');
-  if(!el || !titleEl)return;
+  if(!badge || !titleEl)return;
 
   const t=travauxPeriod();
-  // La section ne reste affichée que tant que la période n'est pas terminée --
-  // volontairement indépendante de la fenêtre "30 prochains jours".
+  // Le badge ne reste affiché que tant que la période n'est pas terminée.
+  // Discret par défaut : il ne prend de la place que si on clique dessus.
   if(!t || t.end<todayISO()){
-    el.classList.add('hidden');
+    badge.classList.add('hidden');
+    closeTravauxBadge();
     return;
   }
 
   const startD=parseISODateOnly(t.start);
   const endD=parseISODateOnly(t.end);
   titleEl.textContent=`Travaux du ${formatDateWithYear(startD)} au ${formatDateWithYear(endD)}`;
-  el.classList.remove('hidden');
+  badge.classList.remove('hidden');
+}
+
+function openTravauxBadge(){
+  const badge=$('travauxBadge');
+  if(!badge)return;
+  badge.classList.add('open');
+  $('travauxBadgeBtn')?.setAttribute('aria-expanded','true');
+}
+
+function closeTravauxBadge(){
+  const badge=$('travauxBadge');
+  if(!badge)return;
+  badge.classList.remove('open');
+  $('travauxBadgeBtn')?.setAttribute('aria-expanded','false');
 }
 
 function render(){
@@ -2469,7 +2515,7 @@ function render(){
     b=>b.classList.toggle('active',b.dataset.view===state.view)
   );
 
-  renderTravauxSection();
+  renderTravauxBadge();
 
   const e=selectedEmployee();
 
@@ -2681,10 +2727,11 @@ function codeHTML(code,dateISO,currentId){
        </div>`
     : `<div class="shift-team compact-team no-mates"><span class="shift-team-inline placeholder">&nbsp;</span></div>`;
 
-  const badgeStackHTML=(holidayName||schoolName)
+  const badgeStackHTML=(holidayName||schoolName||inTravaux)
     ? `<div class="week-shift-badge-stack">
         ${holidayName?`<div class="week-shift-holiday-badge" title="${escapeHTML(holidayName)}">${escapeHTML(holidayName)}</div>`:''}
         ${schoolName?`<div class="week-shift-school-badge" title="${escapeHTML(schoolName)}">${escapeHTML(schoolName)}</div>`:''}
+        ${inTravaux?`<div class="week-shift-travaux-badge" title="Période de travaux">⚒️ Travaux</div>`:''}
       </div>`
     : '';
 
@@ -2693,7 +2740,6 @@ function codeHTML(code,dateISO,currentId){
     <div class="shift-mainline"><b>${escapeHTML(c||'—')}</b>${displayLabel?`<span>${escapeHTML(displayLabel)}</span>`:''}</div>
     <div class="shift-time ${feComment?'fe-comment':''}">${escapeHTML(secondary)}</div>
     ${teamHTML}
-    ${!holidayName && inTravaux?`<div class="week-shift-travaux">🚧 Travaux</div>`:''}
   </div>`;
 }
 
@@ -3060,12 +3106,21 @@ $('employeeSearch').addEventListener('input',event=>{
   }
 });
 
+if($('travauxBadgeBtn'))$('travauxBadgeBtn').addEventListener('click',()=>{
+  if($('travauxBadge').classList.contains('open'))closeTravauxBadge();
+  else openTravauxBadge();
+});
+
 document.addEventListener('click',event=>{
   if(!$('employeePicker').contains(event.target))closeEmployeePicker();
+  if($('travauxBadge') && !$('travauxBadge').contains(event.target))closeTravauxBadge();
 });
 
 document.addEventListener('keydown',event=>{
-  if(event.key==='Escape')closeEmployeePicker();
+  if(event.key==='Escape'){
+    closeEmployeePicker();
+    closeTravauxBadge();
+  }
 
   if(event.key==='ArrowLeft' || event.key==='ArrowRight'){
     const tag=(document.activeElement && document.activeElement.tagName) || '';
