@@ -123,7 +123,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
    ========================================================== */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-card)}
 .controls{padding:12px;margin-bottom:12px}
-.controls-grid{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:9px;align-items:end}
+.controls-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:end}
 .field label{display:block;font:800 10px/1 var(--font-body);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 7px}
 
 .today-btn{
@@ -193,30 +193,16 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .employee-results-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:11px}
 
 /* ==========================================================
-   Badge travaux — discret, dans l'en-tête à côté d'"Aujourd'hui".
-   N'occupe de la place que si on clique dessus (info consultée de
-   temps en temps, pas besoin d'être visible en permanence).
+   Ligne travaux — intégrée dans la carte "Prochains événements",
+   sous le libellé et au-dessus de "30 prochains jours". Reste dans
+   sa propre carte (ne touche jamais à l'encadré employé) et réutilise
+   exactement la structure/l'alignement de .upcoming-item pour que le
+   bouton calendrier tombe au même endroit que les autres.
    ========================================================== */
-.travaux-badge{position:relative}
-.travaux-badge.hidden{display:none}
-.travaux-badge-btn{
-  height:48px;width:48px;flex:0 0 auto;display:grid;place-items:center;
-  border:1px solid var(--signal-tint);background:var(--signal-tint);color:var(--signal-ink);
-  border-radius:var(--radius-sm);font-size:18px;line-height:1;
-  transition:background-color .15s var(--ease),border-color .15s var(--ease),transform .1s var(--ease);
-}
-.travaux-badge-btn:hover{background:var(--surface);border-color:var(--signal)}
-.travaux-badge-btn:active{transform:scale(.95)}
-.travaux-badge.open .travaux-badge-btn{background:var(--surface);border-color:var(--signal)}
-.travaux-badge-panel{
-  display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:20;
-  width:min(300px,80vw);padding:6px;
-  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);
-  box-shadow:var(--shadow-card);
-}
-.travaux-badge.open .travaux-badge-panel{display:block}
-.travaux-badge-panel .upcoming-item{border-color:var(--signal-tint);background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%)}
-.travaux-badge-panel .upcoming-copy strong{color:var(--signal-ink)}
+.travaux-section{display:none}
+.travaux-section:not(.hidden){display:block;margin-top:8px;margin-bottom:10px}
+.travaux-section .upcoming-item{border-color:var(--signal-tint);background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%)}
+.travaux-section .upcoming-copy strong{color:var(--signal-ink)}
 .travaux-copy-centered{display:flex;align-items:center;min-height:32px}
 .travaux-copy-centered strong{margin:0}
 
@@ -543,8 +529,6 @@ body.view-year .stats-grid{display:grid}
 @media(max-width:390px){
   .controls-grid{grid-template-columns:1fr}
   .today-btn{width:100%}
-  .travaux-badge{width:100%}
-  .travaux-badge-btn{width:100%}
   .hero p{display:none}
   .update-chip{max-width:128px}
   .week-row{grid-template-columns:60px 1fr}
@@ -604,33 +588,6 @@ body.view-year .stats-grid{display:grid}
           </div>
         </div>
       </div>
-      <div id="travauxBadge" class="travaux-badge hidden">
-        <button
-          id="travauxBadgeBtn"
-          class="travaux-badge-btn"
-          type="button"
-          aria-haspopup="true"
-          aria-expanded="false"
-          aria-label="Informations période de travaux"
-          title="Période de travaux"
-        >⚒️</button>
-        <div id="travauxBadgePanel" class="travaux-badge-panel">
-          <div class="upcoming-item upcoming-travaux">
-            <div class="upcoming-icon" aria-hidden="true">⚒️</div>
-            <div class="upcoming-copy travaux-copy-centered">
-              <strong id="travauxSectionTitle"></strong>
-            </div>
-            <button
-              id="travauxCalendarBtn"
-              class="upcoming-calendar-btn"
-              type="button"
-              onclick="addTravauxToCalendar()"
-              aria-label="Ajouter au calendrier"
-              title="Ajouter au calendrier"
-            ><span aria-hidden="true">📅</span></button>
-          </div>
-        </div>
-      </div>
       <button id="todayBtn" class="today-btn" type="button">Aujourd’hui</button>
     </div>
   </section>
@@ -638,6 +595,23 @@ body.view-year .stats-grid{display:grid}
 
   <section id="upcomingEventsCard" class="card upcoming-card hidden">
     <span class="upcoming-kicker">Prochains événements</span>
+
+    <div id="travauxSection" class="travaux-section hidden">
+      <div class="upcoming-item upcoming-travaux">
+        <div class="upcoming-icon" aria-hidden="true">⚒️</div>
+        <div class="upcoming-copy travaux-copy-centered">
+          <strong id="travauxSectionTitle"></strong>
+        </div>
+        <button
+          id="travauxCalendarBtn"
+          class="upcoming-calendar-btn"
+          type="button"
+          onclick="addTravauxToCalendar()"
+          aria-label="Ajouter au calendrier"
+          title="Ajouter au calendrier"
+        ><span aria-hidden="true">📅</span></button>
+      </div>
+    </div>
 
     <div class="upcoming-head">
       <strong id="upcomingTitle">30 prochains jours</strong>
@@ -1756,9 +1730,10 @@ function buildUpcomingEvents(employee){
     events.push(event);
   };
 
-  // La période de travaux a son propre badge discret dans l'en-tête
-  // (voir renderTravauxBadge / addTravauxToCalendar) -- elle n'apparaît
-  // volontairement pas dans la liste ci-dessous, aussi lointaine soit-elle.
+  // La période de travaux a sa propre ligne dans la carte "Prochains
+  // événements" (voir renderTravauxSection / addTravauxToCalendar) --
+  // elle n'apparaît volontairement pas dans la liste ci-dessous, aussi
+  // lointaine soit-elle.
 
   const isVacationCode=code=>code==='VA' || code==='VJ';
 
@@ -2473,38 +2448,23 @@ function attachDayClickHandlers(){
   });
 }
 
-function renderTravauxBadge(){
-  const badge=$('travauxBadge');
+function renderTravauxSection(){
+  const el=$('travauxSection');
   const titleEl=$('travauxSectionTitle');
-  if(!badge || !titleEl)return;
+  if(!el || !titleEl)return;
 
   const t=travauxPeriod();
-  // Le badge ne reste affiché que tant que la période n'est pas terminée.
-  // Discret par défaut : il ne prend de la place que si on clique dessus.
+  // La section ne reste affichée que tant que la période n'est pas terminée --
+  // volontairement indépendante de la fenêtre "30 prochains jours".
   if(!t || t.end<todayISO()){
-    badge.classList.add('hidden');
-    closeTravauxBadge();
+    el.classList.add('hidden');
     return;
   }
 
   const startD=parseISODateOnly(t.start);
   const endD=parseISODateOnly(t.end);
   titleEl.textContent=`Travaux du ${formatDateWithYear(startD)} au ${formatDateWithYear(endD)}`;
-  badge.classList.remove('hidden');
-}
-
-function openTravauxBadge(){
-  const badge=$('travauxBadge');
-  if(!badge)return;
-  badge.classList.add('open');
-  $('travauxBadgeBtn')?.setAttribute('aria-expanded','true');
-}
-
-function closeTravauxBadge(){
-  const badge=$('travauxBadge');
-  if(!badge)return;
-  badge.classList.remove('open');
-  $('travauxBadgeBtn')?.setAttribute('aria-expanded','false');
+  el.classList.remove('hidden');
 }
 
 function render(){
@@ -2515,7 +2475,7 @@ function render(){
     b=>b.classList.toggle('active',b.dataset.view===state.view)
   );
 
-  renderTravauxBadge();
+  renderTravauxSection();
 
   const e=selectedEmployee();
 
@@ -3106,21 +3066,12 @@ $('employeeSearch').addEventListener('input',event=>{
   }
 });
 
-if($('travauxBadgeBtn'))$('travauxBadgeBtn').addEventListener('click',()=>{
-  if($('travauxBadge').classList.contains('open'))closeTravauxBadge();
-  else openTravauxBadge();
-});
-
 document.addEventListener('click',event=>{
   if(!$('employeePicker').contains(event.target))closeEmployeePicker();
-  if($('travauxBadge') && !$('travauxBadge').contains(event.target))closeTravauxBadge();
 });
 
 document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'){
-    closeEmployeePicker();
-    closeTravauxBadge();
-  }
+  if(event.key==='Escape')closeEmployeePicker();
 
   if(event.key==='ArrowLeft' || event.key==='ArrowRight'){
     const tag=(document.activeElement && document.activeElement.tagName) || '';
