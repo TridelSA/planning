@@ -344,6 +344,9 @@ body.view-year .stats-grid{display:grid}
 .day-num{font:600 10px/1 var(--font-body)}
 .month-code-label{align-self:flex-start;font:800 10px/1 var(--font-body)}
 .month-cell.outside .day-num{color:var(--muted)}
+.month-cell.outside-month{opacity:.55}
+.month-cell.outside-month .day-num{color:var(--muted)}
+.month-cell.outside-month.today{opacity:1}
 .month-cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
 .month-cell.today .day-num{color:var(--accent-ink);font-weight:800}
 .month-cell.is-holiday::before{content:'';position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--danger)}
@@ -354,12 +357,16 @@ body.view-year .stats-grid{display:grid}
 /* ==========================================================
    Vue Année
    ========================================================== */
-.year-calendar{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.mini-month{border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface)}
+/* min-width:0 à chaque niveau de grille imbriquée : par défaut un item de
+   grille refuse de rétrécir sous la taille de son contenu ("min-width:auto"),
+   ce qui peut faire déborder les grilles imbriquées (surtout sur Safari/iOS)
+   même quand ça ne se reproduit pas ailleurs -- on neutralise ça partout. */
+.year-calendar{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;min-width:0}
+.mini-month{min-width:0;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface)}
 .mini-month h3{margin:0;padding:7px;text-align:center;background:var(--paper);font:700 12px/1 var(--font-body);color:var(--ink)}
-.mini-head,.mini-grid{display:grid;grid-template-columns:repeat(7,1fr)}
-.mini-head span{text-align:center;padding:3px 0;color:var(--muted);font:700 7.5px/1 var(--font-body)}
-.mini-cell{position:relative;aspect-ratio:1/1;display:grid;place-items:center;font:600 8.5px/1 var(--font-body);border-radius:4px;margin:1px;cursor:pointer}
+.mini-head,.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);min-width:0;gap:2px}
+.mini-head span{min-width:0;text-align:center;padding:3px 0;color:var(--muted);font:700 7.5px/1 var(--font-body)}
+.mini-cell{position:relative;min-width:0;aspect-ratio:1/1;display:grid;place-items:center;font:600 8.5px/1 var(--font-body);border-radius:4px;cursor:pointer}
 .mini-cell.today{outline:2px solid var(--accent);outline-offset:-1px;font-weight:800}
 .mini-empty{background:var(--paper);color:var(--empty-ink);cursor:default}
 .mini-cell.has-comment::after{content:'';position:absolute;right:4px;bottom:4px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.7}
@@ -2874,10 +2881,14 @@ function renderMonth(e){
     const schoolName=schoolHolidayName(dISO);
     const inMonth=d.getMonth()===m;
     const visible=codeMatchesFilter(c);
-    const colorClass=(inMonth&&visible)?classFor(c):'outside';
-    const showLabel=inMonth&&visible&&c;
+    // On affiche désormais le code même pour les jours du mois précédent/suivant
+    // qui débordent dans la grille (ligne "outside-month" un peu atténuée) --
+    // plus besoin de changer de mois pour voir ce qu'il y a juste après/avant.
+    const colorClass=visible?classFor(c):'outside';
+    const showLabel=visible&&c;
+    const outsideClass=inMonth?'':'outside-month';
     const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
-    h+=`<div class="month-cell ${colorClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num">${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
+    h+=`<div class="month-cell ${colorClass} ${outsideClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num">${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
   }
   h+='</div></div>';$('viewContainer').innerHTML=h;
 }
