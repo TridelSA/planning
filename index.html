@@ -201,8 +201,19 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
    ========================================================== */
 .travaux-section{display:none}
 .travaux-section:not(.hidden){display:block;margin-top:8px;margin-bottom:10px}
-.travaux-section .upcoming-item{border-color:var(--signal-tint);background:linear-gradient(155deg,var(--signal-tint),var(--surface) 85%)}
-.travaux-section .upcoming-copy strong{color:var(--signal-ink)}
+/* Volontairement discrète : ce n'est pas une info qu'on a besoin de voir
+   ressortir à chaque coup d'œil, donc case plus petite et plus transparente
+   que les autres lignes d'événements. */
+.travaux-section .upcoming-item{
+  padding:6px 9px;opacity:.72;
+  border-color:var(--line);
+  background:linear-gradient(155deg,var(--signal-tint),var(--surface) 94%);
+  transition:opacity .15s var(--ease);
+}
+.travaux-section .upcoming-item:hover{opacity:1}
+.travaux-section .upcoming-icon{width:26px;height:26px;font-size:12px}
+.travaux-section .upcoming-copy strong{color:var(--ink-soft);font-size:11px}
+.travaux-section .upcoming-calendar-btn{width:28px;height:28px;flex-basis:28px;font-size:13px}
 .travaux-copy-centered{display:flex;align-items:center;min-height:32px}
 .travaux-copy-centered strong{margin:0}
 
@@ -1961,7 +1972,11 @@ function buildUpcomingEvents(employee){
 
     // Si la date est déjà codée FE, l'événement "Formation externe"
     // affiche déjà ce commentaire comme détail : aucun doublon.
-    if(safeCode(employee.schedule[dateISO])==='FE')return;
+    // Les jours HOR/HSR n'affichent jamais leur commentaire (ni ici, ni
+    // ailleurs dans l'appli) : ils n'apparaissent donc pas non plus dans
+    // les "30 prochains jours".
+    const dayCode=safeCode(employee.schedule[dateISO]);
+    if(dayCode==='FE' || dayCode==='HOR' || dayCode==='HSR')return;
 
     const eventDate=parseLocalISO(dateISO);
     eventDate.setHours(0,0,0,0);
@@ -2342,7 +2357,7 @@ function openDayModal(dateObj,employee=selectedEmployee()){
   const dISO=isoDate(d);
   const code=safeCode(employee.schedule[dISO]);
   const info=CODE_INFO[code]||[code||'Repos',code?'Code du planning':'Aucun service'];
-  const comment=commentFor(employee,dISO);
+  const comment=(code==='HOR'||code==='HSR')?'':commentFor(employee,dISO);
   const detailText=comment||info[1];
   const mates=ROTATION_CODES.includes(code)?colleaguesFor(dISO,code,employee.id):[];
   const holidayName=swissHolidayName(dISO);
@@ -2908,7 +2923,7 @@ function renderYear(e){
       const isToday=isoDate(d)===todayISO();
       const dISO=isoDate(d);
       const visible=codeMatchesFilter(c);
-      const hasComment=d.getMonth()===m && !!commentFor(e,dISO);
+      const hasComment=d.getMonth()===m && c!=='HOR' && c!=='HSR' && !!commentFor(e,dISO);
       const isHoliday=d.getMonth()===m && !!swissHolidayName(dISO);
       const inTravaux=d.getMonth()===m && isInTravaux(dISO);
       const schoolName=d.getMonth()===m ? schoolHolidayName(dISO) : null;
