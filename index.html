@@ -102,12 +102,19 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .hero-copy{min-width:0}
 .hero h1{margin:0;font:700 24px/1.15 var(--font-display);letter-spacing:-.01em}
 .hero p{margin:4px 0 0;color:#D3E8DB;font:500 12.5px/1.4 var(--font-body)}
+.update-wrap{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
 .update-chip{
-  position:relative;margin-left:auto;max-width:300px;padding:8px 11px;border-radius:11px;
+  position:relative;max-width:300px;padding:8px 11px;border-radius:11px;
   background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);
   text-align:right;font-size:10px;color:#D3E8DB
 }
 .update-chip strong{display:block;color:#fff;font-size:11.5px;font-weight:700;margin-bottom:2px}
+
+.team-toggle{
+  padding:3px 2px;border:0;background:transparent;
+  font-size:10px;color:#D3E8DB;text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(211,232,219,.5);
+}
+.team-toggle:hover,.team-toggle:focus-visible{color:#fff;text-decoration-color:#fff}
 
 .journal-access{
   position:absolute;left:2px;bottom:-6px;
@@ -117,16 +124,6 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 }
 .journal-access:hover,.journal-access:focus-visible{color:rgba(255,255,255,.5)}
 .journal-access:focus-visible{outline:1px solid rgba(255,255,255,.4);outline-offset:1px;border-radius:50%}
-
-.team-access{
-  position:absolute;right:2px;bottom:-6px;
-  display:flex;align-items:center;gap:5px;
-  padding:5px 10px 5px 8px;border:1px solid rgba(255,255,255,.24);border-radius:999px;
-  background:rgba(255,255,255,.10);color:rgba(255,255,255,.88);
-  font:700 10.5px/1 var(--font-body);letter-spacing:.01em;
-}
-.team-access:hover,.team-access:focus-visible{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.4)}
-.team-access svg{flex:0 0 auto}
 
 /* ==========================================================
    Cartes génériques + contrôles
@@ -402,13 +399,6 @@ body.view-year .stats-grid{display:grid}
 .team-cell{color:var(--ink);font-weight:700}
 .team-cell.is-reinforced::after{content:'';position:absolute;right:3px;top:3px;width:4px;height:4px;border-radius:50%;background:var(--signal)}
 .team-view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
-.team-back-btn{
-  display:flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid var(--line);
-  background:var(--surface);border-radius:var(--radius-sm);font:700 11px/1 var(--font-body);color:var(--ink-soft);
-  order:2;
-}
-.team-back-btn:hover{background:var(--paper)}
-.team-view-title{order:1}
 .team-view-title h2{margin:0;font:700 17px/1.25 var(--font-display);color:var(--ink)}
 .team-view-title p{margin:3px 0 0;color:var(--muted);font:500 11px/1.4 var(--font-body)}
 .team-legend{display:flex;flex-wrap:wrap;gap:14px;margin:2px 0 12px;font:600 10.5px/1 var(--font-body);color:var(--ink-soft)}
@@ -523,6 +513,7 @@ body.view-year .stats-grid{display:grid}
   .hero p{font-size:10.5px}
   .update-chip{padding:6px 8px;max-width:150px;font-size:8.5px;border-radius:9px}
   .update-chip strong{font-size:9.5px}
+  .team-toggle{font-size:8.5px}
 
   .controls{padding:9px;margin-bottom:9px}
   .today-btn{height:44px;padding:0 12px;font-size:11px}
@@ -572,8 +563,8 @@ body.view-year .stats-grid{display:grid}
   .legend-summary{padding:7px 9px;font-size:10px}
   .legend-item{padding:4px 7px;font-size:9.5px}
 
-  .day-modal-backdrop{align-items:flex-end;padding:8px}
-  .day-modal{width:100%;max-height:82vh;border-radius:18px 18px 12px 12px}
+  .day-modal-backdrop{align-items:flex-start;padding:8px}
+  .day-modal{width:100%;max-height:calc(100vh - 16px);border-radius:18px}
 }
 
 @media(max-width:390px){
@@ -602,16 +593,15 @@ body.view-year .stats-grid{display:grid}
         <h1>Planning Tridel</h1>
         <p>Planning individuel</p>
       </div>
-      <div class="update-chip">
-        <strong id="sourceStatus">Chargement…</strong>
-        <span id="updateStatus"></span>
+      <div class="update-wrap">
+        <div class="update-chip">
+          <strong id="sourceStatus">Chargement…</strong>
+          <span id="updateStatus"></span>
+        </div>
+        <button id="teamViewToggleBtn" class="team-toggle" type="button" aria-label="Planning d'équipe annuel">Équipe</button>
       </div>
       <button id="journalAccessBtn" class="journal-access" type="button" aria-label="Journal des publications">
         <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="12"/></svg>
-      </button>
-      <button id="teamViewAccessBtn" class="team-access" type="button" aria-label="Planning d'équipe annuel">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"></path><circle cx="9" cy="7" r="3.2"></circle><path d="M22.5 20v-1a3.6 3.6 0 0 0-2.6-3.46"></path><path d="M16 3.6a3.6 3.6 0 0 1 0 6.9"></path></svg>
-        <span>Équipe</span>
       </button>
     </div>
   </header>
@@ -727,10 +717,6 @@ body.view-year .stats-grid{display:grid}
         <h2>Planning d'équipe</h2>
         <p>Qui est en rotation, jour par jour, sur toute l'année</p>
       </div>
-      <button id="teamViewBack" class="team-back-btn" type="button" aria-label="Retour au planning individuel">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"></polyline></svg>
-        <span>Planning individuel</span>
-      </button>
     </div>
 
     <div class="period-nav">
@@ -2517,8 +2503,7 @@ $('journalAccessBtn').addEventListener('click',openJournalModal);
 $('journalModalClose').addEventListener('click',closeJournalModal);
 $('journalModalBackdrop').addEventListener('click',e=>{ if(e.target===$('journalModalBackdrop'))closeJournalModal(); });
 
-$('teamViewAccessBtn').addEventListener('click',openTeamView);
-$('teamViewBack').addEventListener('click',closeTeamView);
+$('teamViewToggleBtn').addEventListener('click',toggleTeamView);
 $('teamPrevBtn').addEventListener('click',()=>teamShiftYear(-1));
 $('teamNextBtn').addEventListener('click',()=>teamShiftYear(1));
 
@@ -2655,6 +2640,18 @@ function teamShiftYear(amount){
   renderTeamView();
 }
 
+function updateTeamToggleLabel(){
+  const btn=$('teamViewToggleBtn');
+  if(!btn)return;
+  btn.textContent=state.teamMode?'Individuel':'Équipe';
+  btn.setAttribute('aria-label',state.teamMode?'Retour au planning individuel':"Planning d'équipe annuel");
+}
+
+function toggleTeamView(){
+  if(state.teamMode)closeTeamView();
+  else openTeamView();
+}
+
 function openTeamView(){
   if(!planning.employees || !planning.employees.length)return;
   state.teamMode=true;
@@ -2667,6 +2664,7 @@ function openTeamView(){
   const mainCard=document.querySelector('main.main-card');
   if(mainCard)mainCard.classList.add('hidden');
   $('teamViewSection').classList.remove('hidden');
+  updateTeamToggleLabel();
   renderTeamView();
 }
 
@@ -2678,6 +2676,7 @@ function closeTeamView(){
   if(mainCard)mainCard.classList.remove('hidden');
   const controls=document.querySelector('.controls');
   if(controls)controls.classList.remove('hidden');
+  updateTeamToggleLabel();
   render();
 }
 
