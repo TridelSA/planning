@@ -407,7 +407,7 @@ body.view-year .stats-grid{display:grid}
    / nuit), fondues en dégradé entre elles, dans la palette des codes RM/RA/RN
    utilisée partout ailleurs dans l'appli. */
 .team-cell{color:var(--ink);font-weight:700}
-.team-cell.is-reinforced::after{content:'';position:absolute;right:3px;top:3px;width:4px;height:4px;border-radius:50%;background:var(--signal)}
+.team-cell.is-reinforced::after{content:'';position:absolute;right:3px;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--signal)}
 .team-view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
 .team-view-title h2{margin:0;font:700 17px/1.25 var(--font-display);color:var(--ink)}
 .team-view-title p{margin:3px 0 0;color:var(--muted);font:500 11px/1.4 var(--font-body)}
@@ -2577,7 +2577,11 @@ function renderTeamView(){
       const isToday=dISO===todayISO();
       const counts=teamCountsFor(dISO);
       const reinforced=counts.some(n=>n>3);
-      h+=`<span class="mini-cell team-cell ${isToday?'today':''} ${reinforced?'is-reinforced':''}" style="${teamCellStyle(counts)}" data-team-date="${dISO}" tabindex="0" role="button" aria-label="Équipe du ${escapeHTML(formatDateWithYear(d))}">${d.getDate()}</span>`;
+      const holidayName=swissHolidayName(dISO);
+      const inTravaux=isInTravaux(dISO);
+      const schoolName=schoolHolidayName(dISO);
+      const markClasses=[holidayName?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
+      h+=`<span class="mini-cell team-cell ${isToday?'today':''} ${reinforced?'is-reinforced':''} ${markClasses}" style="${teamCellStyle(counts)}" data-team-date="${dISO}" tabindex="0" role="button" ${holidayName?`title="${escapeHTML(holidayName)}"`:(schoolName?`title="${escapeHTML(schoolName)}"`:'')} aria-label="Équipe du ${escapeHTML(formatDateWithYear(d))}">${d.getDate()}</span>`;
     }
     h+='</div></div>';
   }
