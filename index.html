@@ -118,6 +118,16 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .journal-access:hover,.journal-access:focus-visible{color:rgba(255,255,255,.5)}
 .journal-access:focus-visible{outline:1px solid rgba(255,255,255,.4);outline-offset:1px;border-radius:50%}
 
+.team-access{
+  position:absolute;right:2px;bottom:-6px;
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px 5px 8px;border:1px solid rgba(255,255,255,.24);border-radius:999px;
+  background:rgba(255,255,255,.10);color:rgba(255,255,255,.88);
+  font:700 10.5px/1 var(--font-body);letter-spacing:.01em;
+}
+.team-access:hover,.team-access:focus-visible{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.4)}
+.team-access svg{flex:0 0 auto}
+
 /* ==========================================================
    Cartes génériques + contrôles
    ========================================================== */
@@ -386,6 +396,28 @@ body.view-year .stats-grid{display:grid}
 .mini-cell.is-schoolholiday{box-shadow:inset 2px 0 0 var(--school-dot)}
 .mini-cell.is-schoolholiday.today{outline:2px solid var(--accent);outline-offset:-1px;box-shadow:inset 2px 0 0 var(--school-dot)}
 
+/* Planning d'équipe annuel : chaque jour en trois bandes (matin / après-midi
+   / nuit), fondues en dégradé entre elles, dans la palette des codes RM/RA/RN
+   utilisée partout ailleurs dans l'appli. */
+.team-cell{color:var(--ink);font-weight:700}
+.team-cell.is-reinforced::after{content:'';position:absolute;right:3px;top:3px;width:4px;height:4px;border-radius:50%;background:var(--signal)}
+.team-view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.team-back-btn{
+  display:flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid var(--line);
+  background:var(--surface);border-radius:var(--radius-sm);font:700 11px/1 var(--font-body);color:var(--ink-soft);
+  order:2;
+}
+.team-back-btn:hover{background:var(--paper)}
+.team-view-title{order:1}
+.team-view-title h2{margin:0;font:700 17px/1.25 var(--font-display);color:var(--ink)}
+.team-view-title p{margin:3px 0 0;color:var(--muted);font:500 11px/1.4 var(--font-body)}
+.team-legend{display:flex;flex-wrap:wrap;gap:14px;margin:2px 0 12px;font:600 10.5px/1 var(--font-body);color:var(--ink-soft)}
+.team-legend-item{display:flex;align-items:center;gap:6px}
+.team-legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.team-legend-dot.dot-rm{background:var(--c-rm-bg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.team-legend-dot.dot-ra{background:var(--c-ra-bg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.team-legend-dot.dot-rn{background:var(--c-rn-bg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+
 /* ==========================================================
    Légende
    ========================================================== */
@@ -577,6 +609,10 @@ body.view-year .stats-grid{display:grid}
       <button id="journalAccessBtn" class="journal-access" type="button" aria-label="Journal des publications">
         <svg viewBox="0 0 24 24" width="8" height="8" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="12"/></svg>
       </button>
+      <button id="teamViewAccessBtn" class="team-access" type="button" aria-label="Planning d'équipe annuel">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"></path><circle cx="9" cy="7" r="3.2"></circle><path d="M22.5 20v-1a3.6 3.6 0 0 0-2.6-3.46"></path><path d="M16 3.6a3.6 3.6 0 0 1 0 6.9"></path></svg>
+        <span>Équipe</span>
+      </button>
     </div>
   </header>
 
@@ -684,6 +720,33 @@ body.view-year .stats-grid{display:grid}
       </div>
     </div>
   </main>
+
+  <section id="teamViewSection" class="card main-card hidden">
+    <div class="team-view-head">
+      <div class="team-view-title">
+        <h2>Planning d'équipe</h2>
+        <p>Qui est en rotation, jour par jour, sur toute l'année</p>
+      </div>
+      <button id="teamViewBack" class="team-back-btn" type="button" aria-label="Retour au planning individuel">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"></polyline></svg>
+        <span>Planning individuel</span>
+      </button>
+    </div>
+
+    <div class="period-nav">
+      <button id="teamPrevBtn" class="nav-btn" type="button" aria-label="Année précédente"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"></polyline></svg></button>
+      <div class="period-center"><strong id="teamYearTitle"></strong></div>
+      <button id="teamNextBtn" class="nav-btn" type="button" aria-label="Année suivante"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg></button>
+    </div>
+
+    <div class="team-legend">
+      <span class="team-legend-item"><i class="team-legend-dot dot-rm"></i>Matin</span>
+      <span class="team-legend-item"><i class="team-legend-dot dot-ra"></i>Après-midi</span>
+      <span class="team-legend-item"><i class="team-legend-dot dot-rn"></i>Nuit</span>
+    </div>
+
+    <div id="teamViewContainer"></div>
+  </section>
 </div>
 
 
@@ -736,7 +799,7 @@ const CODE_INFO={
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
-let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date()};
+let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear()};
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -745,6 +808,8 @@ const safeCode=v=>v==null?'':String(v).trim().toUpperCase();
 const classFor=code=>code?`code-${code.replace(/[^A-Z0-9_-]/g,'')}`:'code-off';
 
 const ROTATION_CODES=['RM','RA','RN'];
+const TEAM_BAND_COLORS={RM:'#E3E0FF',RA:'#D9EDFF',RN:'#FFEDCF'};
+const TEAM_BAND_EMPTY='#F1F4F7';
 const LEGEND_ORDER=[
   'RM','RA','RN','PIQ','R','VA','VJ','HOR','HSR','FE','PC','PI','EM','RF','PO','CA','GR','EN','MI','AN','AP','PR','MS','MC','NS','PA','DE','DL','DC','JT'
 ];
@@ -2452,6 +2517,11 @@ $('journalAccessBtn').addEventListener('click',openJournalModal);
 $('journalModalClose').addEventListener('click',closeJournalModal);
 $('journalModalBackdrop').addEventListener('click',e=>{ if(e.target===$('journalModalBackdrop'))closeJournalModal(); });
 
+$('teamViewAccessBtn').addEventListener('click',openTeamView);
+$('teamViewBack').addEventListener('click',closeTeamView);
+$('teamPrevBtn').addEventListener('click',()=>teamShiftYear(-1));
+$('teamNextBtn').addEventListener('click',()=>teamShiftYear(1));
+
 function attachDayClickHandlers(){
   document.querySelectorAll('[data-date]').forEach(el=>{
     if(!el.dataset.date)return;
@@ -2468,6 +2538,147 @@ function attachDayClickHandlers(){
       }
     });
   });
+}
+
+// ==========================================================
+// Planning d'équipe annuel (qui est en rotation matin / après-midi / nuit,
+// jour par jour, toute l'année) -- vue supplémentaire, indépendante de
+// l'employé sélectionné, accessible via le bouton discret dans l'en-tête.
+// ==========================================================
+function teamCellStyle(counts){
+  const bg=[
+    counts[0]>0?TEAM_BAND_COLORS.RM:TEAM_BAND_EMPTY,
+    counts[1]>0?TEAM_BAND_COLORS.RA:TEAM_BAND_EMPTY,
+    counts[2]>0?TEAM_BAND_COLORS.RN:TEAM_BAND_EMPTY
+  ];
+  return `background:linear-gradient(90deg,${bg[0]} 0%,${bg[0]} 30%,${bg[1]} 36%,${bg[1]} 64%,${bg[2]} 70%,${bg[2]} 100%)`;
+}
+
+function teamCountsFor(dISO){
+  return ROTATION_CODES.map(code=>teamFor(dISO,code).filter(e=>!isVacantEmployee(e.name)).length);
+}
+
+function renderTeamView(){
+  if(!$('teamViewSection'))return;
+  const {min,max}=navBounds();
+  const y=Math.min(Math.max(state.teamYear,min.getFullYear()),max.getFullYear());
+  state.teamYear=y;
+  $('teamYearTitle').textContent=String(y);
+  $('teamPrevBtn').disabled=y<=min.getFullYear();
+  $('teamNextBtn').disabled=y>=max.getFullYear();
+
+  let h='<div class="year-calendar">';
+  for(let m=0;m<12;m++){
+    const first=new Date(y,m,1),start=mondayOf(first);
+    h+=`<div class="mini-month"><h3>${MONTH_NAMES[m]}</h3><div class="mini-head">${DAY_NAMES.map(d=>`<span>${d[0]}</span>`).join('')}</div><div class="mini-grid">`;
+    for(let i=0;i<42;i++){
+      const d=new Date(start);d.setDate(start.getDate()+i);
+      const inMonth=d.getMonth()===m;
+      if(!inMonth){
+        h+='<span class="mini-cell mini-empty"></span>';
+        continue;
+      }
+      const dISO=isoDate(d);
+      const isToday=dISO===todayISO();
+      const counts=teamCountsFor(dISO);
+      const reinforced=counts.some(n=>n>3);
+      h+=`<span class="mini-cell team-cell ${isToday?'today':''} ${reinforced?'is-reinforced':''}" style="${teamCellStyle(counts)}" data-team-date="${dISO}" tabindex="0" role="button" aria-label="Équipe du ${escapeHTML(formatDateWithYear(d))}">${d.getDate()}</span>`;
+    }
+    h+='</div></div>';
+  }
+  h+='</div>';
+  $('teamViewContainer').innerHTML=h;
+  attachTeamDayClickHandlers();
+}
+
+function openTeamDayModal(dateObj){
+  const d=new Date(dateObj);
+  const dISO=isoDate(d);
+
+  $('dayModalTitle').textContent="Équipe du jour";
+  $('dayModalDate').textContent=d.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const holidayName=swissHolidayName(dISO);
+  const schoolName=schoolHolidayName(dISO);
+  const dayInTravaux=isInTravaux(dISO);
+
+  const holidayHTML=holidayName?`<div class="day-detail-holiday">${escapeHTML(holidayName)}</div>`:'';
+  const schoolHTML=schoolName?`<div class="day-detail-schoolholiday">Vacances scolaires VD — ${escapeHTML(schoolName)}</div>`:'';
+  const travauxHTML=dayInTravaux?`<div class="day-detail-travaux">⚒️ Période de travaux</div>`:'';
+
+  const shiftsHTML=ROTATION_CODES.map(code=>{
+    const info=CODE_INFO[code]||[code,''];
+    const team=teamFor(dISO,code).filter(e=>!isVacantEmployee(e.name));
+    const peopleHTML=team.length
+      ? team.map(emp=>`<div class="day-detail-person">
+          <span class="day-detail-person-avatar">${escapeHTML(initials(emp.name))}</span>
+          <span>${escapeHTML(cleanEmployeeName(emp.name))}</span>
+        </div>`).join('')
+      : '<div class="day-detail-empty">Personne en rotation</div>';
+
+    return `<div class="day-detail-service ${classFor(code)}" style="margin-bottom:10px">
+      <div class="day-detail-top">
+        <div class="day-detail-code">${escapeHTML(code)}</div>
+        <div class="day-detail-info"><strong>${escapeHTML(info[0])}</strong><small>${escapeHTML(info[1])}</small></div>
+      </div>
+      <div class="day-detail-team"><strong>Équipe${team.length>3?' · effectif renforcé':''}</strong>${peopleHTML}</div>
+    </div>`;
+  }).join('');
+
+  $('dayModalBody').innerHTML=`${holidayHTML}${schoolHTML}${travauxHTML}${shiftsHTML}`;
+  $('dayModalBackdrop').classList.add('open');
+}
+
+function attachTeamDayClickHandlers(){
+  document.querySelectorAll('[data-team-date]').forEach(el=>{
+    if(!el.dataset.teamDate)return;
+
+    el.addEventListener('click',()=>{
+      const [y,m,d]=el.dataset.teamDate.split('-').map(Number);
+      openTeamDayModal(new Date(y,m-1,d));
+    });
+
+    el.addEventListener('keydown',event=>{
+      if(event.key==='Enter' || event.key===' '){
+        event.preventDefault();
+        el.click();
+      }
+    });
+  });
+}
+
+function teamShiftYear(amount){
+  const {min,max}=navBounds();
+  const next=state.teamYear+amount;
+  if(next<min.getFullYear() || next>max.getFullYear())return;
+  state.teamYear=next;
+  renderTeamView();
+}
+
+function openTeamView(){
+  if(!planning.employees || !planning.employees.length)return;
+  state.teamMode=true;
+  document.body.classList.add('team-mode');
+  closeEmployeePicker();
+  const controls=document.querySelector('.controls');
+  if(controls)controls.classList.add('hidden');
+  if($('rotationCard'))$('rotationCard').classList.add('hidden');
+  if($('upcomingEventsCard'))$('upcomingEventsCard').classList.add('hidden');
+  const mainCard=document.querySelector('main.main-card');
+  if(mainCard)mainCard.classList.add('hidden');
+  $('teamViewSection').classList.remove('hidden');
+  renderTeamView();
+}
+
+function closeTeamView(){
+  state.teamMode=false;
+  document.body.classList.remove('team-mode');
+  $('teamViewSection').classList.add('hidden');
+  const mainCard=document.querySelector('main.main-card');
+  if(mainCard)mainCard.classList.remove('hidden');
+  const controls=document.querySelector('.controls');
+  if(controls)controls.classList.remove('hidden');
+  render();
 }
 
 function renderTravauxSection(){
@@ -2490,6 +2701,11 @@ function renderTravauxSection(){
 }
 
 function render(){
+  if(state.teamMode){
+    renderTeamView();
+    return;
+  }
+
   document.body.classList.remove('view-week','view-month','view-year','view-team');
   document.body.classList.add(`view-${state.view}`);
 
@@ -3104,7 +3320,7 @@ document.addEventListener('keydown',event=>{
     const isTyping=['INPUT','TEXTAREA','SELECT'].includes(tag);
     const pickerOpen=$('employeePicker').classList.contains('open');
     const modalOpen=$('dayModalBackdrop').classList.contains('open');
-    if(!isTyping && !pickerOpen && !modalOpen){
+    if(!isTyping && !pickerOpen && !modalOpen && !state.teamMode){
       shiftDate(event.key==='ArrowLeft'?-1:1);
     }
   }
