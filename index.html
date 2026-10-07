@@ -758,8 +758,8 @@ body.presence-mode .app{max-width:1680px}
           <span id="updateStatus"></span>
         </div>
         <div class="hero-actions">
-          <button id="presenceViewToggleBtn" class="team-toggle" type="button" aria-label="Présences annuelles par semaine">Présences</button>
-          <button id="teamViewToggleBtn" class="team-toggle" type="button" aria-label="Planning d'équipe annuel">Équipe</button>
+          <button id="presenceViewToggleBtn" class="team-toggle" type="button" aria-label="Présences annuelles par semaine">Maintenance</button>
+          <button id="teamViewToggleBtn" class="team-toggle" type="button" aria-label="Planning d'équipe annuel">Rotations</button>
         </div>
       </div>
       <button id="journalAccessBtn" class="journal-access" type="button" aria-label="Journal des publications">
@@ -2904,12 +2904,12 @@ function updateTeamToggleLabel(){
   const page=currentPage();
   const teamBtn=$('teamViewToggleBtn');
   if(teamBtn){
-    teamBtn.textContent=page==='team'?'Individuel':'Équipe';
+    teamBtn.textContent=page==='team'?'Individuel':'Rotations';
     teamBtn.setAttribute('aria-label',page==='team'?'Retour au planning individuel':"Planning d'équipe annuel");
   }
   const presenceBtn=$('presenceViewToggleBtn');
   if(presenceBtn){
-    presenceBtn.textContent=page==='presence'?'Individuel':'Présences';
+    presenceBtn.textContent=page==='presence'?'Individuel':'Maintenance';
     presenceBtn.setAttribute('aria-label',page==='presence'?'Retour au planning individuel':'Présences annuelles par semaine');
   }
   const subtitle=$('heroSubtitle');
@@ -3170,7 +3170,7 @@ function renderPresenceView(){
   const fullCounts=weeks.map(()=>0);
   for(const group of groups){
     {
-      h+=`<tr class="pv-group"><th class="pv-name"><div class="pv-name-inner">${escapeHTML(group.name)}<small>${group.people.length}</small></div></th><td colspan="${weeks.length}"></td></tr>`;
+      h+=`<tr class="pv-group"><th class="pv-name"><div class="pv-name-inner">${escapeHTML(group.name)}</div></th><td colspan="${weeks.length}"></td></tr>`;
     }
     for(const emp of group.people){
       const rowIndex=rows.length;
@@ -3220,7 +3220,7 @@ function renderPresenceChips(){
   let h=`<button type="button" class="pv-chip ${allOn?'is-on':''}" data-pv-cat-all>Tous</button>`;
   h+=groups.map(g=>{
     const on=!presence.hiddenCats.has(g.name);
-    return `<button type="button" class="pv-chip ${on?'is-on':''}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${on}" title="Afficher / masquer — double-clic : seulement ce groupe">${escapeHTML(g.name)} <span>${g.people.length}</span></button>`;
+    return `<button type="button" class="pv-chip ${on?'is-on':''}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${on}" title="Afficher / masquer — double-clic : seulement ce groupe">${escapeHTML(g.name)}</button>`;
   }).join('');
   el.innerHTML=h;
 }
