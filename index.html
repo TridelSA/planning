@@ -208,6 +208,9 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .employee-result.active .employee-result-avatar{background:var(--surface);color:var(--accent-ink)}
 .employee-result-name{min-width:0;font:600 12.5px/1.3 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .employee-results-empty{padding:16px 8px;text-align:center;color:var(--muted);font-size:11px}
+.employee-result-group{display:grid;gap:2px}
+.employee-result-group+.employee-result-group{margin-top:8px}
+.employee-result-group-label{padding:6px 8px 2px;font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink)}
 
 /* ==========================================================
    Ligne travaux — intégrée dans la carte "Prochains événements",
@@ -1539,31 +1542,56 @@ function initializeState(preferredId){
   if(resolved)persistSelectedEmployee(resolved);
 }
 
-function populateEmployees(filter=''){
-  const results=$('employeeResults');
-  const query=filter.trim();
-
-  let list=planning.employees.slice();
-
-  if(query){
-    list=list
-      .map(e=>({employee:e,score:fuzzyEmployeeScore(e.name,query)}))
-      .filter(x=>x.score>=0)
-      .sort((a,b)=>b.score-a.score || a.employee.name.localeCompare(b.employee.name,'fr',{sensitivity:'base'}))
-      .map(x=>x.employee);
-  }
-
-  if(!list.length){
-    results.innerHTML='<div class="employee-results-empty">Aucun employé trouvé</div>';
-    return;
-  }
-
-  results.innerHTML=list.map(e=>`
+function employeeResultButtonHTML(e){
+  return `
     <button type="button" class="employee-result ${e.id===state.employeeId?'active':''}" data-employee-id="${escapeHTML(e.id)}">
       <span class="employee-result-avatar">${escapeHTML(initials(e.name))}</span>
       <span class="employee-result-name">${escapeHTML(e.name)}</span>
     </button>
-  `).join('');
+  `;
+}
+
+function populateEmployees(filter=''){
+  const results=$('employeeResults');
+  const query=filter.trim();
+
+  if(query){
+    // Recherche active : liste plate triée par pertinence, comme avant.
+    const list=planning.employees
+      .map(e=>({employee:e,score:fuzzyEmployeeScore(e.name,query)}))
+      .filter(x=>x.score>=0)
+      .sort((a,b)=>b.score-a.score || a.employee.name.localeCompare(b.employee.name,'fr',{sensitivity:'base'}))
+      .map(x=>x.employee);
+
+    results.innerHTML=list.length
+      ? list.map(employeeResultButtonHTML).join('')
+      : '<div class="employee-results-empty">Aucun employé trouvé</div>';
+  }else{
+    // Parcours libre : regroupé par équipe/fonction, dans l'ordre du classeur.
+    const byGroup=new Map();
+    for(const e of planning.employees){
+      const group=typeof categoryLabel==='function' ? categoryLabel(e.category) : (e.category||'');
+      if(!byGroup.has(group))byGroup.set(group,[]);
+      byGroup.get(group).push(e);
+    }
+
+    const groups=[...byGroup.entries()].sort(([a],[b])=>{
+      const orderDiff=(typeof categoryLabelOrderIndex==='function')
+        ? categoryLabelOrderIndex(a)-categoryLabelOrderIndex(b)
+        : 0;
+      return orderDiff || a.localeCompare(b,'fr',{sensitivity:'base'});
+    });
+
+    results.innerHTML=groups.length
+      ? groups.map(([name,people])=>{
+          const peopleHTML=people
+            .slice()
+            .sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}))
+            .map(employeeResultButtonHTML).join('');
+          return `<div class="employee-result-group"><div class="employee-result-group-label">${escapeHTML(name)}</div>${peopleHTML}</div>`;
+        }).join('')
+      : '<div class="employee-results-empty">Aucun employé trouvé</div>';
+  }
 
   results.querySelectorAll('.employee-result').forEach(button=>{
     button.addEventListener('click',()=>{
@@ -2926,21 +2954,48 @@ $('presenceViewToggleBtn').addEventListener('click',togglePresenceView);
 //   vert   = 4 jours ou plus
 //   orange = 1 à 3 jours
 //   rouge  = aucun jour présent
-// Les personnes sont regroupées en équipes : les équipes en rotation sont
-// reconnues automatiquement (mêmes RM / RA / RN aux mêmes dates), les
-// autres personnes sont « Hors rotation » (ou dans leur catégorie si le
-// fichier en publie une). Les équipes et personnes masquées sont
-// mémorisées dans ce navigateur uniquement ; par défaut, les équipes en
-// rotation sont masquées.
+// Les personnes sont regroupées par équipe/fonction telle que publiée par
+// Excel (intitulés de la colonne A, voir CATEGORY_LABELS). Les équipes de
+// rotation (Équipe 1 à 5) et le personnel hors-rotation (Admin., Cadres) ne
+// sont volontairement jamais proposés dans cette vue (voir
+// PRESENCE_EXCLUDED_CATEGORIES) : la rotation a déjà sa propre vue dédiée
+// (« Planning d'équipe »), et l'admin/les cadres ne suivent pas de présence
+// au sens de cette page. Les personnes masquées individuellement restent
+// mémorisées dans ce navigateur uniquement.
 // ==========================================================
 const PRESENCE_CODES=new Set(['R','RM','RA','RN','PO','CA','EN']); // codes comptés comme « présent »
 const PRESENCE_FULL_DAYS=4;                        // seuil de la case verte
 const PRESENCE_HIDDEN_GROUPS_KEY='presenceHiddenGroups';
 const PRESENCE_HIDDEN_PEOPLE_KEY='presenceHiddenPeople';
-const OTHER_GROUP_LABEL='Hors rotation';
-const ROTATION_TEAM_MIN_DAYS=100;   // jours de RM/RA/RN dans l'année pour être « en rotation »
-const ROTATION_TEAM_SIMILARITY=.7;  // part de services identiques pour être dans la même équipe
+const OTHER_GROUP_LABEL='Sans catégorie';
 const EYE_OFF_ICON='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+// Intitulés bruts publiés depuis la colonne A du classeur Excel (dans
+// l'ordre où ils apparaissent, de haut en bas) -> titre affiché. Si Excel
+// change un intitulé ou en ajoute un nouveau, il apparaît ici tel quel (pas
+// d'erreur), simplement sans traduction ni ordre particulier -- il suffit de
+// compléter ces deux tables.
+const CATEGORY_ORDER=['Equipe 1','Equipe 2','Equipe 3','Equipe 4','Equipe 5','Elect','Autom.','Mécanique','Intendance','Chauffeurs-grutiers','Admin.','Cadres'];
+const CATEGORY_LABELS={
+  'Equipe 1':'Équipe 1','Equipe 2':'Équipe 2','Equipe 3':'Équipe 3','Equipe 4':'Équipe 4','Equipe 5':'Équipe 5',
+  'Elect':'Électricien','Autom.':'Automaticien','Mécanique':'Mécanicien',
+  'Intendance':'Intendance','Chauffeurs-grutiers':'Chauffeurs-grutiers',
+  'Admin.':'Administration','Cadres':'Cadres'
+};
+// Catégories jamais proposées dans la vue Présences (masquées en
+// permanence, sans bouton ni case pour les révéler).
+const PRESENCE_EXCLUDED_CATEGORIES=new Set(['Equipe 1','Equipe 2','Equipe 3','Equipe 4','Equipe 5','Admin.','Cadres']);
+
+function categoryLabel(rawCategory){
+  return CATEGORY_LABELS[rawCategory]||rawCategory||OTHER_GROUP_LABEL;
+}
+// Même ordre que CATEGORY_ORDER, mais sur les titres affichés (ce que les
+// groupes utilisent une fois résolus via categoryLabel).
+const CATEGORY_LABEL_ORDER=CATEGORY_ORDER.map(categoryLabel);
+function categoryLabelOrderIndex(label){
+  const i=CATEGORY_LABEL_ORDER.indexOf(label);
+  return i===-1?CATEGORY_LABEL_ORDER.length:i;
+}
 
 function readStoredList(key){
   try{
@@ -2977,90 +3032,39 @@ function rowNumberOf(emp){
   return match?Number(match[1]):Infinity;
 }
 
-// Équipes en rotation de l'année : les personnes avec beaucoup de RM/RA/RN,
-// regroupées quand elles font le même service les mêmes jours. Numérotées
-// dans l'ordre des lignes de l'Excel (Équipe 1 = la plus haute).
-let rotationTeamsCache={planning:null,year:null,teams:null};
-function rotationTeams(year){
-  if(rotationTeamsCache.planning===planning && rotationTeamsCache.year===year)return rotationTeamsCache.teams;
-
-  const prefix=`${year}-`;
-  const core=[];
-  for(const emp of planning.employees){
-    const shifts=new Map();
-    for(const [dateISO,value] of Object.entries(emp.schedule)){
-      if(!dateISO.startsWith(prefix))continue;
-      const code=safeCode(value);
-      if(ROTATION_CODES.includes(code))shifts.set(dateISO,code);
-    }
-    if(shifts.size>=ROTATION_TEAM_MIN_DAYS)core.push({emp,shifts});
-  }
-
-  const parent=core.map((_,i)=>i);
-  const find=i=>parent[i]===i?i:(parent[i]=find(parent[i]));
-  for(let i=0;i<core.length;i++){
-    for(let j=i+1;j<core.length;j++){
-      let both=0,same=0;
-      for(const [dateISO,code] of core[i].shifts){
-        const other=core[j].shifts.get(dateISO);
-        if(!other)continue;
-        both++;
-        if(other===code)same++;
-      }
-      if(both>=30 && same/both>=ROTATION_TEAM_SIMILARITY)parent[find(i)]=find(j);
-    }
-  }
-
-  const clusters=new Map();
-  core.forEach((c,i)=>{
-    const root=find(i);
-    if(!clusters.has(root))clusters.set(root,[]);
-    clusters.get(root).push(c.emp);
-  });
-
-  const byPerson=new Map();
-  const labels=[];
-  [...clusters.values()]
-    .sort((a,b)=>Math.min(...a.map(rowNumberOf))-Math.min(...b.map(rowNumberOf)))
-    .forEach((members,index)=>{
-      const label=`Équipe ${index+1}`;
-      labels.push(label);
-      for(const emp of members)byPerson.set(presencePersonKey(emp),label);
-    });
-
-  const teams={byPerson,labels:new Set(labels),order:labels};
-  rotationTeamsCache={planning,year,teams};
-  return teams;
+// Groupe (titre affiché) de la personne, d'après la catégorie publiée par
+// Excel. Une personne sans catégorie publiée (classeur pas encore republié
+// avec la macro mise à jour) tombe dans OTHER_GROUP_LABEL plutôt que de
+// faire planter l'affichage.
+function presenceGroupOf(emp){
+  return categoryLabel(emp.category);
 }
 
-function presenceGroupOf(emp){
-  return rotationTeams(state.presenceYear).byPerson.get(presencePersonKey(emp)) || emp.category || OTHER_GROUP_LABEL;
+function isPresenceExcludedCategory(emp){
+  return PRESENCE_EXCLUDED_CATEGORIES.has(String(emp.category||'').trim());
 }
 
 function isPresenceVisible(emp){
+  if(isPresenceExcludedCategory(emp))return false;
   if(presence.hiddenPeople.has(presencePersonKey(emp)))return false;
-  if(presence.hiddenCats.has(presenceGroupOf(emp)))return false;
+  if(presence.hiddenCats && presence.hiddenCats.has(presenceGroupOf(emp)))return false;
   return true;
 }
 
-// Groupes affichés : équipes en rotation (dans l'ordre), puis catégories
-// éventuelles (ordre alphabétique), puis « Hors rotation ».
+// Groupes affichés, dans l'ordre du classeur Excel (CATEGORY_ORDER) ;
+// Équipe 1-5 / Admin. / Cadres n'apparaissent jamais ici (voir
+// PRESENCE_EXCLUDED_CATEGORIES).
 function presenceGroups(){
-  const teams=rotationTeams(state.presenceYear);
   const byGroup=new Map();
   for(const emp of planning.employees){
+    if(isPresenceExcludedCategory(emp))continue;
     const group=presenceGroupOf(emp);
     if(!byGroup.has(group))byGroup.set(group,[]);
     byGroup.get(group).push(emp);
   }
-  const rank=name=>teams.labels.has(name)?0:name===OTHER_GROUP_LABEL?2:1;
   return [...byGroup.entries()]
-    .sort(([a],[b])=>{
-      if(rank(a)!==rank(b))return rank(a)-rank(b);
-      if(rank(a)===0)return teams.order.indexOf(a)-teams.order.indexOf(b);
-      return a.localeCompare(b,'fr',{sensitivity:'base'});
-    })
-    .map(([name,people])=>({name,people,rotation:teams.labels.has(name)}));
+    .sort(([a],[b])=>categoryLabelOrderIndex(a)-categoryLabelOrderIndex(b) || a.localeCompare(b,'fr',{sensitivity:'base'}))
+    .map(([name,people])=>({name,people}));
 }
 
 // Années pour lesquelles un fichier planning-<année>.json a été chargé.
@@ -3114,8 +3118,10 @@ function renderPresenceView(){
   }
   const year=state.presenceYear;
   if(presence.hiddenCats===null){
-    // Première visite : les équipes en rotation sont masquées par défaut.
-    presence.hiddenCats=new Set(rotationTeams(year).labels);
+    // Première visite : tous les groupes proposés sont visibles par défaut
+    // (Équipe 1-5 / Admin. / Cadres ne sont de toute façon jamais proposés,
+    // voir PRESENCE_EXCLUDED_CATEGORIES).
+    presence.hiddenCats=new Set();
     savePresenceFilters();
   }
   $('presenceYearTitle').textContent=String(year);
@@ -3211,7 +3217,7 @@ function renderPresenceChips(){
   let h=`<button type="button" class="pv-chip ${allOn?'is-on':''}" data-pv-cat-all>Tous</button>`;
   h+=groups.map(g=>{
     const on=!presence.hiddenCats.has(g.name);
-    return `<button type="button" class="pv-chip ${on?'is-on':''} ${g.rotation?'is-rotation':''}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${on}" title="Afficher / masquer — double-clic : seulement ce groupe">${escapeHTML(g.name)} <span>${g.people.length}</span></button>`;
+    return `<button type="button" class="pv-chip ${on?'is-on':''}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${on}" title="Afficher / masquer — double-clic : seulement ce groupe">${escapeHTML(g.name)} <span>${g.people.length}</span></button>`;
   }).join('');
   el.innerHTML=h;
 }
@@ -3235,7 +3241,7 @@ function renderPresencePanelList(){
     if(!people.length)continue;
     {
       const catOn=!presence.hiddenCats.has(group.name);
-      h+=`<div class="pv-panel-group"><label><input type="checkbox" data-pv-panel-cat="${escapeHTML(group.name)}" ${catOn?'checked':''}>${escapeHTML(group.name)}${group.rotation?' <small>rotation</small>':''}</label><button type="button" class="pv-link" data-pv-only="${escapeHTML(group.name)}">Seulement</button></div>`;
+      h+=`<div class="pv-panel-group"><label><input type="checkbox" data-pv-panel-cat="${escapeHTML(group.name)}" ${catOn?'checked':''}>${escapeHTML(group.name)}</label><button type="button" class="pv-link" data-pv-only="${escapeHTML(group.name)}">Seulement</button></div>`;
     }
     for(const emp of people){
       const key=presencePersonKey(emp);
