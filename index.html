@@ -1231,7 +1231,11 @@ function mergeEmployeesByName(perYearData){
     }
   }
 
-  return [...byName.values()].sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
+  // Ordre du classeur Excel : l'ordre d'insertion du Map suit l'ordre de
+  // première apparition de chaque personne en parcourant les années de
+  // publication croissantes (voir boucle ci-dessus), donc aucun tri
+  // alphabétique ici.
+  return [...byName.values()];
 }
 
 function combinePlannings(perYearData){
@@ -1344,8 +1348,9 @@ function normalizeData(raw){
         comments
       };
     })
-    .filter(e=>e.name && !isVacantEmployee(e.name))
-    .sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}));
+    .filter(e=>e.name && !isVacantEmployee(e.name));
+    // Pas de tri alphabétique : on garde l'ordre des lignes du classeur Excel
+    // (celui dans lequel la macro VBA a publié le JSON).
 
   if(!employees.length){
     throw new Error('Aucun employé visible n’a été publié.');
@@ -1584,10 +1589,8 @@ function populateEmployees(filter=''){
 
     results.innerHTML=groups.length
       ? groups.map(([name,people])=>{
-          const peopleHTML=people
-            .slice()
-            .sort((a,b)=>a.name.localeCompare(b.name,'fr',{sensitivity:'base'}))
-            .map(employeeResultButtonHTML).join('');
+          // Ordre du classeur Excel au sein du groupe (pas de tri alphabétique).
+          const peopleHTML=people.map(employeeResultButtonHTML).join('');
           return `<div class="employee-result-group"><div class="employee-result-group-label">${escapeHTML(name)}</div>${peopleHTML}</div>`;
         }).join('')
       : '<div class="employee-results-empty">Aucun employé trouvé</div>';
