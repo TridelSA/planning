@@ -501,9 +501,9 @@ body.presence-mode .app{max-width:1680px}
 .pv-table th,.pv-table td{padding:0}
 .pv-table thead th{position:sticky;background:var(--surface);z-index:2}
 .pv-table thead tr:first-child th{top:0;height:22px}
-.pv-table thead tr:nth-child(2) th{top:24px;height:22px}
+.pv-table thead tr:nth-child(2) th{top:24px;height:26px}
 .pv-month{font:800 9.5px/1 var(--font-body);color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;text-align:left;padding-left:4px!important;border-left:1px solid var(--line-strong)}
-.pv-week{width:var(--pv-cell);min-width:var(--pv-cell);color:var(--muted);font-weight:700;text-align:center}
+.pv-week{width:var(--pv-cell);min-width:var(--pv-cell);color:var(--muted);font-weight:700;font-size:12.5px;text-align:center}
 .pv-week.is-current{background:var(--accent)!important;color:#fff;border-radius:5px}
 .pv-name{
   position:sticky;left:0;z-index:1;background:var(--surface);
@@ -900,7 +900,6 @@ body.presence-mode .app{max-width:1680px}
     <div class="pv-head">
       <div class="team-view-title">
         <h2>Présences annuelles</h2>
-        <p id="presenceSubtitle">Nombre de jours présents par personne et par semaine</p>
       </div>
       <div class="pv-year">
         <button id="presencePrevBtn" class="nav-btn" type="button" aria-label="Année précédente"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"></polyline></svg></button>
@@ -3128,7 +3127,6 @@ function renderPresenceView(){
     savePresenceFilters();
   }
   $('presenceYearTitle').textContent=String(year);
-  $('presenceSubtitle').textContent=`Nombre de jours présents (${[...PRESENCE_CODES].join(', ')}) par personne et par semaine`;
   $('presencePrevBtn').disabled=!years.length || year<=years[0];
   $('presenceNextBtn').disabled=!years.length || year>=years[years.length-1];
 
@@ -3183,8 +3181,7 @@ function renderPresenceView(){
         const label=p.level==='none'
           ? 'pas de données'
           : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''}${p.known<7?` (données sur ${p.known} j)`:''}`;
-        const text=p.level==='full'||p.level==='partial'?p.present:'';
-        h+=`<td class="pv-cell pv-${p.level} ${i===currentWeekIndex?'is-current':''}" data-pv-row="${rowIndex}" data-pv-week="${i}" tabindex="-1" title="${escapeHTML(name)} · S${w.num} · ${escapeHTML(label)}">${text}</td>`;
+        h+=`<td class="pv-cell pv-${p.level} ${i===currentWeekIndex?'is-current':''}" data-pv-row="${rowIndex}" data-pv-week="${i}" tabindex="-1" title="${escapeHTML(name)} · S${w.num} · ${escapeHTML(label)}"></td>`;
       });
       h+='</tr>';
     }
