@@ -430,7 +430,7 @@ body.view-year .stats-grid{display:grid}
 :root{
   --pv-full-bg:#5DBB85;--pv-full-ink:#0D3B22;
   --pv-partial-bg:#F4AE4A;--pv-partial-ink:#4F3000;
-  --pv-reserve-bg:#8E6FC9;--pv-reserve-ink:#FFFFFF;
+  --pv-reserve-bg:#5DBB85;--pv-reserve-ink:#0D3B22;
   --pv-absent-bg:#E66A74;--pv-absent-ink:#FFFFFF;
   --pv-cell:24px;--pv-name:168px;
 }
@@ -750,21 +750,30 @@ body.presence-mode .app{max-width:1680px}
 @media print{
   @page{size:A4 landscape;margin:10mm}
   html,body{background:#fff}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
   body *{visibility:hidden}
   #presenceViewSection,#presenceViewSection *{visibility:visible}
-  #presenceViewSection{position:absolute;left:0;top:0;width:100%;margin:0;padding:0;border:0;box-shadow:none}
+  #presenceViewSection{
+    position:absolute;left:0;top:0;width:100%;margin:0;padding:0;border:0;box-shadow:none;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  #presenceViewSection>*{width:auto;max-width:100%}
+  .pv-head{width:100%;justify-content:center;position:relative}
   #presencePrevBtn,#presenceNextBtn,#presenceExportBtn,#presenceFilter,#presenceShowAllBtn,.pv-hide{display:none!important}
   :root{--pv-cell:15px;--pv-name:90px}
-  .pv-table{border-spacing:1px;font-size:7.5px}
+  .pv-table{border-spacing:1px;font-size:7.5px;margin:0 auto}
   .pv-month{font-size:7px}
   .pv-week{font-size:7.5px}
   .pv-name{font-size:8.5px}
-  .pv-wrap{max-height:none;overflow:visible;border:0;background:transparent}
+  .pv-wrap{max-height:none;overflow:visible;border:0;background:transparent;display:flex;justify-content:center}
   .pv-table thead th,.pv-table tfoot td,.pv-table tfoot th,.pv-name{position:static;box-shadow:none}
   .pv-cell:hover{transform:none;box-shadow:none}
   .pv-table tbody tr,.pv-table thead tr{page-break-inside:avoid;break-inside:avoid}
   .pv-chip{border-width:1px;background:transparent!important;color:#000!important}
   .pv-chip::before{display:none}
+  /* Pas d'indicateur « semaine en cours » sur le PDF : il n'a de sens qu'à l'écran. */
+  .pv-cell.is-current{box-shadow:none!important}
+  .pv-week.is-current{background:transparent!important;color:var(--muted)!important;border-radius:0!important}
 }
 </style>
 </head>
@@ -969,7 +978,7 @@ body.presence-mode .app{max-width:1680px}
     <div class="pv-legend">
       <span class="pv-legend-item"><i class="pv-swatch pv-full"></i>Présent 4 jours ou plus</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-partial"></i>Présent 1 à 3 jours</span>
-      <span class="pv-legend-item"><i class="pv-swatch pv-reserve"></i>Piquet (jour de réserve)</span>
+      <span class="pv-legend-item"><i class="pv-swatch pv-reserve"></i>Jour de réserve (RM/RA/RN/PIQ)</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-absent"></i>Aucun jour présent</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-none"></i>Pas de données</span>
     </div>
@@ -2999,6 +3008,7 @@ $('presenceExportBtn').addEventListener('click',()=>window.print());
 // mémorisées dans ce navigateur uniquement.
 // ==========================================================
 const PRESENCE_CODES=new Set(['R','PO','CA','EN']); // codes comptés comme « présent » (RM/RA/RN exclus : ce sont des codes de rotation, pas de présence)
+const PRESENCE_RESERVE_CODES=new Set(['PIQ','RM','RA','RN']); // codes comptés comme « réserve » (même couleur que « présent »)
 const PRESENCE_FULL_DAYS=4;                        // seuil de la case verte
 const PRESENCE_HIDDEN_GROUPS_KEY='presenceHiddenGroups';
 const PRESENCE_HIDDEN_PEOPLE_KEY='presenceHiddenPeople';
@@ -3131,22 +3141,39 @@ function weekPresence(emp,week){
   // le week-end n'entre jamais dans le calcul de présence / réserve.
   const weekdays=week.days.slice(0,5);
   let present=0,reserve=0,known=0;
+  const reserveBreakdown={}; // détail par code réel (PIQ, RM, RA, RN) pour l'info-bulle
   for(const d of weekdays){
     const key=isoDate(d);
     if(!Object.prototype.hasOwnProperty.call(emp.schedule,key))continue;
     known++;
     const code=safeCode(emp.schedule[key]);
     if(PRESENCE_CODES.has(code))present++;
-    else if(code==='PIQ')reserve++;
+    else if(PRESENCE_RESERVE_CODES.has(code)){
+      reserve++;
+      reserveBreakdown[code]=(reserveBreakdown[code]||0)+1;
+    }
   }
   let level='none';
   if(known){
     if(present>=PRESENCE_FULL_DAYS)level='full';
-    else if(reserve>0)level='reserve'; // piquet (PIQ) compte comme jour de réserve, couleur dédiée
+    else if(reserve>0)level='reserve'; // RM/RA/RN/PIQ comptent comme jour de réserve (même couleur que présent)
     else if(present>0)level='partial';
     else level='absent';
   }
-  return {present,reserve,known,level};
+  return {present,reserve,reserveBreakdown,known,level};
+}
+
+// Texte précis du détail « réserve » à partir des vrais codes du planning
+// (ex. « 2 j. Piquet, 1 j. Rotation nuit ») plutôt qu'un libellé générique.
+function reserveBreakdownText(breakdown){
+  return Object.keys(breakdown)
+    .filter(code=>breakdown[code]>0)
+    .map(code=>{
+      const n=breakdown[code];
+      const label=(CODE_INFO[code]&&CODE_INFO[code][0])||code;
+      return `${n} j. ${label}`;
+    })
+    .join(', ');
 }
 
 function presenceWeekRange(week){
@@ -3224,7 +3251,7 @@ function renderPresenceView(){
         const label=p.level==='none'
           ? 'pas de données'
           : p.level==='reserve'
-            ? `${p.reserve} jour${p.reserve>1?'s':''} de piquet${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}${p.known<5?` (données sur ${p.known} j)`:''}`
+            ? `${reserveBreakdownText(p.reserveBreakdown)}${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}${p.known<5?` (données sur ${p.known} j)`:''}`
             : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''}${p.known<5?` (données sur ${p.known} j)`:''}`;
         h+=`<td class="pv-cell pv-${p.level} ${i===currentWeekIndex?'is-current':''}" data-pv-row="${rowIndex}" data-pv-week="${i}" tabindex="-1" title="${escapeHTML(name)} · S${w.num} · ${escapeHTML(label)}"></td>`;
       });
@@ -3355,7 +3382,7 @@ function openPresenceWeekModal(emp,week){
   const summary=p.level==='none'
     ? 'Pas de données pour cette semaine'
     : p.level==='reserve'
-      ? `${p.reserve} jour${p.reserve>1?'s':''} de piquet${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''} sur ${p.known} (lun-ven)`
+      ? `${reserveBreakdownText(p.reserveBreakdown)}${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''} sur ${p.known} (lun-ven)`
       : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''} sur ${p.known} (lun-ven)`;
 
   const daysHTML=week.days.map(d=>{
@@ -3366,7 +3393,7 @@ function openPresenceWeekModal(emp,week){
     const label=!known?'Pas de données':code?(info?info[0]:code):'Pas de service';
     const holiday=swissHolidayName(key);
     const dayName=d.toLocaleDateString('fr-CH',{weekday:'short',day:'numeric',month:'short'});
-    return `<div class="pv-day ${classFor(code)} ${PRESENCE_CODES.has(code)?'is-present':code==='PIQ'?'is-reserve':''} ${known?'':'is-missing'}">
+    return `<div class="pv-day ${classFor(code)} ${PRESENCE_CODES.has(code)?'is-present':PRESENCE_RESERVE_CODES.has(code)?'is-reserve':''} ${known?'':'is-missing'}">
       <span class="pv-day-name">${escapeHTML(dayName)}</span>
       <span class="pv-day-code">${escapeHTML(code||'—')}</span>
       <span class="pv-day-label">${escapeHTML(label)}${holiday?` · ${escapeHTML(holiday)}`:''}</span>
