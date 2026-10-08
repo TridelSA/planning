@@ -978,7 +978,7 @@ body.presence-mode .app{max-width:1680px}
     <div class="pv-legend">
       <span class="pv-legend-item"><i class="pv-swatch pv-full"></i>Présent 4 jours ou plus</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-partial"></i>Présent 1 à 3 jours</span>
-      <span class="pv-legend-item"><i class="pv-swatch pv-reserve"></i>Jour de réserve (RM/RA/RN/PIQ)</span>
+      <span class="pv-legend-item"><i class="pv-swatch pv-reserve"></i>Piquet (jour de réserve)</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-absent"></i>Aucun jour présent</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-none"></i>Pas de données</span>
     </div>
@@ -3008,7 +3008,7 @@ $('presenceExportBtn').addEventListener('click',()=>window.print());
 // mémorisées dans ce navigateur uniquement.
 // ==========================================================
 const PRESENCE_CODES=new Set(['R','PO','CA','EN']); // codes comptés comme « présent » (RM/RA/RN exclus : ce sont des codes de rotation, pas de présence)
-const PRESENCE_RESERVE_CODES=new Set(['PIQ','RM','RA','RN']); // codes comptés comme « réserve » (même couleur que « présent »)
+const PRESENCE_RESERVE_CODES=new Set(['PIQ']); // réserve = piquet uniquement ; RM/RA/RN ne comptent ni présent ni réserve (→ absent)
 const PRESENCE_FULL_DAYS=4;                        // seuil de la case verte
 const PRESENCE_HIDDEN_GROUPS_KEY='presenceHiddenGroups';
 const PRESENCE_HIDDEN_PEOPLE_KEY='presenceHiddenPeople';
