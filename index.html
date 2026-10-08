@@ -430,6 +430,7 @@ body.view-year .stats-grid{display:grid}
 :root{
   --pv-full-bg:#5DBB85;--pv-full-ink:#0D3B22;
   --pv-partial-bg:#F4AE4A;--pv-partial-ink:#4F3000;
+  --pv-reserve-bg:#8E6FC9;--pv-reserve-ink:#FFFFFF;
   --pv-absent-bg:#E66A74;--pv-absent-ink:#FFFFFF;
   --pv-cell:24px;--pv-name:168px;
 }
@@ -493,13 +494,14 @@ body.presence-mode .app{max-width:1680px}
 
 .pv-full{background:var(--pv-full-bg);color:var(--pv-full-ink)}
 .pv-partial{background:var(--pv-partial-bg);color:var(--pv-partial-ink)}
+.pv-reserve{background:var(--pv-reserve-bg);color:var(--pv-reserve-ink)}
 .pv-absent{background:var(--pv-absent-bg);color:var(--pv-absent-ink)}
 .pv-none{background:repeating-linear-gradient(135deg,var(--paper) 0 3px,var(--line) 3px 4px);color:var(--muted)}
 
 .pv-wrap{overflow:auto;max-height:calc(100vh - 250px);min-height:200px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface)}
 .pv-table{border-collapse:separate;border-spacing:2px;font:600 10px/1 var(--font-body)}
 .pv-table th,.pv-table td{padding:0}
-.pv-table thead th{position:sticky;background:var(--surface);z-index:2}
+.pv-table thead th{position:sticky;background:var(--surface);z-index:2;box-shadow:0 0 0 2px var(--surface)}
 .pv-table thead tr:first-child th{top:0;height:22px}
 .pv-table thead tr:nth-child(2) th{top:24px;height:26px}
 .pv-month{font:800 9.5px/1 var(--font-body);color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;text-align:left;padding-left:4px!important;border-left:1px solid var(--line-strong)}
@@ -532,7 +534,7 @@ body.presence-mode .app{max-width:1680px}
 .pv-group th{padding-top:10px!important}
 .pv-group .pv-name-inner{height:auto;padding:4px 8px;font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink)}
 .pv-group .pv-name-inner small{font-weight:600;color:var(--muted);letter-spacing:0;margin-left:4px}
-.pv-table tfoot td,.pv-table tfoot th{position:sticky;bottom:0;background:var(--surface);z-index:1}
+.pv-table tfoot td,.pv-table tfoot th{position:sticky;bottom:0;background:var(--surface);z-index:1;box-shadow:0 0 0 2px var(--surface)}
 .pv-table tfoot .pv-name{z-index:3}
 .pv-total{height:var(--pv-cell);text-align:center;color:var(--ink-soft);font-weight:800;border-top:2px solid var(--line-strong)}
 .pv-table tfoot .pv-name-inner{border-top:2px solid var(--line-strong);color:var(--ink-soft);font-weight:800;font-size:10.5px}
@@ -545,6 +547,7 @@ body.presence-mode .app{max-width:1680px}
 .pv-day-code{font:800 13px/1 var(--font-display);text-align:center;padding:5px 0;border-radius:6px;background:var(--tint-overlay)}
 .pv-day-label{font-weight:500;opacity:.85}
 .pv-day.is-present{box-shadow:inset 3px 0 0 var(--pv-full-bg)}
+.pv-day.is-reserve{box-shadow:inset 3px 0 0 var(--pv-reserve-bg)}
 .pv-day.is-missing{opacity:.5}
 
 @media(max-width:700px){
@@ -739,6 +742,30 @@ body.presence-mode .app{max-width:1680px}
 @media(min-width:540px) and (max-width:700px){
   .year-calendar{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 }
+
+/* ==========================================================
+   Export PDF des présences : n'imprime que le tableau
+   actuellement affiché (mêmes filtres), en A4 paysage.
+   ========================================================== */
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  html,body{background:#fff}
+  body *{visibility:hidden}
+  #presenceViewSection,#presenceViewSection *{visibility:visible}
+  #presenceViewSection{position:absolute;left:0;top:0;width:100%;margin:0;padding:0;border:0;box-shadow:none}
+  #presencePrevBtn,#presenceNextBtn,#presenceExportBtn,#presenceFilter,#presenceShowAllBtn,.pv-hide{display:none!important}
+  :root{--pv-cell:15px;--pv-name:90px}
+  .pv-table{border-spacing:1px;font-size:7.5px}
+  .pv-month{font-size:7px}
+  .pv-week{font-size:7.5px}
+  .pv-name{font-size:8.5px}
+  .pv-wrap{max-height:none;overflow:visible;border:0;background:transparent}
+  .pv-table thead th,.pv-table tfoot td,.pv-table tfoot th,.pv-name{position:static;box-shadow:none}
+  .pv-cell:hover{transform:none;box-shadow:none}
+  .pv-table tbody tr,.pv-table thead tr{page-break-inside:avoid;break-inside:avoid}
+  .pv-chip{border-width:1px;background:transparent!important;color:#000!important}
+  .pv-chip::before{display:none}
+}
 </style>
 </head>
 <body>
@@ -912,6 +939,10 @@ body.presence-mode .app{max-width:1680px}
       <div id="presenceChips" class="pv-chips"></div>
       <div class="pv-toolbar-end">
         <button id="presenceShowAllBtn" class="pv-link hidden" type="button"></button>
+        <button id="presenceExportBtn" class="pv-filter-btn" type="button" title="Exporter en PDF (A4 paysage)">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h9l3 3v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          Exporter en PDF
+        </button>
         <div id="presenceFilter" class="pv-filter">
           <button id="presenceFilterBtn" class="pv-filter-btn" type="button" aria-expanded="false">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -938,6 +969,7 @@ body.presence-mode .app{max-width:1680px}
     <div class="pv-legend">
       <span class="pv-legend-item"><i class="pv-swatch pv-full"></i>Présent 4 jours ou plus</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-partial"></i>Présent 1 à 3 jours</span>
+      <span class="pv-legend-item"><i class="pv-swatch pv-reserve"></i>Piquet (jour de réserve)</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-absent"></i>Aucun jour présent</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-none"></i>Pas de données</span>
     </div>
@@ -2949,6 +2981,7 @@ function closeTeamView(){ setPage('individual'); }
 function togglePresenceView(){ setPage(state.presenceMode?'individual':'presence'); }
 
 $('presenceViewToggleBtn').addEventListener('click',togglePresenceView);
+$('presenceExportBtn').addEventListener('click',()=>window.print());
 
 // ==========================================================
 // Présences annuelles : une ligne par personne, une colonne par semaine
@@ -2965,7 +2998,7 @@ $('presenceViewToggleBtn').addEventListener('click',togglePresenceView);
 // au sens de cette page. Les personnes masquées individuellement restent
 // mémorisées dans ce navigateur uniquement.
 // ==========================================================
-const PRESENCE_CODES=new Set(['R','RM','RA','RN','PO','CA','EN']); // codes comptés comme « présent »
+const PRESENCE_CODES=new Set(['R','PO','CA','EN']); // codes comptés comme « présent » (RM/RA/RN exclus : ce sont des codes de rotation, pas de présence)
 const PRESENCE_FULL_DAYS=4;                        // seuil de la case verte
 const PRESENCE_HIDDEN_GROUPS_KEY='presenceHiddenGroups';
 const PRESENCE_HIDDEN_PEOPLE_KEY='presenceHiddenPeople';
@@ -3094,16 +3127,26 @@ function isoWeeksOfYear(year){
 }
 
 function weekPresence(emp,week){
-  let present=0,known=0;
-  for(const d of week.days){
+  // Seuls les 5 premiers jours de la semaine ISO (lundi à vendredi) comptent :
+  // le week-end n'entre jamais dans le calcul de présence / réserve.
+  const weekdays=week.days.slice(0,5);
+  let present=0,reserve=0,known=0;
+  for(const d of weekdays){
     const key=isoDate(d);
     if(!Object.prototype.hasOwnProperty.call(emp.schedule,key))continue;
     known++;
-    if(PRESENCE_CODES.has(safeCode(emp.schedule[key])))present++;
+    const code=safeCode(emp.schedule[key]);
+    if(PRESENCE_CODES.has(code))present++;
+    else if(code==='PIQ')reserve++;
   }
   let level='none';
-  if(known)level=present>=PRESENCE_FULL_DAYS?'full':present>0?'partial':'absent';
-  return {present,known,level};
+  if(known){
+    if(present>=PRESENCE_FULL_DAYS)level='full';
+    else if(reserve>0)level='reserve'; // piquet (PIQ) compte comme jour de réserve, couleur dédiée
+    else if(present>0)level='partial';
+    else level='absent';
+  }
+  return {present,reserve,known,level};
 }
 
 function presenceWeekRange(week){
@@ -3180,7 +3223,9 @@ function renderPresenceView(){
         if(p.level==='full')fullCounts[i]++;
         const label=p.level==='none'
           ? 'pas de données'
-          : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''}${p.known<7?` (données sur ${p.known} j)`:''}`;
+          : p.level==='reserve'
+            ? `${p.reserve} jour${p.reserve>1?'s':''} de piquet${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}${p.known<5?` (données sur ${p.known} j)`:''}`
+            : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''}${p.known<5?` (données sur ${p.known} j)`:''}`;
         h+=`<td class="pv-cell pv-${p.level} ${i===currentWeekIndex?'is-current':''}" data-pv-row="${rowIndex}" data-pv-week="${i}" tabindex="-1" title="${escapeHTML(name)} · S${w.num} · ${escapeHTML(label)}"></td>`;
       });
       h+='</tr>';
@@ -3309,7 +3354,9 @@ function openPresenceWeekModal(emp,week){
 
   const summary=p.level==='none'
     ? 'Pas de données pour cette semaine'
-    : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''} sur ${p.known}`;
+    : p.level==='reserve'
+      ? `${p.reserve} jour${p.reserve>1?'s':''} de piquet${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''} sur ${p.known} (lun-ven)`
+      : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''} sur ${p.known} (lun-ven)`;
 
   const daysHTML=week.days.map(d=>{
     const key=isoDate(d);
@@ -3319,7 +3366,7 @@ function openPresenceWeekModal(emp,week){
     const label=!known?'Pas de données':code?(info?info[0]:code):'Pas de service';
     const holiday=swissHolidayName(key);
     const dayName=d.toLocaleDateString('fr-CH',{weekday:'short',day:'numeric',month:'short'});
-    return `<div class="pv-day ${classFor(code)} ${PRESENCE_CODES.has(code)?'is-present':''} ${known?'':'is-missing'}">
+    return `<div class="pv-day ${classFor(code)} ${PRESENCE_CODES.has(code)?'is-present':code==='PIQ'?'is-reserve':''} ${known?'':'is-missing'}">
       <span class="pv-day-name">${escapeHTML(dayName)}</span>
       <span class="pv-day-code">${escapeHTML(code||'—')}</span>
       <span class="pv-day-label">${escapeHTML(label)}${holiday?` · ${escapeHTML(holiday)}`:''}</span>
