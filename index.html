@@ -778,6 +778,15 @@ body.presence-mode .app{max-width:1680px}
   .pv-table tbody tr,.pv-table thead tr{page-break-inside:avoid;break-inside:avoid}
   .pv-chip{border-width:1px;background:transparent!important;color:#000!important}
   .pv-chip::before{display:none}
+  /* Titre et année alignés sur la même ligne, même police */
+  .pv-head{align-items:center;gap:10px;margin-bottom:8px}
+  .team-view-title h2{font:700 17px/1.2 var(--font-display)}
+  .pv-year{align-items:center}
+  .pv-year strong{min-width:0;font:700 17px/1.2 var(--font-display)}
+  /* Moins d'espace sous les numéros de semaine */
+  .pv-table thead tr:first-child th{height:14px}
+  .pv-table thead tr:nth-child(2) th{height:14px;vertical-align:middle}
+  .pv-group th{padding-top:5px!important}
   /* Pas d'indicateur « semaine en cours » sur le PDF : il n'a de sens qu'à l'écran. */
   .pv-cell.is-current{box-shadow:none!important}
   .pv-week.is-current{background:transparent!important;color:var(--muted)!important;border-radius:0!important}
@@ -3316,7 +3325,7 @@ function renderPresenceChips(){
   h+=groups.map(g=>{
     const st=presenceGroupState(g);
     const cls=st==='all'?'is-on':st==='some'?'is-partial':'';
-    return `<button type="button" class="pv-chip ${cls}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${st==='all'}" title="${allOn?'Afficher uniquement ce groupe':'Ajouter ou retirer ce groupe'}">${escapeHTML(g.name)}</button>`;
+    return `<button type="button" class="pv-chip ${cls}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${st==='all'}" title="Afficher / masquer ce groupe">${escapeHTML(g.name)}</button>`;
   }).join('');
   el.innerHTML=h;
 }
@@ -3398,19 +3407,12 @@ function presencePanelListedPeople(){
   return presenceGroups().flatMap(g=>g.people).filter(emp=>!query || normalizeSearchText(emp.name).includes(query));
 }
 
-// Puce d'un groupe : si tout est affiché on isole le groupe, sinon on
-// l'ajoute / le retire. Si plus personne n'est affiché, on réaffiche tout.
+// Puce d'un groupe : bascule simple. Affiché en entier → on le masque ;
+// masqué ou partiel → on l'affiche en entier.
 function presenceChipClick(category){
-  const groups=presenceGroups();
-  const group=groups.find(g=>g.name===category);
+  const group=presenceGroups().find(g=>g.name===category);
   if(!group)return;
-  const everythingShown=groups.every(g=>presenceGroupState(g)==='all');
-  if(everythingShown){
-    for(const g of groups)presenceSetVisible(g.people,g===group);
-  }else{
-    presenceSetVisible(group.people,presenceGroupState(group)!=='all');
-  }
-  if(!groups.some(g=>g.people.some(isPresenceVisible)))presence.hiddenPeople.clear();
+  presenceSetVisible(group.people,presenceGroupState(group)!=='all');
   presenceFinishChange();
 }
 
