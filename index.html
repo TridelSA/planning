@@ -470,7 +470,12 @@ body.presence-mode .app{max-width:1680px}
   width:min(320px,calc(100vw - 32px));max-height:min(480px,70vh);display:flex;flex-direction:column;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);box-shadow:var(--shadow-pop);
 }
-.pv-panel-head{display:none}
+.pv-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 2px;font:800 12px/1.2 var(--font-body);color:var(--ink)}
+.pv-panel-done{height:30px;padding:0 14px;border:0;border-radius:var(--radius-sm);background:var(--accent-solid);color:#fff;font:800 11.5px/1 var(--font-body)}
+.pv-panel-head .pv-panel-done{display:none}
+.pv-panel-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-top:1px solid var(--line)}
+.pv-chip.is-partial{border-style:dashed;border-color:var(--accent);color:var(--accent-ink)}
+.pv-chip.is-partial::before{background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
 .pv-panel-group small{font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted);opacity:.8}
 .pv-chip.is-rotation:not(.is-on){border-style:dashed}
 .pv-backdrop{position:fixed;inset:0;z-index:1090;background:rgba(11,20,37,.45)}
@@ -562,8 +567,10 @@ body.presence-mode .app{max-width:1680px}
     width:auto;max-height:82vh;border-radius:18px 18px 0 0;
     padding-bottom:env(safe-area-inset-bottom);
   }
-  .pv-panel-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px;font:700 14px/1.2 var(--font-body)}
-  .pv-panel-done{height:34px;padding:0 14px;border:0;border-radius:var(--radius-sm);background:var(--accent-solid);color:#fff;font:800 12px/1 var(--font-body)}
+  .pv-panel-head{padding:14px 14px 4px;font-size:14px}
+  .pv-panel-done{height:34px;font-size:12px}
+  .pv-panel-head .pv-panel-done{display:inline-block}
+  .pv-panel-foot .pv-panel-done{display:none}
   .pv-panel-search input{font-size:16px;height:40px}
   .pv-panel-person{padding:9px 6px;font-size:13px}
   .pv-panel input[type=checkbox]{width:18px;height:18px}
@@ -759,10 +766,10 @@ body.presence-mode .app{max-width:1680px}
   }
   #presenceViewSection>*{width:auto;max-width:100%}
   .pv-head{width:100%;justify-content:center;position:relative}
-  #presencePrevBtn,#presenceNextBtn,#presenceExportBtn,#presenceFilter,#presenceShowAllBtn,.pv-hide{display:none!important}
+  #presencePrevBtn,#presenceNextBtn,#presenceExportBtn,#presenceFilter,#presenceBackdrop,#presenceShowAllBtn,.pv-hide{display:none!important}
   :root{--pv-cell:15px;--pv-name:90px}
   .pv-table{border-spacing:1px;font-size:7.5px;margin:0 auto}
-  .pv-month{font-size:7px}
+  .pv-month{font-size:7px;letter-spacing:.03em}
   .pv-week{font-size:7.5px}
   .pv-name{font-size:8.5px}
   .pv-wrap{max-height:none;overflow:visible;border:0;background:transparent;display:flex;justify-content:center}
@@ -955,21 +962,25 @@ body.presence-mode .app{max-width:1680px}
         <div id="presenceFilter" class="pv-filter">
           <button id="presenceFilterBtn" class="pv-filter-btn" type="button" aria-expanded="false">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Équipes et personnes <span id="presenceCount" class="pv-count"></span>
+            Personnes <span id="presenceCount" class="pv-count"></span>
           </button>
-          <div id="presencePanel" class="pv-panel hidden" role="dialog" aria-label="Équipes et personnes affichées">
+          <div id="presencePanel" class="pv-panel hidden" role="dialog" aria-label="Personnes affichées">
             <div class="pv-panel-head">
-              <strong>Équipes et personnes</strong>
+              <strong>Personnes affichées</strong>
               <button id="presencePanelDone" type="button" class="pv-panel-done">Terminé</button>
             </div>
             <div class="pv-panel-search">
               <input id="presenceSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off">
             </div>
             <div class="pv-panel-actions">
-              <button type="button" class="pv-link" data-pv-all="show">Tout afficher</button>
-              <button type="button" class="pv-link" data-pv-all="hide">Tout masquer</button>
+              <button type="button" class="pv-link" data-pv-all="show">Tout cocher</button>
+              <button type="button" class="pv-link" data-pv-all="hide">Tout décocher</button>
             </div>
             <div id="presencePanelList" class="pv-panel-list"></div>
+            <div class="pv-panel-foot">
+              <button type="button" class="pv-link" data-pv-reset>Réinitialiser le filtre</button>
+              <button id="presencePanelDone2" type="button" class="pv-panel-done">Terminé</button>
+            </div>
           </div>
         </div>
       </div>
@@ -978,7 +989,6 @@ body.presence-mode .app{max-width:1680px}
     <div class="pv-legend">
       <span class="pv-legend-item"><i class="pv-swatch pv-full"></i>Présent 4 jours ou plus</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-partial"></i>Présent 1 à 3 jours</span>
-      <span class="pv-legend-item"><i class="pv-swatch pv-reserve"></i>Piquet (jour de réserve)</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-absent"></i>Aucun jour présent</span>
       <span class="pv-legend-item"><i class="pv-swatch pv-none"></i>Pas de données</span>
     </div>
@@ -3031,8 +3041,14 @@ const CATEGORY_LABELS={
 // permanence, sans bouton ni case pour les révéler).
 const PRESENCE_EXCLUDED_CATEGORIES=new Set(['Equipe 1','Equipe 2','Equipe 3','Equipe 4','Equipe 5','Admin.','Cadres']);
 
+// Comparaison tolérante (casse, accents, espaces, point final) : « Mécanique »,
+// « mecanique » ou « Autom » doivent tomber dans le bon groupe.
+function categoryKey(raw){
+  return String(raw||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[.\s]+/g,' ').trim();
+}
+const CATEGORY_LABELS_NORMALIZED=Object.fromEntries(Object.entries(CATEGORY_LABELS).map(([k,v])=>[categoryKey(k),v]));
 function categoryLabel(rawCategory){
-  return CATEGORY_LABELS[rawCategory]||rawCategory||OTHER_GROUP_LABEL;
+  return CATEGORY_LABELS[rawCategory]||CATEGORY_LABELS_NORMALIZED[categoryKey(rawCategory)]||rawCategory||OTHER_GROUP_LABEL;
 }
 // Même ordre que CATEGORY_ORDER, mais sur les titres affichés (ce que les
 // groupes utilisent une fois résolus via categoryLabel).
@@ -3085,15 +3101,14 @@ function presenceGroupOf(emp){
   return categoryLabel(emp.category);
 }
 
+const PRESENCE_EXCLUDED_KEYS=new Set([...PRESENCE_EXCLUDED_CATEGORIES].map(categoryKey));
 function isPresenceExcludedCategory(emp){
-  return PRESENCE_EXCLUDED_CATEGORIES.has(String(emp.category||'').trim());
+  return PRESENCE_EXCLUDED_KEYS.has(categoryKey(emp.category));
 }
 
 function isPresenceVisible(emp){
   if(isPresenceExcludedCategory(emp))return false;
-  if(presence.hiddenPeople.has(presencePersonKey(emp)))return false;
-  if(presence.hiddenCats && presence.hiddenCats.has(presenceGroupOf(emp)))return false;
-  return true;
+  return !presence.hiddenPeople.has(presencePersonKey(emp));
 }
 
 // Groupes affichés, dans l'ordre du classeur Excel (CATEGORY_ORDER) ;
@@ -3189,10 +3204,14 @@ function renderPresenceView(){
     state.presenceYear=Math.min(Math.max(state.presenceYear,years[0]),years[years.length-1]);
   }
   const year=state.presenceYear;
-  if(presence.hiddenCats===null){
-    // Première visite : tous les groupes proposés sont visibles par défaut
-    // (Équipe 1-5 / Admin. / Cadres ne sont de toute façon jamais proposés,
-    // voir PRESENCE_EXCLUDED_CATEGORIES).
+  // Le filtre ne repose plus que sur les personnes masquées. Un ancien réglage
+  // « groupe masqué » (version précédente) est converti une fois en personnes.
+  if(presence.hiddenCats===null || presence.hiddenCats.size){
+    for(const g of presenceGroups()){
+      if(presence.hiddenCats && presence.hiddenCats.has(g.name)){
+        for(const emp of g.people)presence.hiddenPeople.add(presencePersonKey(emp));
+      }
+    }
     presence.hiddenCats=new Set();
     savePresenceFilters();
   }
@@ -3215,7 +3234,7 @@ function renderPresenceView(){
 
   if(!groups.length){
     presence.rows=[];
-    $('presenceGrid').innerHTML=`<div class="pv-empty-state">Toutes les personnes sont masquées.<br><button type="button" class="pv-link" data-pv-all="show">Tout réafficher</button></div>`;
+    $('presenceGrid').innerHTML=`<div class="pv-empty-state">Aucune personne affichée.<br><button type="button" class="pv-link" data-pv-reset>Réinitialiser le filtre</button></div>`;
     return;
   }
 
@@ -3229,7 +3248,7 @@ function renderPresenceView(){
   }
 
   let h='<table class="pv-table"><thead><tr><th class="pv-name" rowspan="2"><div class="pv-name-inner"><span>Semaine</span></div></th>';
-  h+=monthSpans.map(ms=>`<th class="pv-month" colspan="${ms.span}">${escapeHTML(MONTH_SHORT[ms.month])}</th>`).join('');
+  h+=monthSpans.map(ms=>`<th class="pv-month" colspan="${ms.span}">${escapeHTML(MONTH_NAMES[ms.month])}</th>`).join('');
   h+='</tr><tr>';
   h+=weeks.map((w,i)=>`<th class="pv-week ${i===currentWeekIndex?'is-current':''}" title="Semaine ${w.num} · ${escapeHTML(presenceWeekRange(w))}">${w.num}</th>`).join('');
   h+='</tr></thead><tbody>';
@@ -3282,26 +3301,35 @@ function renderPresenceView(){
   }
 }
 
+// État d'un groupe d'après la visibilité réelle de ses membres :
+// 'all' (tous affichés), 'some' (une partie), 'none' (aucun).
+function presenceGroupState(group){
+  const n=group.people.filter(isPresenceVisible).length;
+  return n===0?'none':n===group.people.length?'all':'some';
+}
+
 function renderPresenceChips(){
   const el=$('presenceChips');
   const groups=presenceGroups();
-  const allOn=groups.every(g=>!presence.hiddenCats.has(g.name));
-  let h=`<button type="button" class="pv-chip ${allOn?'is-on':''}" data-pv-cat-all>Tous</button>`;
+  const allOn=groups.every(g=>presenceGroupState(g)==='all');
+  let h=`<button type="button" class="pv-chip ${allOn?'is-on':''}" data-pv-cat-all aria-pressed="${allOn}" title="Afficher tous les groupes">Tous</button>`;
   h+=groups.map(g=>{
-    const on=!presence.hiddenCats.has(g.name);
-    return `<button type="button" class="pv-chip ${on?'is-on':''}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${on}" title="Afficher / masquer — double-clic : seulement ce groupe">${escapeHTML(g.name)}</button>`;
+    const st=presenceGroupState(g);
+    const cls=st==='all'?'is-on':st==='some'?'is-partial':'';
+    return `<button type="button" class="pv-chip ${cls}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${st==='all'}" title="${allOn?'Afficher uniquement ce groupe':'Ajouter ou retirer ce groupe'}">${escapeHTML(g.name)}</button>`;
   }).join('');
   el.innerHTML=h;
 }
 
 function renderPresenceToolbarState(){
-  const total=planning.employees.length;
-  const visible=planning.employees.filter(isPresenceVisible).length;
-  $('presenceCount').textContent=`${visible}/${total}`;
+  const everyone=presenceGroups().flatMap(g=>g.people);
+  const total=everyone.length;
+  const visible=everyone.filter(isPresenceVisible).length;
+  $('presenceCount').textContent=visible===total?`${total}`:`${visible}/${total}`;
   const hidden=total-visible;
   const btn=$('presenceShowAllBtn');
   btn.classList.toggle('hidden',hidden===0);
-  btn.textContent=`${hidden} masquée${hidden>1?'s':''} · Tout réafficher`;
+  btn.textContent=`${hidden} personne${hidden>1?'s':''} masquée${hidden>1?'s':''} · Réinitialiser`;
 }
 
 function renderPresencePanelList(){
@@ -3311,18 +3339,18 @@ function renderPresencePanelList(){
   for(const group of presenceGroups()){
     const people=group.people.filter(emp=>!query || normalizeSearchText(emp.name).includes(query));
     if(!people.length)continue;
-    {
-      const catOn=!presence.hiddenCats.has(group.name);
-      h+=`<div class="pv-panel-group"><label><input type="checkbox" data-pv-panel-cat="${escapeHTML(group.name)}" ${catOn?'checked':''}>${escapeHTML(group.name)}</label><button type="button" class="pv-link" data-pv-only="${escapeHTML(group.name)}">Seulement</button></div>`;
-    }
+    const n=people.filter(isPresenceVisible).length;
+    const st=n===0?'none':n===people.length?'all':'some';
+    h+=`<div class="pv-panel-group"><label><input type="checkbox" data-pv-panel-cat="${escapeHTML(group.name)}" ${st==='all'?'checked':''} ${st==='some'?'data-indeterminate="1"':''}>${escapeHTML(group.name)}</label></div>`;
     for(const emp of people){
       const key=presencePersonKey(emp);
       const on=isPresenceVisible(emp);
-      h+=`<label class="pv-panel-person ${on?'':'is-off'}"><input type="checkbox" data-pv-panel-person="${escapeHTML(key)}" ${!presence.hiddenPeople.has(key)?'checked':''}>${escapeHTML(cleanEmployeeName(emp.name))}</label>`;
+      h+=`<label class="pv-panel-person ${on?'':'is-off'}"><input type="checkbox" data-pv-panel-person="${escapeHTML(key)}" ${on?'checked':''}>${escapeHTML(cleanEmployeeName(emp.name))}</label>`;
     }
   }
   if(!h)h='<div class="pv-panel-empty">Aucune personne trouvée.</div>';
   list.innerHTML=h;
+  list.querySelectorAll('input[data-indeterminate]').forEach(i=>{ i.indeterminate=true; });
 }
 
 function isPhoneLayout(){ return window.matchMedia('(max-width:700px)').matches; }
@@ -3343,34 +3371,47 @@ function closePresencePanel(){
   $('presenceFilterBtn').setAttribute('aria-expanded','false');
 }
 
+function presenceFinishChange(){
+  savePresenceFilters();
+  renderPresenceView();
+}
+
+// Réinitialise tout le filtre : tout le monde redevient visible.
 function presenceShowAll(){
-  presence.hiddenCats.clear();
   presence.hiddenPeople.clear();
-  savePresenceFilters();
-  renderPresenceView();
+  presence.hiddenCats=new Set();
+  presenceFinishChange();
 }
 
-function presenceHideAll(){
-  for(const emp of planning.employees)presence.hiddenPeople.add(presencePersonKey(emp));
-  savePresenceFilters();
-  renderPresenceView();
-}
-
-function presenceOnlyCategory(category){
-  presence.hiddenCats=new Set(presenceGroups().map(g=>g.name).filter(name=>name!==category));
-  // On réaffiche aussi les personnes masquées individuellement dans cette catégorie.
-  for(const emp of planning.employees){
-    if(presenceGroupOf(emp)===category)presence.hiddenPeople.delete(presencePersonKey(emp));
+function presenceSetVisible(people,visible){
+  for(const emp of people){
+    const key=presencePersonKey(emp);
+    if(visible)presence.hiddenPeople.delete(key);
+    else presence.hiddenPeople.add(key);
   }
-  savePresenceFilters();
-  renderPresenceView();
 }
 
-function presenceToggleCategory(category){
-  if(presence.hiddenCats.has(category))presence.hiddenCats.delete(category);
-  else presence.hiddenCats.add(category);
-  savePresenceFilters();
-  renderPresenceView();
+// « Tout cocher / Tout décocher » : agit sur la liste affichée dans le
+// panneau (donc sur le résultat de la recherche s'il y en a une).
+function presencePanelListedPeople(){
+  const query=normalizeSearchText(presence.search);
+  return presenceGroups().flatMap(g=>g.people).filter(emp=>!query || normalizeSearchText(emp.name).includes(query));
+}
+
+// Puce d'un groupe : si tout est affiché on isole le groupe, sinon on
+// l'ajoute / le retire. Si plus personne n'est affiché, on réaffiche tout.
+function presenceChipClick(category){
+  const groups=presenceGroups();
+  const group=groups.find(g=>g.name===category);
+  if(!group)return;
+  const everythingShown=groups.every(g=>presenceGroupState(g)==='all');
+  if(everythingShown){
+    for(const g of groups)presenceSetVisible(g.people,g===group);
+  }else{
+    presenceSetVisible(group.people,presenceGroupState(group)!=='all');
+  }
+  if(!groups.some(g=>g.people.some(isPresenceVisible)))presence.hiddenPeople.clear();
+  presenceFinishChange();
 }
 
 function openPresenceWeekModal(emp,week){
@@ -3421,6 +3462,7 @@ $('presenceFilterBtn').addEventListener('click',event=>{
   else closePresencePanel();
 });
 $('presencePanelDone').addEventListener('click',event=>{ event.stopPropagation(); closePresencePanel(); });
+$('presencePanelDone2').addEventListener('click',event=>{ event.stopPropagation(); closePresencePanel(); });
 $('presenceSearch').addEventListener('input',event=>{
   presence.search=event.target.value;
   renderPresencePanelList();
@@ -3432,26 +3474,19 @@ $('presenceViewSection').addEventListener('click',event=>{
 
   const allBtn=target.closest('[data-pv-all]');
   if(allBtn){
-    if(allBtn.dataset.pvAll==='show')presenceShowAll();
-    else presenceHideAll();
+    presenceSetVisible(presencePanelListedPeople(),allBtn.dataset.pvAll==='show');
+    presenceFinishChange();
     return;
   }
 
-  const onlyBtn=target.closest('[data-pv-only]');
-  if(onlyBtn){ presenceOnlyCategory(onlyBtn.dataset.pvOnly); return; }
-
-  if(target.closest('[data-pv-cat-all]')){
-    presence.hiddenCats.clear();
-    savePresenceFilters();
-    renderPresenceView();
+  if(target.closest('[data-pv-reset]') || target.closest('[data-pv-cat-all]')){
+    presenceShowAll();
     return;
   }
 
   const chip=target.closest('[data-pv-cat]');
   if(chip){
-    // Double-clic = « seulement cette catégorie » : on laisse le 2e clic au dblclick.
-    if(event.detail>1)return;
-    presenceToggleCategory(chip.dataset.pvCat);
+    presenceChipClick(chip.dataset.pvCat);
     return;
   }
 
@@ -3471,16 +3506,12 @@ $('presenceViewSection').addEventListener('click',event=>{
   }
 });
 
-$('presenceViewSection').addEventListener('dblclick',event=>{
-  const chip=event.target.closest('[data-pv-cat]');
-  if(chip)presenceOnlyCategory(chip.dataset.pvCat);
-});
-
 $('presenceViewSection').addEventListener('change',event=>{
   const target=event.target;
   if(target.dataset.pvPanelCat!==undefined){
-    if(target.checked)presence.hiddenCats.delete(target.dataset.pvPanelCat);
-    else presence.hiddenCats.add(target.dataset.pvPanelCat);
+    const query=normalizeSearchText(presence.search);
+    const group=presenceGroups().find(g=>g.name===target.dataset.pvPanelCat);
+    if(group)presenceSetVisible(group.people.filter(emp=>!query || normalizeSearchText(emp.name).includes(query)),target.checked);
   }else if(target.dataset.pvPanelPerson!==undefined){
     if(target.checked)presence.hiddenPeople.delete(target.dataset.pvPanelPerson);
     else presence.hiddenPeople.add(target.dataset.pvPanelPerson);
