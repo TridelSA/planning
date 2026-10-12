@@ -422,6 +422,31 @@ body.view-year .stats-grid{display:grid}
 .team-legend-dot.dot-rn{background:var(--c-rn-bg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
 
 .hero-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.navm-btn{
+  display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;
+  border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(255,255,255,.14);
+  font:700 11.5px/1 var(--font-body);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.12);
+  transition:background-color .12s var(--ease),transform .12s var(--ease);
+}
+.navm-btn:hover,.navm-btn[aria-expanded="true"]{background:rgba(255,255,255,.26)}
+.navm-btn:active{transform:scale(.97)}
+.navm-btn:focus-visible{outline:1px solid #fff;outline-offset:2px}
+.navm-panel{
+  position:fixed;z-index:1200;width:min(290px,calc(100vw - 20px));padding:6px;
+  background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);
+}
+.navm-item{
+  display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border:0;border-radius:10px;background:transparent;text-align:left;
+  font:600 12.5px/1.25 var(--font-body);color:var(--ink);
+}
+.navm-item:hover{background:var(--paper)}
+.navm-item.is-active{background:var(--accent-tint);color:var(--accent-ink)}
+.navm-ico{flex:0 0 auto;width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:var(--paper);color:var(--ink-soft)}
+.navm-item.is-active .navm-ico{background:var(--accent-solid);color:#fff}
+.navm-txt{flex:1;min-width:0}
+.navm-txt b{display:block;font-weight:800;font-size:12.5px}
+.navm-txt small{display:block;margin-top:2px;font-weight:500;font-size:10.5px;color:var(--muted)}
+.navm-check{flex:0 0 auto;color:var(--accent-solid)}
 
 /* ==========================================================
    Présences annuelles : une ligne par personne, une colonne par
@@ -760,7 +785,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .hero p{font-size:10.5px}
   .update-chip{padding:6px 8px;max-width:150px;font-size:8.5px;border-radius:9px}
   .update-chip strong{font-size:9.5px}
-  .team-toggle{font-size:8.5px}
+  .navm-btn{height:28px;padding:0 10px;font-size:10.5px}
 
   .controls{padding:9px;margin-bottom:9px}
   .today-btn{height:44px;padding:0 12px;font-size:11px}
@@ -877,6 +902,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 </head>
 <body>
 
+<div id="navMenuPanel" class="navm-panel hidden" role="menu" aria-label="Pages"></div>
+
 <div class="app">
   <header class="hero">
     <div class="hero-stripe"></div>
@@ -892,9 +919,10 @@ body:not(.cmp-week) .cmp-cell{height:30px}
           <span id="updateStatus"></span>
         </div>
         <div class="hero-actions">
-          <button id="presenceViewToggleBtn" class="team-toggle" type="button" aria-label="Présences annuelles par semaine">Maintenance</button>
-          <button id="compareViewToggleBtn" class="team-toggle" type="button" aria-label="Comparer des collègues">Comparer</button>
-          <button id="teamViewToggleBtn" class="team-toggle" type="button" aria-label="Planning d'équipe annuel">Rotations</button>
+          <button id="navMenuBtn" class="navm-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="navMenuPanel">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            <span id="navMenuLabel">Individuel</span>
+          </button>
         </div>
       </div>
       <button id="journalAccessBtn" class="journal-access" type="button" aria-label="Journal des publications">
@@ -1635,7 +1663,7 @@ async function loadPlanning(preserve=true){
     populateEmployees();
     updateEmployeePicker();
     showUI();
-    render();
+    if(!restoreSavedPage())render();
 
     $('sourceStatus').textContent='';
     $('sourceStatus').classList.remove('status-warning');
@@ -1658,7 +1686,7 @@ async function loadPlanning(preserve=true){
       populateEmployees();
       updateEmployeePicker();
       showUI();
-      render();
+      if(!restoreSavedPage())render();
       $('sourceStatus').textContent='⚠ Hors-ligne';
       $('sourceStatus').classList.add('status-warning');
       return;
@@ -2928,7 +2956,6 @@ $('journalAccessBtn').addEventListener('click',openJournalModal);
 $('journalModalClose').addEventListener('click',closeJournalModal);
 $('journalModalBackdrop').addEventListener('click',e=>{ if(e.target===$('journalModalBackdrop'))closeJournalModal(); });
 
-$('teamViewToggleBtn').addEventListener('click',toggleTeamView);
 $('teamPrevBtn').addEventListener('click',()=>teamShiftYear(-1));
 $('teamNextBtn').addEventListener('click',()=>teamShiftYear(1));
 
@@ -3080,28 +3107,77 @@ function currentPage(){
   return 'individual';
 }
 
+// Pages de l'application : pour en ajouter une, il suffit d'ajouter une ligne
+// ici (et son affichage dans setPage / render).
+const NAV_PAGES=[
+  {id:'individual',label:'Individuel',desc:'Mon planning, semaine · mois · année',
+   icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>'},
+  {id:'team',label:'Rotations',desc:'Qui est en rotation, jour par jour',
+   icon:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>'},
+  {id:'presence',label:'Maintenance',desc:'Présences annuelles par semaine',
+   icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>'},
+  {id:'compare',label:'Comparer',desc:'Plusieurs collègues côte à côte',
+   icon:'<path d="M8 3v18M16 3v18M3 8h5M16 8h5M3 16h5M16 16h5"/>'}
+];
+const PAGE_KEY='planningPage';
+
 function updateTeamToggleLabel(){
   const page=currentPage();
-  const teamBtn=$('teamViewToggleBtn');
-  if(teamBtn){
-    teamBtn.textContent=page==='team'?'Individuel':'Rotations';
-    teamBtn.setAttribute('aria-label',page==='team'?'Retour au planning individuel':"Planning d'équipe annuel");
-  }
-  const compareBtn=$('compareViewToggleBtn');
-  if(compareBtn){
-    compareBtn.textContent=page==='compare'?'Individuel':'Comparer';
-    compareBtn.setAttribute('aria-label',page==='compare'?'Retour au planning individuel':'Comparer des collègues');
-  }
-  const presenceBtn=$('presenceViewToggleBtn');
-  if(presenceBtn){
-    presenceBtn.textContent=page==='presence'?'Individuel':'Maintenance';
-    presenceBtn.setAttribute('aria-label',page==='presence'?'Retour au planning individuel':'Présences annuelles par semaine');
-  }
+  const current=NAV_PAGES.find(x=>x.id===page)||NAV_PAGES[0];
+  $('navMenuLabel').textContent=current.label;
+  $('navMenuPanel').innerHTML=NAV_PAGES.map(x=>`<button type="button" class="navm-item ${x.id===page?'is-active':''}" role="menuitem" data-nav-page="${x.id}">
+    <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.icon}</svg></span>
+    <span class="navm-txt"><b>${x.label}</b><small>${x.desc}</small></span>
+    ${x.id===page?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
+  </button>`).join('');
   const subtitle=$('heroSubtitle');
   if(subtitle){
     subtitle.textContent=page==='compare'?'Comparer des collègues':page==='presence'?'Présences annuelles':page==='team'?"Planning d'équipe":'Planning individuel';
   }
 }
+
+function openNavMenu(){
+  const btn=$('navMenuBtn'),panel=$('navMenuPanel');
+  const r=btn.getBoundingClientRect();
+  panel.classList.remove('hidden');
+  panel.style.top=`${Math.round(r.bottom+8)}px`;
+  panel.style.right=`${Math.max(10,Math.round(window.innerWidth-r.right))}px`;
+  btn.setAttribute('aria-expanded','true');
+}
+function closeNavMenu(){
+  $('navMenuPanel').classList.add('hidden');
+  $('navMenuBtn').setAttribute('aria-expanded','false');
+}
+$('navMenuBtn').addEventListener('click',event=>{
+  event.stopPropagation();
+  if($('navMenuPanel').classList.contains('hidden'))openNavMenu(); else closeNavMenu();
+});
+$('navMenuPanel').addEventListener('click',event=>{
+  const item=event.target.closest('[data-nav-page]');
+  if(!item)return;
+  closeNavMenu();
+  setPage(item.dataset.navPage);
+});
+document.addEventListener('click',event=>{
+  if(!$('navMenuPanel').contains(event.target))closeNavMenu();
+});
+document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeNavMenu(); });
+window.addEventListener('resize',closeNavMenu);
+
+// Page affichée au dernier passage : restaurée une seule fois, au premier
+// affichage des données (fermeture / actualisation de la page).
+let pageRestored=false;
+function restoreSavedPage(){
+  if(pageRestored)return false;
+  pageRestored=true;
+  let saved='individual';
+  try{ saved=localStorage.getItem(PAGE_KEY)||'individual'; }catch(e){ saved='individual'; }
+  if(saved==='individual' || !NAV_PAGES.some(x=>x.id===saved))return false;
+  setPage(saved);
+  return true;
+}
+
+updateTeamToggleLabel();
 
 function setPage(page){
   if(page!=='individual' && (!planning.employees || !planning.employees.length))return;
@@ -3131,6 +3207,7 @@ function setPage(page){
   $('compareViewSection').classList.toggle('hidden',page!=='compare');
 
   updateTeamToggleLabel();
+  try{ localStorage.setItem(PAGE_KEY,page); }catch(e){ /* stockage indisponible */ }
   render();
 }
 
@@ -3139,7 +3216,6 @@ function openTeamView(){ setPage('team'); }
 function closeTeamView(){ setPage('individual'); }
 function togglePresenceView(){ setPage(state.presenceMode?'individual':'presence'); }
 
-$('presenceViewToggleBtn').addEventListener('click',togglePresenceView);
 $('presenceExportBtn').addEventListener('click',()=>window.print());
 
 // ==========================================================
@@ -3931,7 +4007,6 @@ function closeCmpPanel(){
   $('cmpPickBtn').setAttribute('aria-expanded','false');
 }
 
-$('compareViewToggleBtn').addEventListener('click',()=>setPage(state.compareMode?'individual':'compare'));
 $('cmpPrevBtn').addEventListener('click',()=>cmpShift(-1));
 $('cmpNextBtn').addEventListener('click',()=>cmpShift(1));
 $('cmpTodayBtn').addEventListener('click',()=>{ cmp.date=new Date(); renderCompareView(); });
