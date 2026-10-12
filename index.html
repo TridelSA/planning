@@ -456,6 +456,7 @@ body.presence-mode .app{max-width:1680px}
 .pv-toolbar-end{display:flex;align-items:center;gap:10px;margin-left:auto}
 .pv-link{border:0;background:none;padding:4px 2px;color:var(--accent);font:700 11px/1 var(--font-body)}
 .pv-link:hover{text-decoration:underline}
+.pv-week.is-hover{background:var(--accent-tint);color:var(--accent-ink);border-radius:6px}
 #presenceTitlesBtn.is-off{opacity:.6;text-decoration:line-through}
 .pv-panel-sep{margin:10px 0 2px;padding-top:8px;border-top:1px solid var(--line);font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 
@@ -3289,7 +3290,7 @@ function renderPresenceView(){
   let h='<table class="pv-table"><thead><tr><th class="pv-name" rowspan="2"><div class="pv-name-inner"><span>Semaine</span></div></th>';
   h+=monthSpans.map(ms=>`<th class="pv-month" colspan="${ms.span}">${escapeHTML(MONTH_NAMES[ms.month])}</th>`).join('');
   h+='</tr><tr>';
-  h+=weeks.map((w,i)=>`<th class="pv-week ${i===currentWeekIndex?'is-current':''}" title="Semaine ${w.num} · ${escapeHTML(presenceWeekRange(w))}">${w.num}</th>`).join('');
+  h+=weeks.map((w,i)=>`<th class="pv-week ${i===currentWeekIndex?'is-current':''}" data-pv-wk="${i}" title="Semaine ${w.num} · ${escapeHTML(presenceWeekRange(w))}">${w.num}</th>`).join('');
   h+='</tr></thead><tbody>';
 
   const rows=[];
@@ -3556,6 +3557,25 @@ $('presenceViewSection').addEventListener('click',event=>{
     if(emp && week)openPresenceWeekModal(emp,week);
   }
 });
+
+// Survol d'une case : le numéro de la semaine correspondante est mis en surbrillance.
+(function(){
+  const grid=$('presenceGrid');
+  if(!grid)return;
+  let current=null;
+  const setWeek=idx=>{
+    grid.querySelectorAll('.pv-week.is-hover').forEach(el=>el.classList.remove('is-hover'));
+    current=idx;
+    if(idx===null)return;
+    const th=grid.querySelector(`.pv-week[data-pv-wk="${idx}"]`);
+    if(th)th.classList.add('is-hover');
+  };
+  grid.addEventListener('mouseover',e=>{
+    const cell=e.target.closest('[data-pv-week]');
+    setWeek(cell?cell.dataset.pvWeek:null);
+  });
+  grid.addEventListener('mouseleave',()=>setWeek(null));
+})();
 
 $('presenceViewSection').addEventListener('change',event=>{
   const target=event.target;
