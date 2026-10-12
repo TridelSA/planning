@@ -3882,11 +3882,12 @@ function cmpYearInfo(emp,c){
 
 // Affichage téléphone : une carte par personne (pas de tableau à faire défiler).
 function cmpCardsHTML(view,groups){
+  // Tout le monde dans un seul bloc, sans séparation par groupe.
+  const everyone=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   let h='';
-  for(const group of groups){
-    const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
-    if(!people.length)continue;
-    h+=`<div class="cmpm-block"><div class="cmpm-group">${escapeHTML(group.name)}</div>`;
+  {
+    const people=everyone;
+    h+='<div class="cmpm-block">';
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<div class="cmpm-card"><div class="cmpm-name">${escapeHTML(name)}</div>`;
@@ -3954,7 +3955,6 @@ function renderCompareView(){
   for(const group of groups){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
     if(!people.length)continue;
-    h+=`<tr class="cmp-group"><th class="cmp-name"><div class="cmp-name-inner">${escapeHTML(group.name)}</div></th><td colspan="${colspan}"></td></tr>`;
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<tr class="cmp-person"><th class="cmp-name"><div class="cmp-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span></div></th>`;
