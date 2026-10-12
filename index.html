@@ -620,6 +620,14 @@ body.presence-mode .app{max-width:1680px}
 .day-modal-close{width:34px;height:34px;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius-sm);font-size:18px;color:var(--ink-soft);transition:background-color .12s var(--ease)}
 .day-modal-close:hover{background:var(--paper)}
 .day-modal-body{padding:15px 18px 18px}
+.day-modal-backdrop.is-team-day .day-modal{width:min(1100px,100%)}
+.day-detail-shifts{display:block}
+@media (min-width:900px){
+  .day-modal-backdrop.is-team-day .day-modal{overflow:visible;overflow-y:auto}
+  .day-detail-shifts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+  .day-detail-shifts .day-detail-service{margin-bottom:0!important}
+}
+
 
 .journal-empty{color:var(--muted);font:600 12px/1.5 var(--font-body);text-align:center;padding:20px 0}
 .journal-entry{padding:10px 12px;border-radius:10px;background:var(--paper);border:1px solid var(--line);margin-bottom:8px}
@@ -2757,10 +2765,10 @@ function openDayModal(dateObj,employee=selectedEmployee()){
       <div class="day-detail-info"><strong>${escapeHTML(info[0])}</strong><small>${escapeHTML(detailText)}</small></div>
     </div>${teamHTML}</div>`;
 
-  $('dayModalBackdrop').classList.add('open');
+  $('dayModalBackdrop').classList.toggle('is-team-day',false);$('dayModalBackdrop').classList.add('open');
 }
 
-function closeDayModal(){ $('dayModalBackdrop').classList.remove('open'); }
+function closeDayModal(){ $('dayModalBackdrop').classList.remove('open'); $('dayModalBackdrop').classList.remove('is-team-day'); }
 $('dayModalClose').addEventListener('click',closeDayModal);
 $('dayModalBackdrop').addEventListener('click',e=>{ if(e.target===$('dayModalBackdrop'))closeDayModal(); });
 
@@ -2926,8 +2934,8 @@ function openTeamDayModal(dateObj){
     </div>`;
   }).join('');
 
-  $('dayModalBody').innerHTML=`${holidayHTML}${schoolHTML}${travauxHTML}${shiftsHTML}`;
-  $('dayModalBackdrop').classList.add('open');
+  $('dayModalBody').innerHTML=`${holidayHTML}${schoolHTML}${travauxHTML}<div class="day-detail-shifts">${shiftsHTML}</div>`;
+  $('dayModalBackdrop').classList.toggle('is-team-day',true);$('dayModalBackdrop').classList.add('open');
 }
 
 function attachTeamDayClickHandlers(){
@@ -3478,7 +3486,7 @@ function openPresenceWeekModal(emp,week){
   }).join('');
 
   $('dayModalBody').innerHTML=`<div class="pv-week-summary pv-${p.level}">${escapeHTML(summary)}</div>${daysHTML}`;
-  $('dayModalBackdrop').classList.add('open');
+  $('dayModalBackdrop').classList.toggle('is-team-day',false);$('dayModalBackdrop').classList.add('open');
 }
 
 function presenceShiftYear(amount){
