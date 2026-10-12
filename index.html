@@ -655,7 +655,11 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .pv-wrap{max-height:calc(100vh - 200px)}
   .pv-name-inner{padding-left:6px}
   .pv-name{font-size:10.5px}
-  .pv-toolbar-end{margin-left:0;width:100%;justify-content:space-between}
+  .pv-toolbar-end{margin-left:0;width:100%;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  #presenceShowAllBtn{order:-1;flex:1 0 100%;text-align:left;white-space:nowrap;padding:0 2px 2px;font-size:11px}
+  .pv-toolbar-end>.pv-filter-btn,.pv-toolbar-end>.pv-filter{flex:1 1 0}
+  .pv-toolbar-end .pv-filter .pv-filter-btn{width:100%;justify-content:center}
+  .pv-toolbar-end .pv-filter-btn{white-space:nowrap;padding:0 8px;font-size:11px}
   /* Téléphone : le panneau devient une feuille fixée en bas de l'écran. */
   .pv-panel{
     position:fixed;left:0;right:0;bottom:0;top:auto;z-index:1100;
