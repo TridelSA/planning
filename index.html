@@ -544,6 +544,12 @@ body.presence-mode .app{max-width:1680px}
 .st-metrics{margin-bottom:4px}
 .st-curve .st-note{margin-top:4px}
 @media (max-width:700px){.st-axis{font-size:12px}.st-val{font-size:12px}.st-nowlab{font-size:11px}.st-chart-head .cmp-tabs{width:100%}}
+.st-more{margin-top:14px}
+.st-more summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);font:700 13px/1 var(--font-display);color:var(--ink)}
+.st-more summary::-webkit-details-marker{display:none}
+.st-more summary::after{content:'⌄';margin-left:auto;color:var(--accent);font-size:18px;transition:transform .16s var(--ease)}
+.st-more[open] summary::after{transform:rotate(180deg)}
+.st-more[open] summary{margin-bottom:12px}
 .st-empty-note{padding:10px 0;color:var(--muted);font:600 12px/1.4 var(--font-body)}
 @media (max-width:700px){
   .st-bar{flex-direction:column;align-items:stretch;gap:10px}
@@ -964,8 +970,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .pv-table tbody tr,.pv-table thead tr{page-break-inside:avoid;break-inside:avoid}
   .pv-chip{border-width:1px;background:transparent!important;color:#000!important}
   .pv-chip::before{display:none}
-  /* PDF : seuls les filtres réellement utilisés (catégories affichées) apparaissent */
-  .pv-chip:not(.is-on):not(.is-partial),.pv-chip[data-pv-cat-all]{display:none!important}
+  /* PDF : ni raccourcis de filtre, ni titres de groupes */
+  #presenceChips,.pv-chip,.pv-group{display:none!important}
   .pv-chips{justify-content:center}
   /* Titre et année alignés sur la même ligne, même police */
   .pv-head{align-items:center;gap:10px;margin-bottom:8px}
@@ -1224,7 +1230,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
       <div id="presenceChips" class="pv-chips"></div>
       <div class="pv-toolbar-end">
         <button id="presenceShowAllBtn" class="pv-link hidden" type="button"></button>
-        <button id="presenceTitlesBtn" class="pv-filter-btn" type="button" aria-pressed="true" title="Afficher / masquer les titres de groupes à gauche (aussi dans le PDF)">Titres</button>
+        <button id="presenceTitlesBtn" class="pv-filter-btn" type="button" aria-pressed="true" title="Afficher / masquer les titres de groupes à gauche (jamais dans le PDF)">Titres</button>
         <button id="presenceExportBtn" class="pv-filter-btn" type="button" title="Exporter en PDF (A4 paysage)">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h9l3 3v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
           Exporter en PDF
@@ -3358,7 +3364,7 @@ const PRESENCE_FULL_DAYS=4;                        // seuil de la case verte
 const PRESENCE_HIDDEN_GROUPS_KEY='presenceHiddenGroups';
 const PRESENCE_HIDDEN_PEOPLE_KEY='presenceHiddenPeople';
 const PRESENCE_SHOWN_EXTRAS_KEY='presenceShownExtras';   // personnes des catégories masquées par défaut (Équipes, Admin., Cadres) affichées à la demande
-const PRESENCE_SHOW_TITLES_KEY='presenceShowTitles';
+const PRESENCE_SHOW_TITLES_KEY='presenceShowTitles2'; // titres de groupes : masqués par défaut (clé renouvelée)
 const OTHER_GROUP_LABEL='Sans catégorie';
 const EYE_OFF_ICON='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
 
@@ -3415,7 +3421,7 @@ const presence={
   hiddenCats:readStoredGroups(),
   hiddenPeople:new Set(readStoredList(PRESENCE_HIDDEN_PEOPLE_KEY)),
   shownExtras:new Set(readStoredList(PRESENCE_SHOWN_EXTRAS_KEY)),
-  showTitles:(()=>{ try{ return localStorage.getItem(PRESENCE_SHOW_TITLES_KEY)!=='0'; }catch(e){ return true; } })(),
+  showTitles:(()=>{ try{ return localStorage.getItem(PRESENCE_SHOW_TITLES_KEY)==='1'; }catch(e){ return false; } })(),
   search:'',
   rows:[],
   weeks:[]
@@ -4195,7 +4201,7 @@ const ST_VAC=['VA','VJ','HSR','HOR']; // « congés » = vacances + récupérati
 const ST_REC=[];
 const ST_OTHER=['MS','MC','AP','MI','EM','PC','PI','FE','PR','AN','NS','PA','DE','DL','DC','JT'];
 const ST_COLORS={vac:'#E0566A',oth:'#6B7A90',rot:'#4545AA',piq:'#63428E'};
-const st={month:'all',metric:'',search:'',mode:'month'};
+const st={month:'all',metric:'',search:'',mode:'month',more:false};
 const ST_MON_SHORT=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
 try{ const m=JSON.parse(localStorage.getItem(ST_KEY)||'{}'); if(m&&(m.month==='all'||(Number.isInteger(m.month)&&m.month>=0&&m.month<12)))st.month=m.month; }catch(e){ /* ignoré */ }
 function saveSt(){ try{ localStorage.setItem(ST_KEY,JSON.stringify({month:st.month})); }catch(e){ /* ignoré */ } }
@@ -4398,7 +4404,8 @@ function renderStatsView(){
   blocks.push(`<div class="st-block"><h3>Détail des congés et absences</h3>${used.length
     ?`<div class="st-list">${used.map(x=>`<div class="st-line"><span class="st-code ${classFor(x.c)}">${x.c}</span><span>${escapeHTML((CODE_INFO[x.c]||[x.c])[0])}</span><b>${stDays(x.n)}</b></div>`).join('')}</div>`
     :`<div class="st-empty-note">Aucun congé ni absence sur ${stPeriodLabel()}.</div>`}</div>`);
-  h+=`<div class="st-blocks">${blocks.join('')}</div>`;
+  const detailBlocks=blocks.splice(blocks.length-2,2);
+  if(blocks.length)h+=`<div class="st-blocks">${blocks.join('')}</div>`;
 
   const metrics=[
     {id:'vac',label:'Congés',codes:ST_VAC,color:ST_COLORS.vac},
@@ -4407,6 +4414,7 @@ function renderStatsView(){
   if(rotYear>0)metrics.push({id:'rot',label:'Rotations',codes:ROTATION_CODES,color:ST_COLORS.rot});
   if(piqYear>0)metrics.push({id:'piq',label:'Piquet',codes:['PIQ'],color:ST_COLORS.piq});
   h+=stChartHTML(months,metrics);
+  h+=`<details class="st-more"${st.more?' open':''}><summary>Voir le détail des congés et absences</summary><div class="st-blocks">${detailBlocks.join('')}</div></details>`;
   body.innerHTML=h;
   // La liste des périodes s'ouvre sur le prochain congé.
   const pl=body.querySelector('.st-periods'),nx=pl&&pl.querySelector('.is-next');
@@ -4457,6 +4465,7 @@ $('stMonth').addEventListener('change',event=>{
   st.month=event.target.value==='all'?'all':Number(event.target.value);
   saveSt(); renderStatsView();
 });
+$('statsViewSection').addEventListener('toggle',event=>{ if(event.target.classList&&event.target.classList.contains('st-more'))st.more=event.target.open; },true);
 $('statsViewSection').addEventListener('click',event=>{
   const m=event.target.closest('[data-st-metric]');
   if(m){ st.metric=m.dataset.stMetric; renderStatsView(); return; }
