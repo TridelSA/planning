@@ -778,6 +778,9 @@ body.presence-mode .app{max-width:1680px}
   .pv-table tbody tr,.pv-table thead tr{page-break-inside:avoid;break-inside:avoid}
   .pv-chip{border-width:1px;background:transparent!important;color:#000!important}
   .pv-chip::before{display:none}
+  /* PDF : seuls les filtres réellement utilisés (catégories affichées) apparaissent */
+  .pv-chip:not(.is-on):not(.is-partial),.pv-chip[data-pv-cat-all]{display:none!important}
+  .pv-chips{justify-content:center}
   /* Titre et année alignés sur la même ligne, même police */
   .pv-head{align-items:center;gap:10px;margin-bottom:8px}
   .team-view-title h2{font:700 17px/1.2 var(--font-display)}
