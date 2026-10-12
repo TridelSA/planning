@@ -342,7 +342,7 @@ body.view-year .stats-grid{display:grid}
 .week-holiday-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--danger);margin-left:4px;vertical-align:middle}
 .week-travaux-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--signal);margin-left:4px;vertical-align:middle}
 .week-school-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--school-dot);margin-left:4px;vertical-align:middle}
-.week-shift{position:relative;padding:11px 9px;height:132px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;overflow:hidden}
+.week-shift{position:relative;padding:24px 9px 11px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;overflow:hidden}
 .week-shift-badge-stack{position:absolute;top:5px;right:5px;max-width:64%;display:flex;flex-direction:column;align-items:flex-end;gap:2px;pointer-events:none}
 .week-shift-holiday-badge{padding:1px 4px;border-radius:4px;background:var(--danger-bg);color:var(--danger);font:700 7px/1.35 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .week-shift-school-badge{padding:1px 4px;border-radius:4px;background:var(--school-tint);color:var(--school-dot);font:700 7px/1.35 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -774,7 +774,8 @@ body.presence-mode .app{max-width:1680px}
   .pv-month{font-size:7px;letter-spacing:.03em}
   .pv-week{font-size:7.5px}
   .pv-name{font-size:8.5px}
-  .pv-wrap{max-height:none;overflow:visible;border:0;background:transparent;display:flex;justify-content:center}
+  .pv-wrap{max-height:none;min-height:0;overflow:visible;border:0;background:transparent;display:flex;justify-content:center;align-items:flex-start}
+  .pv-table{height:auto!important}
   .pv-table thead th,.pv-table tfoot td,.pv-table tfoot th,.pv-name{position:static;box-shadow:none}
   .pv-cell:hover{transform:none;box-shadow:none}
   .pv-table tbody tr,.pv-table thead tr{page-break-inside:avoid;break-inside:avoid}
@@ -3354,14 +3355,16 @@ function renderPresenceChips(){
 function renderPresenceToolbarState(){
   const tb=$('presenceTitlesBtn');
   if(tb){ tb.setAttribute('aria-pressed',String(presence.showTitles)); tb.classList.toggle('is-off',!presence.showTitles); }
-  const everyone=presenceGroups().flatMap(g=>g.people);
-  const total=everyone.length;
+  // Pastille : nombre total de personnes disponibles dans le panneau.
+  // Lien : nombre de personnes actuellement affichées (visible dès que le
+  // filtre diffère de l'affichage par défaut).
+  const everyone=presenceGroups(true).flatMap(g=>g.people);
   const visible=everyone.filter(isPresenceVisible).length;
-  $('presenceCount').textContent=visible===total?`${total}`:`${visible}/${total}`;
-  const hidden=total-visible;
+  $('presenceCount').textContent=String(everyone.length);
+  const isDefault=everyone.every(e=>isPresenceVisible(e)===!isPresenceExcludedCategory(e));
   const btn=$('presenceShowAllBtn');
-  btn.classList.toggle('hidden',hidden===0);
-  btn.textContent=`${hidden} personne${hidden>1?'s':''} masquée${hidden>1?'s':''} · Réinitialiser`;
+  btn.classList.toggle('hidden',isDefault);
+  btn.textContent=`${visible} personne${visible>1?'s':''} affichée${visible>1?'s':''} · Réinitialiser`;
 }
 
 function renderPresencePanelList(){
