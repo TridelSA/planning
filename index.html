@@ -3275,7 +3275,7 @@ function renderPresenceView(){
       h+=`<tr class="pv-person"><th class="pv-name"><div class="pv-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span><button type="button" class="pv-hide" data-pv-hide="${escapeHTML(presencePersonKey(emp))}" title="Masquer ${escapeHTML(name)}" aria-label="Masquer ${escapeHTML(name)}">${EYE_OFF_ICON}</button></div></th>`;
       weeks.forEach((w,i)=>{
         const p=weekPresence(emp,w);
-        if(p.level==='full')fullCounts[i]++;
+        if(p.level==='full'||p.level==='reserve')fullCounts[i]++; // = cases vertes (présent ≥ 4 j ou réserve/piquet)
         const label=p.level==='none'
           ? 'pas de données'
           : p.level==='reserve'
@@ -3286,7 +3286,7 @@ function renderPresenceView(){
       h+='</tr>';
     }
   }
-  h+='</tbody><tfoot><tr><th class="pv-name"><div class="pv-name-inner" title="Personnes affichées présentes au moins 4 jours dans la semaine"><span>Présents ≥ 4 j</span></div></th>';
+  h+='</tbody><tfoot><tr><th class="pv-name"><div class="pv-name-inner" title="Nombre de personnes affichées en vert cette semaine (présentes au moins 4 jours, ou de piquet)"><span>Présents</span></div></th>';
   h+=fullCounts.map(n=>`<td class="pv-total">${n}</td>`).join('');
   h+='</tr></tfoot></table>';
 
