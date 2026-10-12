@@ -572,7 +572,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 }
 .pv-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 2px;font:800 12px/1.2 var(--font-body);color:var(--ink)}
 .pv-panel-done{height:30px;padding:0 14px;border:0;border-radius:var(--radius-sm);background:var(--accent-solid);color:#fff;font:800 11.5px/1 var(--font-body)}
-.pv-panel-head .pv-panel-done{display:none}
 .pv-panel-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-top:1px solid var(--line)}
 .pv-chip.is-partial{border-style:dashed;border-color:var(--accent);color:var(--accent-ink)}
 .pv-chip.is-partial::before{background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
@@ -673,8 +672,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   }
   .pv-panel-head{padding:14px 14px 4px;font-size:14px}
   .pv-panel-done{height:34px;font-size:12px}
-  .pv-panel-head .pv-panel-done{display:inline-block}
-  .pv-panel-foot .pv-panel-done{display:none}
   .pv-panel-search input{font-size:16px;height:40px}
   .pv-panel-person{padding:9px 6px;font-size:13px}
   .pv-panel input[type=checkbox]{width:18px;height:18px}
@@ -1093,9 +1090,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
         <div id="cmpPanel" class="pv-panel hidden" role="dialog" aria-label="Collègues à comparer">
           <div class="pv-panel-head"><strong>Collègues à comparer</strong></div>
           <div class="pv-panel-search"><input id="cmpSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off"></div>
-          <div class="pv-panel-actions"><button id="cmpClearBtn" type="button" class="pv-link">Vider la sélection</button></div>
           <div id="cmpPanelList" class="pv-panel-list"></div>
-          <div class="pv-panel-foot"><span></span><button id="cmpPanelDone" type="button" class="pv-panel-done" style="display:inline-block">Terminé</button></div>
+          <div class="pv-panel-foot"><button id="cmpClearBtn" type="button" class="pv-link">Vider la sélection</button><button id="cmpPanelDone" type="button" class="pv-panel-done">Terminé</button></div>
         </div>
       </div>
       </div>
@@ -1135,7 +1131,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
           <div id="presencePanel" class="pv-panel hidden" role="dialog" aria-label="Personnes affichées">
             <div class="pv-panel-head">
               <strong>Personnes affichées</strong>
-              <button id="presencePanelDone" type="button" class="pv-panel-done">Terminé</button>
             </div>
             <div class="pv-panel-search">
               <input id="presenceSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off">
@@ -3708,7 +3703,6 @@ $('presenceFilterBtn').addEventListener('click',event=>{
   if($('presencePanel').classList.contains('hidden'))openPresencePanel();
   else closePresencePanel();
 });
-$('presencePanelDone').addEventListener('click',event=>{ event.stopPropagation(); closePresencePanel(); });
 $('presencePanelDone2').addEventListener('click',event=>{ event.stopPropagation(); closePresencePanel(); });
 $('presenceSearch').addEventListener('input',event=>{
   presence.search=event.target.value;
