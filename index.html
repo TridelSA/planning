@@ -495,15 +495,17 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmp-yr{height:22px;min-width:15px;width:15px}
 
 .cmp-groups{margin-bottom:8px}
-.cmpm-group{margin:14px 2px 6px;font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink)}
-.cmpm-card{padding:10px;margin-bottom:8px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface)}
-.cmpm-name{margin-bottom:8px;font:700 13px/1.2 var(--font-body);color:var(--ink)}
+.cmpm-block{margin-bottom:8px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);overflow:hidden}
+.cmpm-group{margin:0;padding:8px 10px 2px;font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink)}
+.cmpm-card{padding:7px 10px 9px}
+.cmpm-card+.cmpm-card{border-top:1px solid var(--line)}
+.cmpm-name{margin-bottom:5px;font:700 10.5px/1.2 var(--font-body);color:var(--ink);text-transform:uppercase;letter-spacing:.02em}
 .cmpm-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cmpm-dow{text-align:center;font:700 9px/1 var(--font-body);color:var(--muted)}
 .cmpm-day{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:7px;min-height:34px;padding:3px 0}
 .cmpm-day small{font:700 8.5px/1 var(--font-body);opacity:.7}
 .cmpm-day b{font:800 12px/1.2 var(--font-display)}
-.cmpm-days.is-week .cmpm-day{min-height:50px}
+.cmpm-days.is-week .cmpm-day{min-height:44px}
 .cmpm-days.is-week .cmpm-day b{font-size:14px}
 .cmpm-day.is-we{opacity:.55}
 .cmpm-day.is-today{box-shadow:inset 0 0 0 2px var(--ink)}
@@ -1061,7 +1063,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
     </div>
 
     <div id="cmpGroups" class="pv-chips cmp-groups" aria-label="Groupes"></div>
-    <div id="cmpSelected" class="pv-chips cmp-selected"></div>
 
     <div id="cmpGrid" class="cmp-wrap"></div>
   </section>
@@ -3809,7 +3810,7 @@ function cmpCardsHTML(view,groups){
   for(const group of groups){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
     if(!people.length)continue;
-    h+=`<div class="cmpm-group">${escapeHTML(group.name)}</div>`;
+    h+=`<div class="cmpm-block"><div class="cmpm-group">${escapeHTML(group.name)}</div>`;
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<div class="cmpm-card"><div class="cmpm-name">${escapeHTML(name)}</div>`;
@@ -3831,6 +3832,7 @@ function cmpCardsHTML(view,groups){
       }
       h+='</div>';
     }
+    h+='</div>';
   }
   return h;
 }
@@ -3853,8 +3855,6 @@ function renderCompareView(){
   }).join('');
 
   const selected=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
-  $('cmpSelected').innerHTML=selected.map(e=>`<button type="button" class="pv-chip is-on" data-cmp-remove="${escapeHTML(presencePersonKey(e))}" title="Retirer de la comparaison">${escapeHTML(cleanEmployeeName(e.name))} <span aria-hidden="true">×</span></button>`).join('');
-  $('cmpSelected').classList.toggle('hidden',!selected.length);
   if(!$('cmpPanel').classList.contains('hidden'))renderCmpPanelList();
 
   if(!selected.length){
