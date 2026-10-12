@@ -458,6 +458,60 @@ body.presence-mode .app{max-width:1680px}
 .pv-link:hover{text-decoration:underline}
 .pv-week.is-hover{background:var(--accent-tint);color:var(--accent-ink);border-radius:6px}
 #presenceTitlesBtn.is-off{opacity:.6;text-decoration:line-through}
+/* ---------- Page Comparer ---------- */
+body.compare-mode .app{max-width:1680px}
+.cmp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
+.cmp-tabs{display:inline-flex;gap:3px;background:var(--paper);border-radius:var(--radius-sm);padding:3px}
+.cmp-tab{border:0;background:transparent;padding:7px 14px;border-radius:7px;font:700 12px/1 var(--font-body);color:var(--muted)}
+.cmp-tab.active{background:var(--surface);color:var(--accent-ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cmp-nav{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;min-width:240px}
+.cmp-nav strong{min-width:210px;text-align:center;font:700 13px/1.2 var(--font-display)}
+.cmp-nav .nav-btn{width:32px;height:32px}
+.cmp-selected{margin-bottom:10px}
+.cmp-selected .pv-chip span{opacity:.6;margin-left:2px}
+.cmp-sw-ok{background:var(--pv-full-bg)}
+.cmp-sw-low{background:var(--pv-partial-bg)}
+.cmp-sw-zero{background:var(--pv-absent-bg)}
+.cmp-wrap{overflow:auto;max-height:calc(100vh - 300px);min-height:120px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface)}
+.cmp-table{border-collapse:separate;border-spacing:2px;font:600 10px/1 var(--font-body)}
+.cmp-table th,.cmp-table td{padding:0}
+.cmp-table thead th{position:sticky;top:0;z-index:2;background:var(--surface);box-shadow:0 0 0 2px var(--surface)}
+.cmp-name{position:sticky;left:0;z-index:1;background:var(--surface);min-width:170px;max-width:210px;text-align:left;box-shadow:2px 0 0 2px var(--surface)}
+.cmp-table thead .cmp-name{z-index:3}
+.cmp-name-inner{display:flex;align-items:center;gap:6px;padding:0 6px 0 8px;min-height:30px;font:700 11.5px/1.2 var(--font-body);color:var(--ink)}
+.cmp-name-inner span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmp-group .cmp-name-inner{min-height:0;padding:8px 8px 3px;font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);flex-wrap:wrap}
+.cmp-warn{color:var(--danger);font-weight:700;letter-spacing:0;text-transform:none;font-size:10px}
+.cmp-day{min-width:34px;text-align:center;padding:4px 0!important;color:var(--muted);font-weight:700}
+.cmp-day span{display:block;font-size:9.5px}
+.cmp-day b{display:block;font:800 13px/1.3 var(--font-body);color:var(--ink-soft)}
+.cmp-day.is-we b,.cmp-day.is-we span{opacity:.55}
+.cmp-day.is-hol b{color:var(--danger)}
+.cmp-day.is-today,.cmp-wk.is-today{background:var(--accent-tint);border-radius:6px}
+.cmp-wk{min-width:15px;text-align:center;color:var(--muted);font-weight:700;font-size:10px;padding:4px 0!important}
+body.cmp-week .cmp-day{min-width:96px}
+.cmp-cell{height:46px;min-width:30px;text-align:center;border-radius:6px;vertical-align:middle}
+.cmp-cell b{display:block;font:800 13px/1.1 var(--font-display)}
+.cmp-cell small{display:block;margin-top:3px;font:600 9px/1.2 var(--font-body);opacity:.8;padding:0 3px}
+.cmp-cell.is-we{opacity:.55}
+.cmp-cell.is-today{box-shadow:inset 0 0 0 2px var(--ink)}
+body:not(.cmp-week) .cmp-cell{height:30px}
+.cmp-yr{height:22px;min-width:15px;width:15px}
+.cmp-cvc{height:26px;text-align:center;border-radius:6px;font:800 11px/1 var(--font-body)}
+.cmp-cvc.is-ok{background:var(--pv-full-bg);color:var(--pv-full-ink)}
+.cmp-cvc.is-low{background:var(--pv-partial-bg);color:var(--pv-partial-ink)}
+.cmp-cvc.is-zero{background:var(--pv-absent-bg);color:var(--pv-absent-ink)}
+.cmp-cvc.is-na{background:var(--paper);color:var(--muted);font-weight:600}
+.cmp-cover .cmp-name-inner{min-height:26px;font:700 10.5px/1.2 var(--font-body);color:var(--ink-soft)}
+.cmp-cover .cmp-name{border-top:0}
+.cmp-min{width:44px;height:22px;padding:0 4px;border:1px solid var(--line-strong);border-radius:6px;background:var(--paper);font:700 11px/1 var(--font-body);color:var(--ink);text-align:center}
+.cmp-cover .cmp-name-inner small{color:var(--muted);font-weight:600}
+@media (max-width:700px){
+  .cmp-nav{order:3;flex-basis:100%}
+  .cmp-nav strong{min-width:0;flex:1}
+  .cmp-name{min-width:120px;max-width:130px}
+  body.cmp-week .cmp-day{min-width:64px}
+}
 .pv-panel-sep{margin:10px 0 2px;padding-top:8px;border-top:1px solid var(--line);font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 
 .pv-filter{position:relative}
@@ -826,6 +880,7 @@ body.presence-mode .app{max-width:1680px}
         </div>
         <div class="hero-actions">
           <button id="presenceViewToggleBtn" class="team-toggle" type="button" aria-label="Présences annuelles par semaine">Maintenance</button>
+          <button id="compareViewToggleBtn" class="team-toggle" type="button" aria-label="Comparer des collègues">Comparer</button>
           <button id="teamViewToggleBtn" class="team-toggle" type="button" aria-label="Planning d'équipe annuel">Rotations</button>
         </div>
       </div>
@@ -963,6 +1018,49 @@ body.presence-mode .app{max-width:1680px}
     <div id="teamViewContainer"></div>
   </section>
 
+  <section id="compareViewSection" class="card main-card pv-card hidden">
+    <div class="pv-head">
+      <div class="team-view-title">
+        <h2>Comparer</h2>
+      </div>
+    </div>
+
+    <div class="cmp-bar">
+      <div class="cmp-tabs" role="tablist" aria-label="Échelle">
+        <button type="button" class="cmp-tab" data-cmp-scale="week">Semaine</button>
+        <button type="button" class="cmp-tab" data-cmp-scale="month">Mois</button>
+        <button type="button" class="cmp-tab" data-cmp-scale="year">Année</button>
+      </div>
+      <div class="cmp-nav">
+        <button id="cmpPrevBtn" class="nav-btn" type="button" aria-label="Période précédente"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <strong id="cmpTitle"></strong>
+        <button id="cmpNextBtn" class="nav-btn" type="button" aria-label="Période suivante"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+        <button id="cmpTodayBtn" class="pv-filter-btn" type="button">Aujourd’hui</button>
+      </div>
+      <div id="cmpFilter" class="pv-filter">
+        <button id="cmpPickBtn" class="pv-filter-btn" type="button" aria-expanded="false">Collègues <span id="cmpCount" class="pv-count">0</span></button>
+        <div id="cmpPanel" class="pv-panel hidden" role="dialog" aria-label="Collègues à comparer">
+          <div class="pv-panel-head"><strong>Collègues à comparer</strong></div>
+          <div class="pv-panel-search"><input id="cmpSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off"></div>
+          <div class="pv-panel-actions"><button id="cmpClearBtn" type="button" class="pv-link">Vider la sélection</button></div>
+          <div id="cmpPanelList" class="pv-panel-list"></div>
+          <div class="pv-panel-foot"><span></span><button id="cmpPanelDone" type="button" class="pv-panel-done" style="display:inline-block">Terminé</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="cmpSelected" class="pv-chips cmp-selected"></div>
+
+    <div class="pv-legend">
+      <span class="pv-legend-item"><i class="pv-swatch cmp-sw-ok"></i>Couverture suffisante</span>
+      <span class="pv-legend-item"><i class="pv-swatch cmp-sw-low"></i>Sous le minimum</span>
+      <span class="pv-legend-item"><i class="pv-swatch cmp-sw-zero"></i>Personne de présent</span>
+      <span class="pv-legend-item">Présent = R, PO, CA, EN ou piquet (PIQ)</span>
+    </div>
+
+    <div id="cmpGrid" class="cmp-wrap"></div>
+  </section>
+
   <section id="presenceViewSection" class="card main-card pv-card hidden">
     <div class="pv-head">
       <div class="team-view-title">
@@ -1073,7 +1171,7 @@ const CODE_INFO={
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
-let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),presenceMode:false,presenceYear:new Date().getFullYear()};
+let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),presenceMode:false,presenceYear:new Date().getFullYear(),compareMode:false};
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -2970,6 +3068,7 @@ function teamShiftYear(amount){
 // d'équipe et présences annuelles (boutons en haut à droite).
 // ==========================================================
 function currentPage(){
+  if(state.compareMode)return 'compare';
   if(state.presenceMode)return 'presence';
   if(state.teamMode)return 'team';
   return 'individual';
@@ -2982,6 +3081,11 @@ function updateTeamToggleLabel(){
     teamBtn.textContent=page==='team'?'Individuel':'Rotations';
     teamBtn.setAttribute('aria-label',page==='team'?'Retour au planning individuel':"Planning d'équipe annuel");
   }
+  const compareBtn=$('compareViewToggleBtn');
+  if(compareBtn){
+    compareBtn.textContent=page==='compare'?'Individuel':'Comparer';
+    compareBtn.setAttribute('aria-label',page==='compare'?'Retour au planning individuel':'Comparer des collègues');
+  }
   const presenceBtn=$('presenceViewToggleBtn');
   if(presenceBtn){
     presenceBtn.textContent=page==='presence'?'Individuel':'Maintenance';
@@ -2989,7 +3093,7 @@ function updateTeamToggleLabel(){
   }
   const subtitle=$('heroSubtitle');
   if(subtitle){
-    subtitle.textContent=page==='presence'?'Présences annuelles':page==='team'?"Planning d'équipe":'Planning individuel';
+    subtitle.textContent=page==='compare'?'Comparer des collègues':page==='presence'?'Présences annuelles':page==='team'?"Planning d'équipe":'Planning individuel';
   }
 }
 
@@ -2997,12 +3101,16 @@ function setPage(page){
   if(page!=='individual' && (!planning.employees || !planning.employees.length))return;
   state.teamMode=page==='team';
   state.presenceMode=page==='presence';
+  state.compareMode=page==='compare';
   const alternate=page!=='individual';
 
   document.body.classList.toggle('team-mode',page==='team');
   document.body.classList.toggle('presence-mode',page==='presence');
+  document.body.classList.toggle('compare-mode',page==='compare');
+  document.body.classList.toggle('cmp-week',page==='compare' && cmp.scale==='week');
   closeEmployeePicker();
   closePresencePanel();
+  closeCmpPanel();
 
   const controls=document.querySelector('.controls');
   if(controls)controls.classList.toggle('hidden',alternate);
@@ -3014,6 +3122,7 @@ function setPage(page){
   if(mainCard)mainCard.classList.toggle('hidden',alternate);
   $('teamViewSection').classList.toggle('hidden',page!=='team');
   $('presenceViewSection').classList.toggle('hidden',page!=='presence');
+  $('compareViewSection').classList.toggle('hidden',page!=='compare');
 
   updateTeamToggleLabel();
   render();
@@ -3600,6 +3709,247 @@ document.addEventListener('keydown',event=>{
   if(event.key==='Escape')closePresencePanel();
 });
 
+// ==========================================================
+// Page « Comparer » : plusieurs collègues côte à côte (semaine / mois /
+// année) + ligne de couverture par métier (présents vs minimum).
+// « Présent » = codes de présence ou piquet (PIQ), comme dans Maintenance.
+// ==========================================================
+const CMP_KEY='compareState';
+const cmp=(()=>{
+  let s={};
+  try{ s=JSON.parse(localStorage.getItem(CMP_KEY)||'{}')||{}; }catch(e){ s={}; }
+  return {
+    scale:['week','month','year'].includes(s.scale)?s.scale:'week',
+    date:new Date(),
+    people:new Set(Array.isArray(s.people)?s.people.map(String):[]),
+    mins:(s.mins&&typeof s.mins==='object')?s.mins:{},
+    search:''
+  };
+})();
+function saveCmp(){
+  try{ localStorage.setItem(CMP_KEY,JSON.stringify({scale:cmp.scale,people:[...cmp.people],mins:cmp.mins})); }catch(e){ /* stockage indisponible */ }
+}
+
+const cmpHas=(emp,iso)=>Object.prototype.hasOwnProperty.call(emp.schedule,iso);
+function cmpIsPresent(emp,iso){
+  const code=safeCode(emp.schedule[iso]);
+  return PRESENCE_CODES.has(code)||PRESENCE_RESERVE_CODES.has(code);
+}
+function cmpMinFor(group){
+  const v=cmp.mins[group.name];
+  const n=Number(v);
+  return v!==undefined && Number.isFinite(n) ? Math.max(0,Math.min(n,group.people.length)) : Math.min(2,group.people.length);
+}
+
+// Colonnes de la période affichée.
+function cmpColumns(){
+  const today=todayISO();
+  if(cmp.scale==='year'){
+    const year=cmp.date.getFullYear();
+    const weeks=isoWeeksOfYear(year);
+    return {
+      kind:'year',title:String(year),weeks,
+      cols:weeks.map(w=>({week:w,label:String(w.num),today:today>=isoDate(w.monday)&&today<=isoDate(w.days[6])}))
+    };
+  }
+  if(cmp.scale==='month'){
+    const y=cmp.date.getFullYear(),m=cmp.date.getMonth();
+    const n=new Date(y,m+1,0).getDate();
+    const cols=[];
+    for(let i=1;i<=n;i++){
+      const d=new Date(y,m,i);const iso=isoDate(d);const dow=(d.getDay()+6)%7;
+      cols.push({iso,d,dow,num:i,name:DAY_NAMES[dow][0],weekend:dow>=5,holiday:!!swissHolidayName(iso),today:iso===today});
+    }
+    return {kind:'day',title:`${MONTH_NAMES[m]} ${y}`,cols};
+  }
+  const monday=mondayOf(cmp.date);
+  const cols=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);const iso=isoDate(d);
+    cols.push({iso,d,dow:i,num:d.getDate(),name:DAY_NAMES[i],weekend:i>=5,holiday:!!swissHolidayName(iso),today:iso===today});
+  }
+  const sunday=cols[6].d;
+  return {kind:'day',title:`Semaine ${isoWeek(monday)} · ${formatShortDate(monday)} – ${formatDateWithYear(sunday)}`,cols};
+}
+
+function cmpShift(dir){
+  const d=new Date(cmp.date);
+  if(cmp.scale==='year')d.setFullYear(d.getFullYear()+dir);
+  else if(cmp.scale==='month'){ d.setDate(1); d.setMonth(d.getMonth()+dir); }
+  else d.setDate(d.getDate()+7*dir);
+  cmp.date=d;
+  renderCompareView();
+}
+
+const CMP_LEVEL_LABEL={full:'Présent 4 jours ou plus',reserve:'Piquet',partial:'Présent 1 à 3 jours',absent:'Aucun jour présent',none:'Pas de données'};
+
+function renderCompareView(){
+  if(!$('compareViewSection'))return;
+  const view=cmpColumns();
+  document.body.classList.toggle('cmp-week',cmp.scale==='week');
+  $('cmpTitle').textContent=view.title;
+  document.querySelectorAll('[data-cmp-scale]').forEach(b=>b.classList.toggle('active',b.dataset.cmpScale===cmp.scale));
+  $('cmpCount').textContent=String(cmp.people.size);
+
+  const groups=presenceGroups(true);
+  // Chips de la sélection (ordre Excel).
+  const selected=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
+  $('cmpSelected').innerHTML=selected.map(e=>`<button type="button" class="pv-chip is-on" data-cmp-remove="${escapeHTML(presencePersonKey(e))}" title="Retirer de la comparaison">${escapeHTML(cleanEmployeeName(e.name))} <span aria-hidden="true">×</span></button>`).join('');
+  if(!$('cmpPanel').classList.contains('hidden'))renderCmpPanelList();
+
+  if(!selected.length){
+    $('cmpGrid').innerHTML='<div class="pv-empty-state">Aucune personne sélectionnée.<br>Utilisez « Collègues » pour choisir qui comparer (une catégorie entière d\'un clic).</div>';
+    return;
+  }
+
+  const colspan=view.cols.length;
+  let h='<table class="cmp-table"><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>';
+  if(view.kind==='year'){
+    h+=view.cols.map(c=>`<th class="cmp-wk ${c.today?'is-today':''}" title="Semaine ${c.week.num} · ${escapeHTML(presenceWeekRange(c.week))}">${c.label}</th>`).join('');
+  }else{
+    h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.today?'is-today':''}"><span>${c.name}</span><b>${c.num}</b></th>`).join('');
+  }
+  h+='</tr></thead><tbody>';
+
+  let rowIndex=0;
+  for(const group of groups){
+    const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
+    if(!people.length)continue;
+    const min=cmpMinFor(group);
+
+    // Couverture : tous les collègues de la catégorie, pas seulement la sélection.
+    const cover=view.cols.map(c=>{
+      let count=0,known=0;
+      if(view.kind==='year'){
+        for(const e of group.people){
+          const p=weekPresence(e,c.week);
+          if(p.level!=='none')known++;
+          if(p.level==='full'||p.level==='reserve')count++;
+        }
+        return {count,known,applies:known>0};
+      }
+      const applies=!c.weekend && !c.holiday;
+      for(const e of group.people){
+        if(cmpHas(e,c.iso))known++;
+        if(cmpIsPresent(e,c.iso))count++;
+      }
+      return {count,known,applies:applies && known>0};
+    });
+    const under=cover.filter(x=>x.applies && x.count<min).length;
+    const unit=view.kind==='year'?'semaine':'jour';
+
+    h+=`<tr class="cmp-group"><th class="cmp-name"><div class="cmp-name-inner">${escapeHTML(group.name)}${under?`<small class="cmp-warn">${under} ${unit}${under>1?'s':''} sous le minimum</small>`:''}</div></th><td colspan="${colspan}"></td></tr>`;
+
+    for(const emp of people){
+      const name=cleanEmployeeName(emp.name);
+      h+=`<tr class="cmp-person"><th class="cmp-name"><div class="cmp-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span></div></th>`;
+      if(view.kind==='year'){
+        h+=view.cols.map(c=>{
+          const p=weekPresence(emp,c.week);
+          const label=p.level==='none'?'pas de données':p.level==='reserve'?`${reserveBreakdownText(p.reserveBreakdown)}${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}`:`${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''} sur ${p.known}`;
+          return `<td class="cmp-cell cmp-yr pv-${p.level} ${c.today?'is-today':''}" title="${escapeHTML(name)} · semaine ${c.week.num} : ${escapeHTML(label)}"></td>`;
+        }).join('');
+      }else{
+        h+=view.cols.map(c=>{
+          const known=cmpHas(emp,c.iso);
+          const code=known?safeCode(emp.schedule[c.iso]):'';
+          const info=CODE_INFO[code];
+          const label=!known?'Pas de données':code?(info?info[0]:code):'Pas de service';
+          const wide=cmp.scale==='week';
+          return `<td class="cmp-cell ${known&&code?classFor(code):'code-off'} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(name)} · ${escapeHTML(c.d.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'}))} : ${escapeHTML(label)}"><b>${escapeHTML(code)}</b>${wide&&code&&info?`<small>${escapeHTML(info[0])}</small>`:''}</td>`;
+        }).join('');
+      }
+      h+='</tr>';
+      rowIndex++;
+    }
+
+    h+=`<tr class="cmp-cover"><th class="cmp-name"><div class="cmp-name-inner"><span>Présents · min.</span><input class="cmp-min" type="number" inputmode="numeric" min="0" max="${group.people.length}" value="${min}" data-cmp-min="${escapeHTML(group.name)}" aria-label="Minimum de présents pour ${escapeHTML(group.name)}"><small>/ ${group.people.length}</small></div></th>`;
+    h+=cover.map(x=>{
+      if(!x.applies)return `<td class="cmp-cvc is-na" title="Pas d'exigence (week-end, férié ou pas de données)">–</td>`;
+      const cls=x.count>=min?'is-ok':x.count>0?'is-low':'is-zero';
+      return `<td class="cmp-cvc ${cls}" title="${x.count} présent${x.count>1?'s':''} sur ${group.people.length} · minimum ${min}">${x.count}</td>`;
+    }).join('');
+    h+='</tr>';
+  }
+  h+='</tbody></table>';
+  $('cmpGrid').innerHTML=h;
+}
+
+function renderCmpPanelList(){
+  const list=$('cmpPanelList');
+  const query=normalizeSearchText(cmp.search);
+  const panelGroups=presenceGroups(true).sort((a,b)=>
+    (isPresenceExcludedCategory(a.people[0])?1:0)-(isPresenceExcludedCategory(b.people[0])?1:0));
+  let h='';
+  for(const group of panelGroups){
+    const people=group.people.filter(e=>!query||normalizeSearchText(e.name).includes(query));
+    if(!people.length)continue;
+    const n=people.filter(e=>cmp.people.has(presencePersonKey(e))).length;
+    h+=`<div class="pv-panel-group"><label><input type="checkbox" data-cmp-cat="${escapeHTML(group.name)}" data-state="${n===0?'none':n===people.length?'all':'some'}" ${n===people.length?'checked':''}>${escapeHTML(group.name)}</label><small>${n}/${people.length}</small></div>`;
+    for(const e of people){
+      const key=presencePersonKey(e);
+      const on=cmp.people.has(key);
+      h+=`<label class="pv-panel-person ${on?'':'is-off'}"><input type="checkbox" data-cmp-person="${escapeHTML(key)}" ${on?'checked':''}>${escapeHTML(cleanEmployeeName(e.name))}</label>`;
+    }
+  }
+  list.innerHTML=h||'<div class="pv-panel-empty">Aucune personne trouvée.</div>';
+  list.querySelectorAll('input[data-state="some"]').forEach(i=>{ i.indeterminate=true; });
+}
+function openCmpPanel(){
+  $('cmpPanel').classList.remove('hidden');
+  $('cmpPickBtn').setAttribute('aria-expanded','true');
+  renderCmpPanelList();
+  if(window.matchMedia('(hover:hover)').matches)$('cmpSearch').focus();
+}
+function closeCmpPanel(){
+  if(!$('cmpPanel'))return;
+  $('cmpPanel').classList.add('hidden');
+  $('cmpPickBtn').setAttribute('aria-expanded','false');
+}
+
+$('compareViewToggleBtn').addEventListener('click',()=>setPage(state.compareMode?'individual':'compare'));
+$('cmpPrevBtn').addEventListener('click',()=>cmpShift(-1));
+$('cmpNextBtn').addEventListener('click',()=>cmpShift(1));
+$('cmpTodayBtn').addEventListener('click',()=>{ cmp.date=new Date(); renderCompareView(); });
+$('cmpPickBtn').addEventListener('click',event=>{
+  event.stopPropagation();
+  if($('cmpPanel').classList.contains('hidden'))openCmpPanel(); else closeCmpPanel();
+});
+$('cmpPanelDone').addEventListener('click',event=>{ event.stopPropagation(); closeCmpPanel(); });
+$('cmpSearch').addEventListener('input',event=>{ cmp.search=event.target.value; renderCmpPanelList(); });
+$('cmpClearBtn').addEventListener('click',()=>{ cmp.people.clear(); saveCmp(); renderCompareView(); });
+document.addEventListener('click',event=>{
+  const f=$('cmpFilter');
+  if(f && !f.contains(event.target))closeCmpPanel();
+});
+$('compareViewSection').addEventListener('click',event=>{
+  const scaleBtn=event.target.closest('[data-cmp-scale]');
+  if(scaleBtn){ cmp.scale=scaleBtn.dataset.cmpScale; saveCmp(); renderCompareView(); return; }
+  const rm=event.target.closest('[data-cmp-remove]');
+  if(rm){ cmp.people.delete(rm.dataset.cmpRemove); saveCmp(); renderCompareView(); }
+});
+$('compareViewSection').addEventListener('change',event=>{
+  const t=event.target;
+  if(t.dataset.cmpCat!==undefined){
+    const query=normalizeSearchText(cmp.search);
+    const group=presenceGroups(true).find(g=>g.name===t.dataset.cmpCat);
+    if(group)for(const e of group.people.filter(e=>!query||normalizeSearchText(e.name).includes(query))){
+      const key=presencePersonKey(e);
+      if(t.checked)cmp.people.add(key); else cmp.people.delete(key);
+    }
+  }else if(t.dataset.cmpPerson!==undefined){
+    if(t.checked)cmp.people.add(t.dataset.cmpPerson); else cmp.people.delete(t.dataset.cmpPerson);
+  }else if(t.dataset.cmpMin!==undefined){
+    const n=Math.max(0,Math.floor(Number(t.value)));
+    cmp.mins[t.dataset.cmpMin]=Number.isFinite(n)?n:0;
+  }else{
+    return;
+  }
+  saveCmp();
+  renderCompareView();
+});
+document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeCmpPanel(); });
+
 function renderTravauxSection(){
   const el=$('travauxSection');
   const titleEl=$('travauxSectionTitle');
@@ -3620,6 +3970,11 @@ function renderTravauxSection(){
 }
 
 function render(){
+  if(state.compareMode){
+    document.body.classList.toggle('cmp-week',cmp.scale==='week');
+    renderCompareView();
+    return;
+  }
   if(state.presenceMode){
     renderPresenceView();
     return;
@@ -4243,7 +4598,7 @@ document.addEventListener('keydown',event=>{
     const isTyping=['INPUT','TEXTAREA','SELECT'].includes(tag);
     const pickerOpen=$('employeePicker').classList.contains('open');
     const modalOpen=$('dayModalBackdrop').classList.contains('open');
-    if(!isTyping && !pickerOpen && !modalOpen && !state.teamMode && !state.presenceMode){
+    if(!isTyping && !pickerOpen && !modalOpen && !state.teamMode && !state.presenceMode && !state.compareMode){
       shiftDate(event.key==='ArrowLeft'?-1:1);
     }
   }
