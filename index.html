@@ -469,9 +469,6 @@ body.compare-mode .app{max-width:1680px}
 .cmp-nav .nav-btn{width:32px;height:32px}
 .cmp-selected{margin-bottom:10px}
 .cmp-selected .pv-chip span{opacity:.6;margin-left:2px}
-.cmp-sw-ok{background:var(--pv-full-bg)}
-.cmp-sw-low{background:var(--pv-partial-bg)}
-.cmp-sw-zero{background:var(--pv-absent-bg)}
 .cmp-wrap{overflow:auto;max-height:calc(100vh - 300px);min-height:120px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface)}
 .cmp-table{border-collapse:separate;border-spacing:2px;font:600 10px/1 var(--font-body)}
 .cmp-table th,.cmp-table td{padding:0}
@@ -481,7 +478,6 @@ body.compare-mode .app{max-width:1680px}
 .cmp-name-inner{display:flex;align-items:center;gap:6px;padding:0 6px 0 8px;min-height:30px;font:700 11.5px/1.2 var(--font-body);color:var(--ink)}
 .cmp-name-inner span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmp-group .cmp-name-inner{min-height:0;padding:8px 8px 3px;font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);flex-wrap:wrap}
-.cmp-warn{color:var(--danger);font-weight:700;letter-spacing:0;text-transform:none;font-size:10px}
 .cmp-day{min-width:34px;text-align:center;padding:4px 0!important;color:var(--muted);font-weight:700}
 .cmp-day span{display:block;font-size:9.5px}
 .cmp-day b{display:block;font:800 13px/1.3 var(--font-body);color:var(--ink-soft)}
@@ -497,21 +493,36 @@ body.cmp-week .cmp-day{min-width:96px}
 .cmp-cell.is-today{box-shadow:inset 0 0 0 2px var(--ink)}
 body:not(.cmp-week) .cmp-cell{height:30px}
 .cmp-yr{height:22px;min-width:15px;width:15px}
-.cmp-cvc{height:26px;text-align:center;border-radius:6px;font:800 11px/1 var(--font-body)}
-.cmp-cvc.is-ok{background:var(--pv-full-bg);color:var(--pv-full-ink)}
-.cmp-cvc.is-low{background:var(--pv-partial-bg);color:var(--pv-partial-ink)}
-.cmp-cvc.is-zero{background:var(--pv-absent-bg);color:var(--pv-absent-ink)}
-.cmp-cvc.is-na{background:var(--paper);color:var(--muted);font-weight:600}
-.cmp-cover .cmp-name-inner{min-height:26px;font:700 10.5px/1.2 var(--font-body);color:var(--ink-soft)}
-.cmp-cover .cmp-name{border-top:0}
-.cmp-min{width:44px;height:22px;padding:0 4px;border:1px solid var(--line-strong);border-radius:6px;background:var(--paper);font:700 11px/1 var(--font-body);color:var(--ink);text-align:center}
-.cmp-cover .cmp-name-inner small{color:var(--muted);font-weight:600}
+
+.cmp-groups{margin-bottom:8px}
+.cmpm-group{margin:14px 2px 6px;font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink)}
+.cmpm-card{padding:10px;margin-bottom:8px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface)}
+.cmpm-name{margin-bottom:8px;font:700 13px/1.2 var(--font-body);color:var(--ink)}
+.cmpm-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cmpm-dow{text-align:center;font:700 9px/1 var(--font-body);color:var(--muted)}
+.cmpm-day{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:7px;min-height:34px;padding:3px 0}
+.cmpm-day small{font:700 8.5px/1 var(--font-body);opacity:.7}
+.cmpm-day b{font:800 12px/1.2 var(--font-display)}
+.cmpm-days.is-week .cmpm-day{min-height:50px}
+.cmpm-days.is-week .cmpm-day b{font-size:14px}
+.cmpm-day.is-we{opacity:.55}
+.cmpm-day.is-today{box-shadow:inset 0 0 0 2px var(--ink)}
+.cmpm-year{display:flex;flex-wrap:wrap;gap:3px}
+.cmpm-year i{width:15px;height:15px;border-radius:4px;display:block}
+.cmpm-year i.is-today{box-shadow:inset 0 0 0 2px var(--ink)}
 @media (max-width:700px){
+  .cmp-groups,.cmp-selected{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .cmp-groups .pv-chip,.cmp-selected .pv-chip{flex:0 0 auto}
+  .cmp-tabs{width:100%}
+  .cmp-tab{flex:1}
+  .cmp-bar>.pv-filter{margin-left:auto}
+  .cmp-wrap{max-height:none;border:0;background:transparent;overflow:visible}
   .cmp-nav{order:3;flex-basis:100%}
   .cmp-nav strong{min-width:0;flex:1}
   .cmp-name{min-width:120px;max-width:130px}
   body.cmp-week .cmp-day{min-width:64px}
 }
+
 .pv-panel-sep{margin:10px 0 2px;padding-top:8px;border-top:1px solid var(--line);font:800 10px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 
 .pv-filter{position:relative}
@@ -1049,14 +1060,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
       </div>
     </div>
 
+    <div id="cmpGroups" class="pv-chips cmp-groups" aria-label="Groupes"></div>
     <div id="cmpSelected" class="pv-chips cmp-selected"></div>
-
-    <div class="pv-legend">
-      <span class="pv-legend-item"><i class="pv-swatch cmp-sw-ok"></i>Couverture suffisante</span>
-      <span class="pv-legend-item"><i class="pv-swatch cmp-sw-low"></i>Sous le minimum</span>
-      <span class="pv-legend-item"><i class="pv-swatch cmp-sw-zero"></i>Personne de présent</span>
-      <span class="pv-legend-item">Présent = R, PO, CA, EN ou piquet (PIQ)</span>
-    </div>
 
     <div id="cmpGrid" class="cmp-wrap"></div>
   </section>
@@ -3722,12 +3727,11 @@ const cmp=(()=>{
     scale:['week','month','year'].includes(s.scale)?s.scale:'week',
     date:new Date(),
     people:new Set(Array.isArray(s.people)?s.people.map(String):[]),
-    mins:(s.mins&&typeof s.mins==='object')?s.mins:{},
     search:''
   };
 })();
 function saveCmp(){
-  try{ localStorage.setItem(CMP_KEY,JSON.stringify({scale:cmp.scale,people:[...cmp.people],mins:cmp.mins})); }catch(e){ /* stockage indisponible */ }
+  try{ localStorage.setItem(CMP_KEY,JSON.stringify({scale:cmp.scale,people:[...cmp.people]})); }catch(e){ /* stockage indisponible */ }
 }
 
 const cmpHas=(emp,iso)=>Object.prototype.hasOwnProperty.call(emp.schedule,iso);
@@ -3735,12 +3739,6 @@ function cmpIsPresent(emp,iso){
   const code=safeCode(emp.schedule[iso]);
   return PRESENCE_CODES.has(code)||PRESENCE_RESERVE_CODES.has(code);
 }
-function cmpMinFor(group){
-  const v=cmp.mins[group.name];
-  const n=Number(v);
-  return v!==undefined && Number.isFinite(n) ? Math.max(0,Math.min(n,group.people.length)) : Math.min(2,group.people.length);
-}
-
 // Colonnes de la période affichée.
 function cmpColumns(){
   const today=todayISO();
@@ -3783,6 +3781,60 @@ function cmpShift(dir){
 
 const CMP_LEVEL_LABEL={full:'Présent 4 jours ou plus',reserve:'Piquet',partial:'Présent 1 à 3 jours',absent:'Aucun jour présent',none:'Pas de données'};
 
+// Groupes (catégories) dans l'ordre d'affichage : métiers d'abord, puis
+// Équipes / Admin. / Cadres.
+function cmpGroupsOrdered(){
+  return presenceGroups(true).sort((a,b)=>
+    (isPresenceExcludedCategory(a.people[0])?1:0)-(isPresenceExcludedCategory(b.people[0])?1:0));
+}
+
+// Contenu d'une case pour une personne et un jour.
+function cmpDayInfo(emp,c){
+  const known=cmpHas(emp,c.iso);
+  const code=known?safeCode(emp.schedule[c.iso]):'';
+  const info=CODE_INFO[code];
+  const label=!known?'Pas de données':code?(info?info[0]:code):'Pas de service';
+  const title=`${cleanEmployeeName(emp.name)} · ${c.d.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'})} : ${label}`;
+  return {code,info,label,title,cls:known&&code?classFor(code):'code-off'};
+}
+function cmpYearInfo(emp,c){
+  const p=weekPresence(emp,c.week);
+  const label=p.level==='none'?'pas de données':p.level==='reserve'?`${reserveBreakdownText(p.reserveBreakdown)}${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}`:`${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''} sur ${p.known}`;
+  return {level:p.level,title:`${cleanEmployeeName(emp.name)} · semaine ${c.week.num} : ${label}`};
+}
+
+// Affichage téléphone : une carte par personne (pas de tableau à faire défiler).
+function cmpCardsHTML(view,groups){
+  let h='';
+  for(const group of groups){
+    const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
+    if(!people.length)continue;
+    h+=`<div class="cmpm-group">${escapeHTML(group.name)}</div>`;
+    for(const emp of people){
+      const name=cleanEmployeeName(emp.name);
+      h+=`<div class="cmpm-card"><div class="cmpm-name">${escapeHTML(name)}</div>`;
+      if(view.kind==='year'){
+        h+='<div class="cmpm-year">'+view.cols.map(c=>{
+          const y=cmpYearInfo(emp,c);
+          return `<i class="pv-${y.level} ${c.today?'is-today':''}" title="${escapeHTML(y.title)}"></i>`;
+        }).join('')+'</div>';
+      }else{
+        const lead=cmp.scale==='month'?view.cols[0].dow:0;
+        h+=`<div class="cmpm-days ${cmp.scale==='week'?'is-week':'is-month'}">`;
+        if(cmp.scale==='month')h+=DAY_NAMES.map(n=>`<span class="cmpm-dow">${n[0]}</span>`).join('');
+        for(let i=0;i<lead;i++)h+='<span></span>';
+        h+=view.cols.map(c=>{
+          const d=cmpDayInfo(emp,c);
+          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"><small>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
+        }).join('');
+        h+='</div>';
+      }
+      h+='</div>';
+    }
+  }
+  return h;
+}
+
 function renderCompareView(){
   if(!$('compareViewSection'))return;
   const view=cmpColumns();
@@ -3791,14 +3843,27 @@ function renderCompareView(){
   document.querySelectorAll('[data-cmp-scale]').forEach(b=>b.classList.toggle('active',b.dataset.cmpScale===cmp.scale));
   $('cmpCount').textContent=String(cmp.people.size);
 
-  const groups=presenceGroups(true);
-  // Chips de la sélection (ordre Excel).
+  const groups=cmpGroupsOrdered();
+
+  // Raccourcis par groupe (même principe que les filtres de Maintenance).
+  $('cmpGroups').innerHTML=groups.map(g=>{
+    const n=g.people.filter(e=>cmp.people.has(presencePersonKey(e))).length;
+    const cls=n===g.people.length?'is-on':n>0?'is-partial':'';
+    return `<button type="button" class="pv-chip ${cls}" data-cmp-grp="${escapeHTML(g.name)}" aria-pressed="${n===g.people.length}" title="Ajouter / retirer tout le groupe">${escapeHTML(g.name)}</button>`;
+  }).join('');
+
   const selected=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   $('cmpSelected').innerHTML=selected.map(e=>`<button type="button" class="pv-chip is-on" data-cmp-remove="${escapeHTML(presencePersonKey(e))}" title="Retirer de la comparaison">${escapeHTML(cleanEmployeeName(e.name))} <span aria-hidden="true">×</span></button>`).join('');
+  $('cmpSelected').classList.toggle('hidden',!selected.length);
   if(!$('cmpPanel').classList.contains('hidden'))renderCmpPanelList();
 
   if(!selected.length){
-    $('cmpGrid').innerHTML='<div class="pv-empty-state">Aucune personne sélectionnée.<br>Utilisez « Collègues » pour choisir qui comparer (une catégorie entière d\'un clic).</div>';
+    $('cmpGrid').innerHTML='<div class="pv-empty-state">Aucune personne sélectionnée.<br>Touchez un groupe ci-dessus, ou « Collègues » pour choisir des personnes.</div>';
+    return;
+  }
+
+  if(isPhoneLayout()){
+    $('cmpGrid').innerHTML=`<div class="cmpm">${cmpCardsHTML(view,groups)}</div>`;
     return;
   }
 
@@ -3810,66 +3875,27 @@ function renderCompareView(){
     h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.today?'is-today':''}"><span>${c.name}</span><b>${c.num}</b></th>`).join('');
   }
   h+='</tr></thead><tbody>';
-
-  let rowIndex=0;
   for(const group of groups){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
     if(!people.length)continue;
-    const min=cmpMinFor(group);
-
-    // Couverture : tous les collègues de la catégorie, pas seulement la sélection.
-    const cover=view.cols.map(c=>{
-      let count=0,known=0;
-      if(view.kind==='year'){
-        for(const e of group.people){
-          const p=weekPresence(e,c.week);
-          if(p.level!=='none')known++;
-          if(p.level==='full'||p.level==='reserve')count++;
-        }
-        return {count,known,applies:known>0};
-      }
-      const applies=!c.weekend && !c.holiday;
-      for(const e of group.people){
-        if(cmpHas(e,c.iso))known++;
-        if(cmpIsPresent(e,c.iso))count++;
-      }
-      return {count,known,applies:applies && known>0};
-    });
-    const under=cover.filter(x=>x.applies && x.count<min).length;
-    const unit=view.kind==='year'?'semaine':'jour';
-
-    h+=`<tr class="cmp-group"><th class="cmp-name"><div class="cmp-name-inner">${escapeHTML(group.name)}${under?`<small class="cmp-warn">${under} ${unit}${under>1?'s':''} sous le minimum</small>`:''}</div></th><td colspan="${colspan}"></td></tr>`;
-
+    h+=`<tr class="cmp-group"><th class="cmp-name"><div class="cmp-name-inner">${escapeHTML(group.name)}</div></th><td colspan="${colspan}"></td></tr>`;
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<tr class="cmp-person"><th class="cmp-name"><div class="cmp-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span></div></th>`;
       if(view.kind==='year'){
         h+=view.cols.map(c=>{
-          const p=weekPresence(emp,c.week);
-          const label=p.level==='none'?'pas de données':p.level==='reserve'?`${reserveBreakdownText(p.reserveBreakdown)}${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}`:`${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''} sur ${p.known}`;
-          return `<td class="cmp-cell cmp-yr pv-${p.level} ${c.today?'is-today':''}" title="${escapeHTML(name)} · semaine ${c.week.num} : ${escapeHTML(label)}"></td>`;
+          const y=cmpYearInfo(emp,c);
+          return `<td class="cmp-cell cmp-yr pv-${y.level} ${c.today?'is-today':''}" title="${escapeHTML(y.title)}"></td>`;
         }).join('');
       }else{
+        const wide=cmp.scale==='week';
         h+=view.cols.map(c=>{
-          const known=cmpHas(emp,c.iso);
-          const code=known?safeCode(emp.schedule[c.iso]):'';
-          const info=CODE_INFO[code];
-          const label=!known?'Pas de données':code?(info?info[0]:code):'Pas de service';
-          const wide=cmp.scale==='week';
-          return `<td class="cmp-cell ${known&&code?classFor(code):'code-off'} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(name)} · ${escapeHTML(c.d.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'}))} : ${escapeHTML(label)}"><b>${escapeHTML(code)}</b>${wide&&code&&info?`<small>${escapeHTML(info[0])}</small>`:''}</td>`;
+          const d=cmpDayInfo(emp,c);
+          return `<td class="cmp-cell ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"><b>${escapeHTML(d.code)}</b>${wide&&d.code&&d.info?`<small>${escapeHTML(d.info[0])}</small>`:''}</td>`;
         }).join('');
       }
       h+='</tr>';
-      rowIndex++;
     }
-
-    h+=`<tr class="cmp-cover"><th class="cmp-name"><div class="cmp-name-inner"><span>Présents · min.</span><input class="cmp-min" type="number" inputmode="numeric" min="0" max="${group.people.length}" value="${min}" data-cmp-min="${escapeHTML(group.name)}" aria-label="Minimum de présents pour ${escapeHTML(group.name)}"><small>/ ${group.people.length}</small></div></th>`;
-    h+=cover.map(x=>{
-      if(!x.applies)return `<td class="cmp-cvc is-na" title="Pas d'exigence (week-end, férié ou pas de données)">–</td>`;
-      const cls=x.count>=min?'is-ok':x.count>0?'is-low':'is-zero';
-      return `<td class="cmp-cvc ${cls}" title="${x.count} présent${x.count>1?'s':''} sur ${group.people.length} · minimum ${min}">${x.count}</td>`;
-    }).join('');
-    h+='</tr>';
   }
   h+='</tbody></table>';
   $('cmpGrid').innerHTML=h;
@@ -3878,10 +3904,8 @@ function renderCompareView(){
 function renderCmpPanelList(){
   const list=$('cmpPanelList');
   const query=normalizeSearchText(cmp.search);
-  const panelGroups=presenceGroups(true).sort((a,b)=>
-    (isPresenceExcludedCategory(a.people[0])?1:0)-(isPresenceExcludedCategory(b.people[0])?1:0));
   let h='';
-  for(const group of panelGroups){
+  for(const group of cmpGroupsOrdered()){
     const people=group.people.filter(e=>!query||normalizeSearchText(e.name).includes(query));
     if(!people.length)continue;
     const n=people.filter(e=>cmp.people.has(presencePersonKey(e))).length;
@@ -3925,6 +3949,19 @@ document.addEventListener('click',event=>{
 $('compareViewSection').addEventListener('click',event=>{
   const scaleBtn=event.target.closest('[data-cmp-scale]');
   if(scaleBtn){ cmp.scale=scaleBtn.dataset.cmpScale; saveCmp(); renderCompareView(); return; }
+  const grp=event.target.closest('[data-cmp-grp]');
+  if(grp){
+    const g=presenceGroups(true).find(x=>x.name===grp.dataset.cmpGrp);
+    if(g){
+      const allOn=g.people.every(e=>cmp.people.has(presencePersonKey(e)));
+      for(const e of g.people){
+        const k=presencePersonKey(e);
+        if(allOn)cmp.people.delete(k); else cmp.people.add(k);
+      }
+      saveCmp(); renderCompareView();
+    }
+    return;
+  }
   const rm=event.target.closest('[data-cmp-remove]');
   if(rm){ cmp.people.delete(rm.dataset.cmpRemove); saveCmp(); renderCompareView(); }
 });
@@ -3939,9 +3976,6 @@ $('compareViewSection').addEventListener('change',event=>{
     }
   }else if(t.dataset.cmpPerson!==undefined){
     if(t.checked)cmp.people.add(t.dataset.cmpPerson); else cmp.people.delete(t.dataset.cmpPerson);
-  }else if(t.dataset.cmpMin!==undefined){
-    const n=Math.max(0,Math.floor(Number(t.value)));
-    cmp.mins[t.dataset.cmpMin]=Number.isFinite(n)?n:0;
   }else{
     return;
   }
@@ -3949,6 +3983,9 @@ $('compareViewSection').addEventListener('change',event=>{
   renderCompareView();
 });
 document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeCmpPanel(); });
+
+// Bascule téléphone <-> ordinateur : on redessine la comparaison.
+window.matchMedia('(max-width:700px)').addEventListener('change',()=>{ if(state.compareMode)renderCompareView(); });
 
 function renderTravauxSection(){
   const el=$('travauxSection');
