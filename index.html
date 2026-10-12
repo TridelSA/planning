@@ -485,22 +485,28 @@ body.presence-mode .app{max-width:1680px}
 #presenceTitlesBtn.is-off{opacity:.6;text-decoration:line-through}
 /* ---------- Page Statistiques ---------- */
 .st-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
-.st-person{position:relative}
+.st-person{position:relative;min-width:260px}
+.st-person .employee-picker-button{min-height:46px}
 @media (min-width:701px){.st-person .pv-panel{left:0;right:auto}}
-.st-person-btn{display:flex;align-items:center;gap:10px;min-width:260px;padding:7px 12px 7px 8px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface);text-align:left;color:var(--ink)}
-.st-person-btn:hover{border-color:var(--accent)}
-.st-person-txt{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
-.st-person-txt small,.st-period small{font:700 10px/1 var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.st-person-txt strong{font:700 14px/1.2 var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.st-period{display:flex;flex-direction:column;gap:5px}
+.st-lab{display:block;margin-bottom:5px;font:700 10px/1 var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.st-period{display:block}
 .st-period select{height:46px;min-width:170px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface);font:700 13px/1 var(--font-body);color:var(--ink)}
 .st-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.st-kpi i.st-sub{display:block;font:600 11.5px/1.4 var(--font-body);font-style:normal;color:var(--muted);margin-top:2px}
+.st-periods{display:flex;flex-direction:column;max-height:300px;overflow:auto;padding-right:4px}
+.st-pline{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font:600 12.5px/1.2 var(--font-body);color:var(--ink)}
+.st-pline:first-child{border-top:0}
+.st-pline span:first-child{flex:1}
+.st-pline b{font:700 13px/1 var(--font-display)}
+.st-pline.is-next b{color:var(--accent-ink)}
+.st-tag{padding:3px 8px;border-radius:99px;background:var(--accent-tint);color:var(--accent-ink);font:800 10px/1 var(--font-body)}
+.st-tag.is-past{background:var(--paper);color:var(--muted)}
 .st-kpi{border:1px solid var(--line);border-radius:var(--radius-md);padding:14px 16px;background:var(--surface);border-left:5px solid var(--st-c,var(--accent))}
 .st-kpi small{display:block;font:700 11px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .st-kpi b{display:block;margin:6px 0 2px;font:700 34px/1 var(--font-display);color:var(--ink)}
 .st-kpi b i{font:600 13px/1 var(--font-body);font-style:normal;color:var(--muted);margin-left:5px}
 .st-kpi span{font:500 11.5px/1.4 var(--font-body);color:var(--muted)}
-.st-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px}
+.st-blocks{align-items:start;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px}
 .st-block{border:1px solid var(--line);border-radius:var(--radius-md);padding:14px 16px;background:var(--surface)}
 .st-block h3{margin:0 0 10px;font:700 13px/1.2 var(--font-display);color:var(--ink)}
 .st-big{display:flex;align-items:baseline;gap:6px;margin-bottom:10px;font:700 30px/1 var(--font-display)}
@@ -531,8 +537,8 @@ body.presence-mode .app{max-width:1680px}
 .st-empty-note{padding:10px 0;color:var(--muted);font:600 12px/1.4 var(--font-body)}
 @media (max-width:700px){
   .st-bar{flex-direction:column;align-items:stretch;gap:10px}
-  .st-person-btn{min-width:0;width:100%;padding:9px 12px 9px 9px}
-  .st-period select{width:100%;height:44px;font-size:16px}
+  .st-person{min-width:0}
+    .st-period select{width:100%;height:44px;font-size:16px}
   .st-kpis{grid-template-columns:1fr;gap:8px}
   .st-kpi{display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 14px}
   .st-kpi small{grid-column:1}
@@ -1170,11 +1176,13 @@ body:not(.cmp-week) .cmp-cell{height:30px}
     </div>
 
     <div class="st-bar">
-      <div id="stPerson" class="pv-filter st-person">
-        <button id="stPersonBtn" class="st-person-btn" type="button" aria-expanded="false">
-          <span id="stAvatar" class="employee-picker-avatar">—</span>
-          <span class="st-person-txt"><small>Personne</small><strong id="stName">Choisir une personne</strong></span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      <div id="stPerson" class="pv-filter st-person"><small class="st-lab">Employé</small>
+        <button id="stPersonBtn" class="employee-picker-button" type="button" aria-expanded="false">
+          <span class="employee-picker-main">
+            <span id="stAvatar" class="employee-picker-avatar">—</span>
+            <span class="employee-picker-copy"><strong id="stName">Choisir une personne</strong></span>
+          </span>
+          <span class="employee-picker-chevron">⌄</span>
         </button>
         <div id="stPanel" class="pv-panel hidden" role="dialog" aria-label="Choisir une personne">
           <div class="pv-panel-head"><strong>Choisir une personne</strong></div>
@@ -1182,7 +1190,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
           <div id="stPanelList" class="pv-panel-list"></div>
         </div>
       </div>
-      <label class="st-period"><small>Période</small>
+      <label class="st-period"><small class="st-lab">Période</small>
         <select id="stMonth" aria-label="Période"></select>
       </label>
     </div>
@@ -4173,10 +4181,10 @@ document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeCmpPan
 // si la personne en a dans son année.
 // ==========================================================
 const ST_KEY='statsState';
-const ST_VAC=['VA','VJ'];
-const ST_REC=['HSR','HOR'];
+const ST_VAC=['VA','VJ','HSR','HOR']; // « congés » = vacances + récupérations (HSR, HOR)
+const ST_REC=[];
 const ST_OTHER=['MS','MC','AP','MI','EM','PC','PI','FE','PR','AN','NS','PA','DE','DL','DC','JT'];
-const ST_COLORS={vac:'#E0566A',rec:'#C9A400',oth:'#6B7A90',rot:'#4545AA',piq:'#63428E'};
+const ST_COLORS={vac:'#E0566A',oth:'#6B7A90',rot:'#4545AA',piq:'#63428E'};
 const st={month:'all',metric:'',search:''};
 try{ const m=JSON.parse(localStorage.getItem(ST_KEY)||'{}'); if(m&&(m.month==='all'||(Number.isInteger(m.month)&&m.month>=0&&m.month<12)))st.month=m.month; }catch(e){ /* ignoré */ }
 function saveSt(){ try{ localStorage.setItem(ST_KEY,JSON.stringify({month:st.month})); }catch(e){ /* ignoré */ } }
@@ -4235,6 +4243,32 @@ function stChartHTML(months,metrics){
     <div class="st-chart">${cols}</div></div>`;
 }
 
+// Périodes de congé : jours consécutifs regroupés (un week-end ou un férié
+// entre deux jours de congé ne coupe pas la période).
+function stLeavePeriods(emp,monthSel){
+  const year=String(planning.year);
+  const days=Object.keys(emp.schedule||{}).filter(iso=>iso.startsWith(year+'-') && ST_VAC.includes(safeCode(emp.schedule[iso]))).sort();
+  const inSel=iso=>monthSel==='all'||Number(iso.slice(5,7))-1===monthSel;
+  const off=iso=>{ const d=parseISODateOnly(iso); return d&&(d.getDay()===0||d.getDay()===6||!!swissHolidayName(iso)||safeCode(emp.schedule[iso])==='RF'); };
+  const out=[];
+  let cur=null;
+  for(const iso of days){
+    if(cur){
+      let ok=true;
+      const d=parseISODateOnly(cur.end); d.setDate(d.getDate()+1);
+      while(isoDate(d)<iso){ if(!off(isoDate(d))){ ok=false; break; } d.setDate(d.getDate()+1); }
+      if(ok){ cur.end=iso; cur.list.push(iso); continue; }
+      out.push(cur);
+    }
+    cur={start:iso,end:iso,list:[iso]};
+  }
+  if(cur)out.push(cur);
+  return out.map(x=>({start:x.start,end:x.end,n:x.list.length,list:x.list})).filter(x=>x.list.some(inSel)).map(x=>({...x,n:x.list.filter(inSel).length}));
+}
+const ST_MON=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function stShortDate(iso){ const d=parseISODateOnly(iso); return `${d.getDate()} ${ST_MON[d.getMonth()]}`; }
+function stRange(a,b){ return a===b?stShortDate(a):`${stShortDate(a)} → ${stShortDate(b)}`; }
+
 function renderStatsView(){
   if(!$('statsViewSection'))return;
   const sel=$('stMonth');
@@ -4259,10 +4293,25 @@ function renderStatsView(){
   const vac=stSum(months,ST_VAC,sub), rec=stSum(months,ST_REC,sub), oth=stSum(months,ST_OTHER,sub);
   const rotYear=stSum(months,ROTATION_CODES,yearAll), piqYear=stSum(months,['PIQ'],yearAll);
 
+  const today=todayISO();
+  const periods=stLeavePeriods(emp,sub);
+  const vacYear=stSum(months,ST_VAC,'all');
+  const vacBreak=[['VA','VJ'],['HSR','HOR']].map(g=>stSum(months,g,sub));
+  const takenYear=Object.keys(emp.schedule||{}).filter(iso=>iso.startsWith(String(planning.year)+'-') && ST_VAC.includes(safeCode(emp.schedule[iso])) && (sub==='all'||Number(iso.slice(5,7))-1===sub));
+  const past=takenYear.filter(i=>i<=today).length, next=takenYear.length-past;
+  const upcoming=stLeavePeriods(emp,'all').find(x=>x.end>=today);
+  let nextTxt='Aucun congé à venir', nextSub='';
+  if(upcoming){
+    const first=upcoming.list.find(i=>i>=today)||upcoming.start;
+    const diff=Math.round((parseISODateOnly(first)-parseISODateOnly(today))/86400000);
+    nextTxt=diff===0?"Aujourd'hui":stShortDate(first);
+    nextSub=`${diff===0?'En cours':diff===1?'Demain':`Dans ${diff} jours`} · ${stRange(upcoming.start,upcoming.end)} (${stDays(upcoming.list.length)})`;
+  }
+
   let h=`<div class="st-kpis">
-    <div class="st-kpi" style="--st-c:${ST_COLORS.vac}"><small>Vacances</small><b>${vac}<i>j</i></b><span>VA + VJ</span></div>
-    <div class="st-kpi" style="--st-c:${ST_COLORS.rec}"><small>Récupérations</small><b>${rec}<i>j</i></b><span>HSR + HOR</span></div>
-    <div class="st-kpi" style="--st-c:${ST_COLORS.oth}"><small>Autres absences</small><b>${oth}<i>j</i></b><span>Maladie, formation, militaire…</span></div>
+    <div class="st-kpi" style="--st-c:${ST_COLORS.vac}"><small>Congés</small><b>${vac}<i>j</i></b><span>${vacBreak[0]} vacances · ${vacBreak[1]} récupération${vacBreak[1]>1?'s':''}${(past&&next)?`<i class="st-sub">${past} pris · ${next} à venir</i>`:''}</span></div>
+    <div class="st-kpi" style="--st-c:${ST_COLORS.oth}"><small>Absences</small><b>${oth}<i>j</i></b><span>Maladie, formation, militaire…</span></div>
+    <div class="st-kpi" style="--st-c:var(--accent)"><small>Prochain congé</small><b style="font-size:${upcoming?'24px':'18px'};line-height:1.2">${nextTxt}</b><span>${nextSub||'—'}</span></div>
   </div>`;
 
   const blocks=[];
@@ -4276,21 +4325,26 @@ function renderStatsView(){
     blocks.push(`<div class="st-block"><h3>Piquet</h3><div class="st-big">${n}<small>${n>1?'jours de piquet':'jour de piquet'}</small></div>
       ${stBarRows([{label:'Semaine',n:n-off,color:'#9A7BC8'},{label:'Week-end / férié',n:off,color:'#63428E'}],n)}</div>`);
   }
-  const used=[...ST_VAC,...ST_REC,...ST_OTHER].map(c=>({c,n:stSum(months,[c],sub)})).filter(x=>x.n>0);
+  const used=[...ST_VAC,...ST_OTHER].map(c=>({c,n:stSum(months,[c],sub)})).filter(x=>x.n>0);
+  blocks.push(`<div class="st-block"><h3>Périodes de congé</h3>${periods.length
+    ?`<div class="st-periods">${periods.map(x=>`<div class="st-pline ${(x.end>=today&&x.start<=today)||(x.start>today&&x===periods.find(y=>y.end>=today))?'is-next':''}"><span>${stRange(x.start,x.end)}</span><span class="st-tag ${x.end<today?'is-past':''}">${x.end<today?'Pris':x.start<=today?'En cours':'À venir'}</span><b>${stDays(x.n)}</b></div>`).join('')}</div>`
+    :`<div class="st-empty-note">Aucun congé sur ${stPeriodLabel()}.</div>`}</div>`);
   blocks.push(`<div class="st-block"><h3>Détail des congés et absences</h3>${used.length
     ?`<div class="st-list">${used.map(x=>`<div class="st-line"><span class="st-code ${classFor(x.c)}">${x.c}</span><span>${escapeHTML((CODE_INFO[x.c]||[x.c])[0])}</span><b>${stDays(x.n)}</b></div>`).join('')}</div>`
     :`<div class="st-empty-note">Aucun congé ni absence sur ${stPeriodLabel()}.</div>`}</div>`);
   h+=`<div class="st-blocks">${blocks.join('')}</div>`;
 
   const metrics=[
-    {id:'vac',label:'Vacances',codes:ST_VAC,color:ST_COLORS.vac},
-    {id:'rec',label:'Récupérations',codes:ST_REC,color:ST_COLORS.rec},
+    {id:'vac',label:'Congés',codes:ST_VAC,color:ST_COLORS.vac},
     {id:'oth',label:'Absences',codes:ST_OTHER,color:ST_COLORS.oth}
   ];
   if(rotYear>0)metrics.push({id:'rot',label:'Rotations',codes:ROTATION_CODES,color:ST_COLORS.rot});
   if(piqYear>0)metrics.push({id:'piq',label:'Piquet',codes:['PIQ'],color:ST_COLORS.piq});
   h+=stChartHTML(months,metrics);
   body.innerHTML=h;
+  // La liste des périodes s'ouvre sur le prochain congé.
+  const pl=body.querySelector('.st-periods'),nx=pl&&pl.querySelector('.is-next');
+  if(pl&&nx)pl.scrollTop=Math.max(0,nx.offsetTop-pl.offsetTop-8);
 }
 
 function renderStPanelList(){
