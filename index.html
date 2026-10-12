@@ -483,6 +483,66 @@ body.presence-mode .app{max-width:1680px}
 .pv-link:hover{text-decoration:underline}
 .pv-week.is-hover{background:var(--accent-tint);color:var(--accent-ink);border-radius:6px}
 #presenceTitlesBtn.is-off{opacity:.6;text-decoration:line-through}
+/* ---------- Page Statistiques ---------- */
+.st-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
+.st-person{position:relative}
+@media (min-width:701px){.st-person .pv-panel{left:0;right:auto}}
+.st-person-btn{display:flex;align-items:center;gap:10px;min-width:260px;padding:7px 12px 7px 8px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface);text-align:left;color:var(--ink)}
+.st-person-btn:hover{border-color:var(--accent)}
+.st-person-txt{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.st-person-txt small,.st-period small{font:700 10px/1 var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.st-person-txt strong{font:700 14px/1.2 var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-period{display:flex;flex-direction:column;gap:5px}
+.st-period select{height:46px;min-width:170px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface);font:700 13px/1 var(--font-body);color:var(--ink)}
+.st-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.st-kpi{border:1px solid var(--line);border-radius:var(--radius-md);padding:14px 16px;background:var(--surface);border-left:5px solid var(--st-c,var(--accent))}
+.st-kpi small{display:block;font:700 11px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.st-kpi b{display:block;margin:6px 0 2px;font:700 34px/1 var(--font-display);color:var(--ink)}
+.st-kpi b i{font:600 13px/1 var(--font-body);font-style:normal;color:var(--muted);margin-left:5px}
+.st-kpi span{font:500 11.5px/1.4 var(--font-body);color:var(--muted)}
+.st-blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:14px}
+.st-block{border:1px solid var(--line);border-radius:var(--radius-md);padding:14px 16px;background:var(--surface)}
+.st-block h3{margin:0 0 10px;font:700 13px/1.2 var(--font-display);color:var(--ink)}
+.st-big{display:flex;align-items:baseline;gap:6px;margin-bottom:10px;font:700 30px/1 var(--font-display)}
+.st-big small{font:600 12px/1 var(--font-body);color:var(--muted)}
+.st-row{display:grid;grid-template-columns:110px 1fr 32px;align-items:center;gap:10px;margin:7px 0;font:600 12px/1.2 var(--font-body);color:var(--ink-soft)}
+.st-track{height:10px;border-radius:99px;background:var(--paper);overflow:hidden}
+.st-fill{display:block;height:100%;border-radius:99px;min-width:0}
+.st-row em{font:700 13px/1 var(--font-display);font-style:normal;text-align:right;color:var(--ink)}
+.st-note{margin:10px 0 0;font:500 11.5px/1.4 var(--font-body);color:var(--muted)}
+.st-list{display:flex;flex-direction:column}
+.st-line{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font:600 12.5px/1.2 var(--font-body);color:var(--ink)}
+.st-line:first-child{border-top:0}
+.st-code{min-width:38px;text-align:center;padding:4px 6px;border-radius:6px;font:800 11px/1 var(--font-body)}
+.st-line span:nth-child(2){flex:1}
+.st-line b{font:700 14px/1 var(--font-display)}
+.st-chart-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.st-chart-head h3{margin:0}
+.st-chart{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:end;height:150px;padding-top:18px}
+.st-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;position:relative}
+.st-col .st-bar-v{width:100%;max-width:34px;border-radius:6px 6px 2px 2px;background:var(--st-c,var(--accent));min-height:2px}
+.st-col .st-bar-v.is-zero{background:var(--paper)}
+.st-col em{position:absolute;top:-16px;font:700 11px/1 var(--font-display);font-style:normal;color:var(--ink)}
+.st-col span{font:600 10px/1 var(--font-body);color:var(--muted)}
+.st-col.is-sel span{color:var(--accent-ink);font-weight:800}
+.st-col.is-dim .st-bar-v{opacity:.35}
+.st-pick{width:100%;border:0;background:none;text-align:left;color:var(--ink);font:600 12.5px/1.2 var(--font-body)}
+.st-pick.is-current{background:var(--accent-tint);color:var(--accent-ink);font-weight:800}
+.st-empty-note{padding:10px 0;color:var(--muted);font:600 12px/1.4 var(--font-body)}
+@media (max-width:700px){
+  .st-bar{flex-direction:column;align-items:stretch;gap:10px}
+  .st-person-btn{min-width:0;width:100%;padding:9px 12px 9px 9px}
+  .st-period select{width:100%;height:44px;font-size:16px}
+  .st-kpis{grid-template-columns:1fr;gap:8px}
+  .st-kpi{display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 14px}
+  .st-kpi small{grid-column:1}
+  .st-kpi b{grid-column:2;grid-row:1/3;margin:0;font-size:30px;text-align:right}
+  .st-kpi span{grid-column:1}
+  .st-row{grid-template-columns:92px 1fr 28px;gap:8px}
+  .st-chart{gap:3px;height:130px}
+  .st-chart-head .pv-chips{width:100%}
+}
+@media print{#statsViewSection{display:none!important}}
 /* ---------- Page Comparer ---------- */
 body.compare-mode .app{max-width:1680px}
 .cmp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
@@ -1102,6 +1162,34 @@ body:not(.cmp-week) .cmp-cell{height:30px}
     <div id="cmpGrid" class="cmp-wrap"></div>
   </section>
 
+  <section id="statsViewSection" class="card main-card pv-card hidden">
+    <div class="pv-head">
+      <div class="team-view-title">
+        <h2>Statistiques</h2>
+      </div>
+    </div>
+
+    <div class="st-bar">
+      <div id="stPerson" class="pv-filter st-person">
+        <button id="stPersonBtn" class="st-person-btn" type="button" aria-expanded="false">
+          <span id="stAvatar" class="employee-picker-avatar">—</span>
+          <span class="st-person-txt"><small>Personne</small><strong id="stName">Choisir une personne</strong></span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div id="stPanel" class="pv-panel hidden" role="dialog" aria-label="Choisir une personne">
+          <div class="pv-panel-head"><strong>Choisir une personne</strong></div>
+          <div class="pv-panel-search"><input id="stSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off"></div>
+          <div id="stPanelList" class="pv-panel-list"></div>
+        </div>
+      </div>
+      <label class="st-period"><small>Période</small>
+        <select id="stMonth" aria-label="Période"></select>
+      </label>
+    </div>
+
+    <div id="stBody"></div>
+  </section>
+
   <section id="presenceViewSection" class="card main-card pv-card hidden">
     <div class="pv-head">
       <div class="team-view-title">
@@ -1211,7 +1299,7 @@ const CODE_INFO={
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
-let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),presenceMode:false,presenceYear:new Date().getFullYear(),compareMode:false};
+let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),presenceMode:false,presenceYear:new Date().getFullYear(),compareMode:false,statsMode:false};
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -3107,6 +3195,7 @@ function teamShiftYear(amount){
 // d'équipe et présences annuelles (boutons en haut à droite).
 // ==========================================================
 function currentPage(){
+  if(state.statsMode)return 'stats';
   if(state.compareMode)return 'compare';
   if(state.presenceMode)return 'presence';
   if(state.teamMode)return 'team';
@@ -3123,7 +3212,9 @@ const NAV_PAGES=[
   {id:'presence',label:'Maintenance',desc:'Présences annuelles par semaine',
    icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>'},
   {id:'compare',label:'Comparer',desc:'Plusieurs collègues côte à côte',
-   icon:'<path d="M8 3v18M16 3v18M3 8h5M16 8h5M3 16h5M16 16h5"/>'}
+   icon:'<path d="M8 3v18M16 3v18M3 8h5M16 8h5M3 16h5M16 16h5"/>'},
+  {id:'stats',label:'Statistiques',desc:'Mes rotations, piquets, congés, absences',
+   icon:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'}
 ];
 const PAGE_KEY='planningPage';
 
@@ -3138,7 +3229,7 @@ function updateTeamToggleLabel(){
   </button>`).join('');
   const subtitle=$('heroSubtitle');
   if(subtitle){
-    subtitle.textContent=page==='compare'?'Comparer des collègues':page==='presence'?'Présences annuelles':page==='team'?"Planning d'équipe":'Planning individuel';
+    subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='presence'?'Présences annuelles':page==='team'?"Planning d'équipe":'Planning individuel';
   }
 }
 
@@ -3190,11 +3281,14 @@ function setPage(page){
   state.teamMode=page==='team';
   state.presenceMode=page==='presence';
   state.compareMode=page==='compare';
+  state.statsMode=page==='stats';
   const alternate=page!=='individual';
 
   document.body.classList.toggle('team-mode',page==='team');
   document.body.classList.toggle('presence-mode',page==='presence');
   document.body.classList.toggle('compare-mode',page==='compare');
+  document.body.classList.toggle('stats-mode',page==='stats');
+  closeStPanel();
   document.body.classList.toggle('cmp-week',page==='compare' && cmp.scale==='week');
   closeEmployeePicker();
   closePresencePanel();
@@ -3211,6 +3305,7 @@ function setPage(page){
   $('teamViewSection').classList.toggle('hidden',page!=='team');
   $('presenceViewSection').classList.toggle('hidden',page!=='presence');
   $('compareViewSection').classList.toggle('hidden',page!=='compare');
+  $('statsViewSection').classList.toggle('hidden',page!=='stats');
 
   updateTeamToggleLabel();
   try{ localStorage.setItem(PAGE_KEY,page); }catch(e){ /* stockage indisponible */ }
@@ -4071,6 +4166,186 @@ $('compareViewSection').addEventListener('change',event=>{
   renderCompareView();
 });
 document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeCmpPanel(); });
+// ==========================================================
+// Page Statistiques : fiche personnelle (aucune comparaison entre personnes).
+// Compte les jours où chaque code apparaît dans le planning de la personne,
+// sur l'année ou sur un mois. Les blocs Rotations / Piquet n'apparaissent que
+// si la personne en a dans son année.
+// ==========================================================
+const ST_KEY='statsState';
+const ST_VAC=['VA','VJ'];
+const ST_REC=['HSR','HOR'];
+const ST_OTHER=['MS','MC','AP','MI','EM','PC','PI','FE','PR','AN','NS','PA','DE','DL','DC','JT'];
+const ST_COLORS={vac:'#E0566A',rec:'#C9A400',oth:'#6B7A90',rot:'#4545AA',piq:'#63428E'};
+const st={month:'all',metric:'',search:''};
+try{ const m=JSON.parse(localStorage.getItem(ST_KEY)||'{}'); if(m&&(m.month==='all'||(Number.isInteger(m.month)&&m.month>=0&&m.month<12)))st.month=m.month; }catch(e){ /* ignoré */ }
+function saveSt(){ try{ localStorage.setItem(ST_KEY,JSON.stringify({month:st.month})); }catch(e){ /* ignoré */ } }
+
+function stCompute(emp){
+  const year=String(planning.year);
+  const months=Array.from({length:12},()=>({}));
+  const piqDays={weekend:0,total:0};
+  for(const [iso,raw] of Object.entries(emp.schedule||{})){
+    if(!iso.startsWith(year+'-'))continue;
+    const code=safeCode(raw);
+    if(!code)continue;
+    const m=Number(iso.slice(5,7))-1;
+    if(!(m>=0&&m<12))continue;
+    months[m][code]=(months[m][code]||0)+1;
+  }
+  return months;
+}
+function stSum(months,codes,monthSel){
+  let n=0;
+  months.forEach((mo,i)=>{ if(monthSel!=='all'&&monthSel!==i)return; for(const c of codes)n+=mo[c]||0; });
+  return n;
+}
+function stPiquetOffDays(emp,monthSel){
+  const year=String(planning.year);
+  let n=0;
+  for(const [iso,raw] of Object.entries(emp.schedule||{})){
+    if(!iso.startsWith(year+'-') || safeCode(raw)!=='PIQ')continue;
+    const m=Number(iso.slice(5,7))-1;
+    if(monthSel!=='all'&&monthSel!==m)continue;
+    const d=new Date(Number(iso.slice(0,4)),m,Number(iso.slice(8,10)));
+    if(d.getDay()===0||d.getDay()===6||swissHolidayName(iso))n++;
+  }
+  return n;
+}
+const stDays=n=>`${n} jour${n>1?'s':''}`;
+
+function stPeriodLabel(){
+  return st.month==='all'?`l'année ${planning.year}`:`${MONTH_NAMES[st.month].toLowerCase()} ${planning.year}`;
+}
+
+function stBarRows(rows,total){
+  const max=Math.max(1,...rows.map(r=>r.n));
+  return rows.map(r=>`<div class="st-row"><span>${r.label}</span><div class="st-track"><i class="st-fill" style="width:${Math.round(r.n/max*100)}%;background:${r.color}"></i></div><em>${r.n}</em></div>`).join('');
+}
+
+function stChartHTML(months,metrics){
+  const metric=metrics.find(x=>x.id===st.metric)||metrics[0];
+  const vals=months.map(mo=>metric.codes.reduce((a,c)=>a+(mo[c]||0),0));
+  const max=Math.max(1,...vals);
+  const chips=metrics.map(x=>`<button type="button" class="pv-chip ${x.id===metric.id?'is-on':''}" data-st-metric="${x.id}" aria-pressed="${x.id===metric.id}">${x.label}</button>`).join('');
+  const cols=vals.map((v,i)=>`<div class="st-col ${st.month===i?'is-sel':''} ${st.month!=='all'&&st.month!==i?'is-dim':''}">
+      ${v?`<em>${v}</em>`:''}<div class="st-bar-v ${v?'':'is-zero'}" style="height:${v?Math.max(4,Math.round(v/max*100)):2}%"></div><span>${['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'][i]}</span></div>`).join('');
+  return `<div class="st-block" style="--st-c:${metric.color}">
+    <div class="st-chart-head"><h3>Mois par mois · ${metric.label.toLowerCase()}</h3><div class="pv-chips">${chips}</div></div>
+    <div class="st-chart">${cols}</div></div>`;
+}
+
+function renderStatsView(){
+  if(!$('statsViewSection'))return;
+  const sel=$('stMonth');
+  const opts=[['all',`Année ${planning.year}`],...MONTH_NAMES.map((n,i)=>[String(i),n])];
+  sel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  sel.value=String(st.month);
+
+  const emp=selectedEmployee();
+  $('stName').textContent=emp?cleanEmployeeName(emp.name):'Choisir une personne';
+  $('stAvatar').textContent=emp?(initials(cleanEmployeeName(emp.name))||'—'):'—';
+  if(!$('stPanel').classList.contains('hidden'))renderStPanelList();
+
+  const body=$('stBody');
+  if(!emp){
+    body.innerHTML='<div class="pv-empty-state">Choisissez une personne pour voir ses statistiques.</div>';
+    return;
+  }
+
+  const months=stCompute(emp);
+  const yearAll='all';
+  const sub=st.month; // période affichée
+  const vac=stSum(months,ST_VAC,sub), rec=stSum(months,ST_REC,sub), oth=stSum(months,ST_OTHER,sub);
+  const rotYear=stSum(months,ROTATION_CODES,yearAll), piqYear=stSum(months,['PIQ'],yearAll);
+
+  let h=`<div class="st-kpis">
+    <div class="st-kpi" style="--st-c:${ST_COLORS.vac}"><small>Vacances</small><b>${vac}<i>j</i></b><span>VA + VJ</span></div>
+    <div class="st-kpi" style="--st-c:${ST_COLORS.rec}"><small>Récupérations</small><b>${rec}<i>j</i></b><span>HSR + HOR</span></div>
+    <div class="st-kpi" style="--st-c:${ST_COLORS.oth}"><small>Autres absences</small><b>${oth}<i>j</i></b><span>Maladie, formation, militaire…</span></div>
+  </div>`;
+
+  const blocks=[];
+  if(rotYear>0){
+    const rows=[['RM','Matin','#8F8AE8'],['RA','Après-midi','#5AA9E6'],['RN','Nuit','#E8A33D']].map(([c,l,col])=>({label:l,n:stSum(months,[c],sub),color:col}));
+    const tot=rows.reduce((a,r)=>a+r.n,0);
+    blocks.push(`<div class="st-block"><h3>Rotations</h3><div class="st-big">${tot}<small>${tot>1?'rotations':'rotation'}</small></div>${stBarRows(rows,tot)}</div>`);
+  }
+  if(piqYear>0){
+    const n=stSum(months,['PIQ'],sub), off=stPiquetOffDays(emp,sub);
+    blocks.push(`<div class="st-block"><h3>Piquet</h3><div class="st-big">${n}<small>${n>1?'jours de piquet':'jour de piquet'}</small></div>
+      ${stBarRows([{label:'Semaine',n:n-off,color:'#9A7BC8'},{label:'Week-end / férié',n:off,color:'#63428E'}],n)}</div>`);
+  }
+  const used=[...ST_VAC,...ST_REC,...ST_OTHER].map(c=>({c,n:stSum(months,[c],sub)})).filter(x=>x.n>0);
+  blocks.push(`<div class="st-block"><h3>Détail des congés et absences</h3>${used.length
+    ?`<div class="st-list">${used.map(x=>`<div class="st-line"><span class="st-code ${classFor(x.c)}">${x.c}</span><span>${escapeHTML((CODE_INFO[x.c]||[x.c])[0])}</span><b>${stDays(x.n)}</b></div>`).join('')}</div>`
+    :`<div class="st-empty-note">Aucun congé ni absence sur ${stPeriodLabel()}.</div>`}</div>`);
+  h+=`<div class="st-blocks">${blocks.join('')}</div>`;
+
+  const metrics=[
+    {id:'vac',label:'Vacances',codes:ST_VAC,color:ST_COLORS.vac},
+    {id:'rec',label:'Récupérations',codes:ST_REC,color:ST_COLORS.rec},
+    {id:'oth',label:'Absences',codes:ST_OTHER,color:ST_COLORS.oth}
+  ];
+  if(rotYear>0)metrics.push({id:'rot',label:'Rotations',codes:ROTATION_CODES,color:ST_COLORS.rot});
+  if(piqYear>0)metrics.push({id:'piq',label:'Piquet',codes:['PIQ'],color:ST_COLORS.piq});
+  h+=stChartHTML(months,metrics);
+  body.innerHTML=h;
+}
+
+function renderStPanelList(){
+  const q=normalizeSearchText(st.search);
+  const cur=state.employeeId;
+  let h='';
+  for(const g of presenceGroups(true)){
+    const people=g.people.filter(e=>!q||normalizeSearchText(e.name).includes(q));
+    if(!people.length)continue;
+    h+=`<div class="pv-panel-group">${escapeHTML(g.name)}</div>`;
+    h+=people.map(e=>`<button type="button" class="pv-panel-person st-pick ${e.id===cur?'is-current':''}" data-st-person="${escapeHTML(e.id)}">${escapeHTML(cleanEmployeeName(e.name))}</button>`).join('');
+  }
+  $('stPanelList').innerHTML=h||'<div class="pv-panel-empty">Aucune personne trouvée.</div>';
+}
+function openStPanel(){
+  $('stPanel').classList.remove('hidden');
+  $('stPersonBtn').setAttribute('aria-expanded','true');
+  renderStPanelList();
+  if(window.matchMedia('(hover:hover)').matches)$('stSearch').focus();
+}
+function closeStPanel(){
+  if(!$('stPanel'))return;
+  $('stPanel').classList.add('hidden');
+  $('stPersonBtn').setAttribute('aria-expanded','false');
+}
+$('stPersonBtn').addEventListener('click',event=>{
+  event.stopPropagation();
+  if($('stPanel').classList.contains('hidden'))openStPanel(); else closeStPanel();
+});
+$('stSearch').addEventListener('input',event=>{ st.search=event.target.value; renderStPanelList(); });
+$('stPanel').addEventListener('click',event=>{
+  event.stopPropagation();
+  const b=event.target.closest('[data-st-person]');
+  if(!b)return;
+  const emp=planning.employees.find(e=>e.id===b.dataset.stPerson);
+  if(!emp)return;
+  state.employeeId=emp.id;
+  persistSelectedEmployee(emp);
+  if(typeof updateEmployeePicker==='function')try{ updateEmployeePicker(); }catch(e){ /* ignoré */ }
+  closeStPanel();
+  renderStatsView();
+});
+$('stMonth').addEventListener('change',event=>{
+  st.month=event.target.value==='all'?'all':Number(event.target.value);
+  saveSt(); renderStatsView();
+});
+$('statsViewSection').addEventListener('click',event=>{
+  const m=event.target.closest('[data-st-metric]');
+  if(m){ st.metric=m.dataset.stMetric; renderStatsView(); }
+});
+document.addEventListener('click',event=>{
+  if(!$('stPerson').contains(event.target))closeStPanel();
+});
+document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeStPanel(); });
+
 
 // Bascule téléphone <-> ordinateur : on redessine la comparaison.
 window.matchMedia('(max-width:700px)').addEventListener('change',()=>{ if(state.compareMode)renderCompareView(); });
@@ -4095,6 +4370,7 @@ function renderTravauxSection(){
 }
 
 function render(){
+  if(state.statsMode){ renderStatsView(); return; }
   if(state.compareMode){
     document.body.classList.toggle('cmp-week',cmp.scale==='week');
     renderCompareView();
@@ -4723,7 +4999,7 @@ document.addEventListener('keydown',event=>{
     const isTyping=['INPUT','TEXTAREA','SELECT'].includes(tag);
     const pickerOpen=$('employeePicker').classList.contains('open');
     const modalOpen=$('dayModalBackdrop').classList.contains('open');
-    if(!isTyping && !pickerOpen && !modalOpen && !state.teamMode && !state.presenceMode && !state.compareMode){
+    if(!isTyping && !pickerOpen && !modalOpen && !state.teamMode && !state.presenceMode && !state.compareMode && !state.statsMode){
       shiftDate(event.key==='ArrowLeft'?-1:1);
     }
   }
