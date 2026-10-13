@@ -459,7 +459,6 @@ body.view-year .stats-grid{display:grid}
   --pv-absent-bg:#E66A74;--pv-absent-ink:#FFFFFF;
   --pv-cell:24px;--pv-name:168px;
 }
-body.presence-mode .app{max-width:1680px}
 .pv-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .pv-year{display:flex;align-items:center;gap:8px}
 .pv-year .nav-btn{width:34px;height:34px}
@@ -482,7 +481,6 @@ body.presence-mode .app{max-width:1680px}
 .pv-link{border:0;background:none;padding:4px 2px;color:var(--accent);font:700 11px/1 var(--font-body)}
 .pv-link:hover{text-decoration:underline}
 .pv-week.is-hover{background:var(--accent-tint);color:var(--accent-ink);border-radius:6px}
-#presenceTitlesBtn.is-off{opacity:.6;text-decoration:line-through}
 /* ---------- Page Statistiques ---------- */
 .st-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:14px}
 .st-person{position:relative;min-width:260px}
@@ -567,12 +565,14 @@ body.presence-mode .app{max-width:1680px}
 @media print{#statsViewSection{display:none!important}}
 /* ---------- Page Comparer ---------- */
 body.compare-mode .app{max-width:1680px}
+.cmp-print-title{display:none}
 .cmp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
 .cmp-tabs{display:inline-flex;gap:3px;background:var(--paper);border-radius:var(--radius-sm);padding:3px}
 .cmp-tab{border:0;background:transparent;padding:7px 14px;border-radius:7px;font:700 12px/1 var(--font-body);color:var(--muted)}
 .cmp-tab.active{background:var(--surface);color:var(--accent-ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .cmp-nav{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;min-width:240px}
-.cmp-actions{display:flex;align-items:center;gap:8px}
+.cmp-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#cmpTitlesBtn.is-off{opacity:.6;text-decoration:line-through}
 .cmp-nav strong{min-width:210px;text-align:center;font:700 13px/1.2 var(--font-display)}
 .cmp-nav .nav-btn{width:32px;height:32px}
 .cmp-selected{margin-bottom:10px}
@@ -630,7 +630,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmp-nav .nav-btn{width:40px;height:40px;border:0;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.06)}
   .cmp-nav strong{flex:1;min-width:0;font-size:13px}
   .cmp-actions{order:3;flex:1 0 100%;gap:8px}
-  .cmp-actions>*{flex:1 1 0}
+  .cmp-actions>*{flex:1 1 calc(50% - 4px)}
   .cmp-actions .pv-filter-btn{width:100%;height:40px;justify-content:center;font-size:12px}
   .cmp-wrap{max-height:none;border:0;background:transparent;overflow:visible}
   .cmp-name{min-width:120px;max-width:130px}
@@ -742,7 +742,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .pv-name-inner{padding-left:6px}
   .pv-name{font-size:10.5px}
   .pv-toolbar-end{margin-left:0;width:100%;justify-content:space-between;flex-wrap:wrap;gap:8px}
-  #presenceShowAllBtn{order:-1;flex:1 0 100%;text-align:left;white-space:nowrap;padding:0 2px 2px;font-size:11px}
   .pv-toolbar-end>.pv-filter-btn,.pv-toolbar-end>.pv-filter{flex:1 1 0}
   .pv-toolbar-end .pv-filter .pv-filter-btn{width:100%;justify-content:center}
   .pv-toolbar-end .pv-filter-btn{white-space:nowrap;padding:0 8px;font-size:11px}
@@ -950,14 +949,14 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   html,body{background:#fff}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
   body *{visibility:hidden}
-  #presenceViewSection,#presenceViewSection *{visibility:visible}
-  #presenceViewSection{
+  #compareViewSection,#compareViewSection *{visibility:visible}
+  #compareViewSection{
     position:absolute;left:0;top:0;width:100%;margin:0;padding:0;border:0;box-shadow:none;
     display:flex;flex-direction:column;align-items:center;
   }
-  #presenceViewSection>*{width:auto;max-width:100%}
-  .pv-head{width:100%;justify-content:center;position:relative}
-  #presencePrevBtn,#presenceNextBtn,#presenceExportBtn,#presenceTitlesBtn,#presenceFilter,#presenceBackdrop,#presenceShowAllBtn,.pv-hide{display:none!important}
+  #compareViewSection>*{width:auto;max-width:100%}
+  #compareViewSection .pv-head,.cmp-bar,#cmpBackdrop,.pv-hide{display:none!important}
+  .cmp-print-title{display:block;width:100%;text-align:center;font:700 17px/1.2 var(--font-display);margin:0 0 8px}
   :root{--pv-cell:15px;--pv-name:90px}
   .pv-table{border-spacing:1px;font-size:7.5px;margin:0 auto}
   .pv-month{font-size:7px;letter-spacing:.03em}
@@ -971,13 +970,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .pv-chip{border-width:1px;background:transparent!important;color:#000!important}
   .pv-chip::before{display:none}
   /* PDF : ni raccourcis de filtre, ni titres de groupes */
-  #presenceChips,.pv-chip,.pv-group{display:none!important}
+  #cmpGroups,.pv-chip,.pv-group{display:none!important}
   .pv-chips{justify-content:center}
-  /* Titre et année alignés sur la même ligne, même police */
-  .pv-head{align-items:center;gap:10px;margin-bottom:8px}
-  .team-view-title h2{font:700 17px/1.2 var(--font-display)}
-  .pv-year{align-items:center}
-  .pv-year strong{min-width:0;font:700 17px/1.2 var(--font-display)}
   /* Moins d'espace sous les numéros de semaine */
   .pv-table thead tr:first-child th{height:14px}
   .pv-table thead tr:nth-child(2) th{height:14px;vertical-align:middle}
@@ -1153,6 +1147,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
         <h2>Comparer</h2>
       </div>
     </div>
+    <div class="cmp-print-title">Présences annuelles <span id="cmpPrintYear"></span></div>
 
     <div class="cmp-bar">
       <div class="cmp-tabs" role="tablist" aria-label="Échelle">
@@ -1167,11 +1162,20 @@ body:not(.cmp-week) .cmp-cell{height:30px}
       </div>
       <div class="cmp-actions">
       <button id="cmpTodayBtn" class="pv-filter-btn" type="button">Aujourd’hui</button>
+      <button id="cmpTitlesBtn" class="pv-filter-btn hidden" type="button" aria-pressed="false" title="Afficher / masquer les titres de groupes à gauche (jamais dans le PDF)">Titres</button>
+      <button id="cmpExportBtn" class="pv-filter-btn hidden" type="button" title="Exporter en PDF (A4 paysage)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h9l3 3v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+        Exporter en PDF
+      </button>
       <div id="cmpFilter" class="pv-filter">
         <button id="cmpPickBtn" class="pv-filter-btn" type="button" aria-expanded="false">Collègues <span id="cmpCount" class="pv-count">0</span></button>
         <div id="cmpPanel" class="pv-panel hidden" role="dialog" aria-label="Collègues à comparer">
           <div class="pv-panel-head"><strong>Collègues à comparer</strong></div>
           <div class="pv-panel-search"><input id="cmpSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off"></div>
+          <div class="pv-panel-actions">
+            <button type="button" class="pv-link" data-cmp-bulk="show">Tout cocher</button>
+            <button type="button" class="pv-link" data-cmp-bulk="hide">Tout décocher</button>
+          </div>
           <div id="cmpPanelList" class="pv-panel-list"></div>
           <div class="pv-panel-foot"><button id="cmpClearBtn" type="button" class="pv-link">Vider la sélection</button><button id="cmpPanelDone" type="button" class="pv-panel-done">Terminé</button></div>
         </div>
@@ -1181,7 +1185,15 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 
     <div id="cmpGroups" class="pv-chips cmp-groups" aria-label="Groupes"></div>
 
+    <div id="cmpLegend" class="pv-legend hidden">
+      <span class="pv-legend-item"><i class="pv-swatch pv-full"></i>Présent 4 jours ou plus</span>
+      <span class="pv-legend-item"><i class="pv-swatch pv-partial"></i>Présent 1 à 3 jours</span>
+      <span class="pv-legend-item"><i class="pv-swatch pv-absent"></i>Aucun jour présent</span>
+      <span class="pv-legend-item"><i class="pv-swatch pv-none"></i>Pas de données</span>
+    </div>
+
     <div id="cmpGrid" class="cmp-wrap"></div>
+    <div id="cmpBackdrop" class="pv-backdrop hidden"></div>
   </section>
 
   <section id="statsViewSection" class="card main-card pv-card hidden">
@@ -1212,64 +1224,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
     </div>
 
     <div id="stBody"></div>
-  </section>
-
-  <section id="presenceViewSection" class="card main-card pv-card hidden">
-    <div class="pv-head">
-      <div class="team-view-title">
-        <h2>Présences annuelles</h2>
-      </div>
-      <div class="pv-year">
-        <button id="presencePrevBtn" class="nav-btn" type="button" aria-label="Année précédente"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 6 9 12 15 18"></polyline></svg></button>
-        <strong id="presenceYearTitle"></strong>
-        <button id="presenceNextBtn" class="nav-btn" type="button" aria-label="Année suivante"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg></button>
-      </div>
-    </div>
-
-    <div class="pv-toolbar">
-      <div id="presenceChips" class="pv-chips"></div>
-      <div class="pv-toolbar-end">
-        <button id="presenceShowAllBtn" class="pv-link hidden" type="button"></button>
-        <button id="presenceTitlesBtn" class="pv-filter-btn" type="button" aria-pressed="true" title="Afficher / masquer les titres de groupes à gauche (jamais dans le PDF)">Titres</button>
-        <button id="presenceExportBtn" class="pv-filter-btn" type="button" title="Exporter en PDF (A4 paysage)">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h9l3 3v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-          Exporter en PDF
-        </button>
-        <div id="presenceFilter" class="pv-filter">
-          <button id="presenceFilterBtn" class="pv-filter-btn" type="button" aria-expanded="false">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Personnes <span id="presenceCount" class="pv-count"></span>
-          </button>
-          <div id="presencePanel" class="pv-panel hidden" role="dialog" aria-label="Personnes affichées">
-            <div class="pv-panel-head">
-              <strong>Personnes affichées</strong>
-            </div>
-            <div class="pv-panel-search">
-              <input id="presenceSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off">
-            </div>
-            <div class="pv-panel-actions">
-              <button type="button" class="pv-link" data-pv-all="show">Tout cocher</button>
-              <button type="button" class="pv-link" data-pv-all="hide">Tout décocher</button>
-            </div>
-            <div id="presencePanelList" class="pv-panel-list"></div>
-            <div class="pv-panel-foot">
-              <button type="button" class="pv-link" data-pv-reset>Réinitialiser le filtre</button>
-              <button id="presencePanelDone2" type="button" class="pv-panel-done">Terminé</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pv-legend">
-      <span class="pv-legend-item"><i class="pv-swatch pv-full"></i>Présent 4 jours ou plus</span>
-      <span class="pv-legend-item"><i class="pv-swatch pv-partial"></i>Présent 1 à 3 jours</span>
-      <span class="pv-legend-item"><i class="pv-swatch pv-absent"></i>Aucun jour présent</span>
-      <span class="pv-legend-item"><i class="pv-swatch pv-none"></i>Pas de données</span>
-    </div>
-
-    <div id="presenceGrid" class="pv-wrap"></div>
-    <div id="presenceBackdrop" class="pv-backdrop hidden"></div>
   </section>
 </div>
 
@@ -1323,7 +1277,7 @@ const CODE_INFO={
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
-let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),presenceMode:false,presenceYear:new Date().getFullYear(),compareMode:false,statsMode:false};
+let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),compareMode:false,statsMode:false};
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -3221,7 +3175,6 @@ function teamShiftYear(amount){
 function currentPage(){
   if(state.statsMode)return 'stats';
   if(state.compareMode)return 'compare';
-  if(state.presenceMode)return 'presence';
   if(state.teamMode)return 'team';
   return 'individual';
 }
@@ -3233,9 +3186,7 @@ const NAV_PAGES=[
    icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>'},
   {id:'team',label:'Rotations',desc:'Qui est en rotation, jour par jour',
    icon:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>'},
-  {id:'presence',label:'Maintenance',desc:'Présences annuelles par semaine',
-   icon:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>'},
-  {id:'compare',label:'Comparer',desc:'Plusieurs collègues côte à côte',
+  {id:'compare',label:'Comparer',desc:'Collègues côte à côte · semaine, mois, année',
    icon:'<path d="M8 3v18M16 3v18M3 8h5M16 8h5M3 16h5M16 16h5"/>'},
   {id:'stats',label:'Statistiques',desc:'Mes rotations, piquets, congés, absences',
    icon:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'}
@@ -3253,7 +3204,7 @@ function updateTeamToggleLabel(){
   </button>`).join('');
   const subtitle=$('heroSubtitle');
   if(subtitle){
-    subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='presence'?'Présences annuelles':page==='team'?"Planning d'équipe":'Planning individuel';
+    subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?"Planning d'équipe":'Planning individuel';
   }
 }
 
@@ -3293,6 +3244,7 @@ function restoreSavedPage(){
   pageRestored=true;
   let saved='individual';
   try{ saved=localStorage.getItem(PAGE_KEY)||'individual'; }catch(e){ saved='individual'; }
+  if(saved==='presence'){ saved='compare'; cmp.scale='year'; saveCmp(); }  // ancienne page Maintenance
   if(saved==='individual' || !NAV_PAGES.some(x=>x.id===saved))return false;
   setPage(saved);
   return true;
@@ -3303,19 +3255,17 @@ updateTeamToggleLabel();
 function setPage(page){
   if(page!=='individual' && (!planning.employees || !planning.employees.length))return;
   state.teamMode=page==='team';
-  state.presenceMode=page==='presence';
   state.compareMode=page==='compare';
   state.statsMode=page==='stats';
   const alternate=page!=='individual';
 
   document.body.classList.toggle('team-mode',page==='team');
-  document.body.classList.toggle('presence-mode',page==='presence');
+  document.body.classList.toggle('cmp-year',page==='compare' && cmp.scale==='year');
   document.body.classList.toggle('compare-mode',page==='compare');
   document.body.classList.toggle('stats-mode',page==='stats');
   closeStPanel();
   document.body.classList.toggle('cmp-week',page==='compare' && cmp.scale==='week');
   closeEmployeePicker();
-  closePresencePanel();
   closeCmpPanel();
 
   const controls=document.querySelector('.controls');
@@ -3327,7 +3277,6 @@ function setPage(page){
   const mainCard=document.querySelector('main.main-card');
   if(mainCard)mainCard.classList.toggle('hidden',alternate);
   $('teamViewSection').classList.toggle('hidden',page!=='team');
-  $('presenceViewSection').classList.toggle('hidden',page!=='presence');
   $('compareViewSection').classList.toggle('hidden',page!=='compare');
   $('statsViewSection').classList.toggle('hidden',page!=='stats');
 
@@ -3339,9 +3288,7 @@ function setPage(page){
 function toggleTeamView(){ setPage(state.teamMode?'individual':'team'); }
 function openTeamView(){ setPage('team'); }
 function closeTeamView(){ setPage('individual'); }
-function togglePresenceView(){ setPage(state.presenceMode?'individual':'presence'); }
 
-$('presenceExportBtn').addEventListener('click',()=>window.print());
 
 // ==========================================================
 // Présences annuelles : une ligne par personne, une colonne par semaine
@@ -3361,9 +3308,6 @@ $('presenceExportBtn').addEventListener('click',()=>window.print());
 const PRESENCE_CODES=new Set(['R','PO','CA','EN']); // codes comptés comme « présent » (RM/RA/RN exclus : ce sont des codes de rotation, pas de présence)
 const PRESENCE_RESERVE_CODES=new Set(['PIQ']); // réserve = piquet uniquement ; RM/RA/RN ne comptent ni présent ni réserve (→ absent)
 const PRESENCE_FULL_DAYS=4;                        // seuil de la case verte
-const PRESENCE_HIDDEN_GROUPS_KEY='presenceHiddenGroups';
-const PRESENCE_HIDDEN_PEOPLE_KEY='presenceHiddenPeople';
-const PRESENCE_SHOWN_EXTRAS_KEY='presenceShownExtras';   // personnes des catégories masquées par défaut (Équipes, Admin., Cadres) affichées à la demande
 const PRESENCE_SHOW_TITLES_KEY='presenceShowTitles2'; // titres de groupes : masqués par défaut (clé renouvelée)
 const OTHER_GROUP_LABEL='Sans catégorie';
 const EYE_OFF_ICON='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
@@ -3401,36 +3345,12 @@ function categoryLabelOrderIndex(label){
   return i===-1?CATEGORY_LABEL_ORDER.length:i;
 }
 
-function readStoredList(key){
-  try{
-    const value=JSON.parse(localStorage.getItem(key)||'[]');
-    return Array.isArray(value)?value.map(String):[];
-  }catch(e){ return []; }
-}
-function writeStoredList(key,set){
-  try{ localStorage.setItem(key,JSON.stringify([...set])); }catch(e){ /* stockage indisponible : pas bloquant */ }
-}
-
-function readStoredGroups(){
-  // null = jamais réglé dans ce navigateur : on appliquera le choix par défaut.
-  try{ if(localStorage.getItem(PRESENCE_HIDDEN_GROUPS_KEY)===null)return null; }catch(e){ return null; }
-  return new Set(readStoredList(PRESENCE_HIDDEN_GROUPS_KEY));
-}
-
 const presence={
-  hiddenCats:readStoredGroups(),
-  hiddenPeople:new Set(readStoredList(PRESENCE_HIDDEN_PEOPLE_KEY)),
-  shownExtras:new Set(readStoredList(PRESENCE_SHOWN_EXTRAS_KEY)),
   showTitles:(()=>{ try{ return localStorage.getItem(PRESENCE_SHOW_TITLES_KEY)==='1'; }catch(e){ return false; } })(),
-  search:'',
   rows:[],
   weeks:[]
 };
-
-function savePresenceFilters(){
-  writeStoredList(PRESENCE_HIDDEN_GROUPS_KEY,presence.hiddenCats);
-  writeStoredList(PRESENCE_HIDDEN_PEOPLE_KEY,presence.hiddenPeople);
-  writeStoredList(PRESENCE_SHOWN_EXTRAS_KEY,presence.shownExtras);
+function savePresenceTitles(){
   try{ localStorage.setItem(PRESENCE_SHOW_TITLES_KEY,presence.showTitles?'1':'0'); }catch(e){ /* stockage indisponible */ }
 }
 
@@ -3451,20 +3371,6 @@ function presenceGroupOf(emp){
 const PRESENCE_EXCLUDED_KEYS=new Set([...PRESENCE_EXCLUDED_CATEGORIES].map(categoryKey));
 function isPresenceExcludedCategory(emp){
   return PRESENCE_EXCLUDED_KEYS.has(categoryKey(emp.category));
-}
-
-// Équipes / Admin. / Cadres : masqués par défaut, mais n'importe qui peut être
-// affiché individuellement depuis le panneau « Personnes ».
-function isPresenceVisible(emp){
-  const key=presencePersonKey(emp);
-  if(isPresenceExcludedCategory(emp))return presence.shownExtras.has(key);
-  return !presence.hiddenPeople.has(key);
-}
-
-// Affiche / masque une personne (quelle que soit sa catégorie).
-function presenceSetPersonKey(key,visible){
-  if(visible){ presence.hiddenPeople.delete(key); presence.shownExtras.add(key); }
-  else{ presence.hiddenPeople.add(key); presence.shownExtras.delete(key); }
 }
 
 // Groupes affichés, dans l'ordre du classeur Excel (CATEGORY_ORDER) ;
@@ -3552,228 +3458,7 @@ function presenceWeekRange(week){
   return `${formatShortDate(week.monday)} – ${formatDateWithYear(sunday)}`;
 }
 
-function renderPresenceView(){
-  if(!$('presenceViewSection'))return;
-
-  const years=presenceYears();
-  if(years.length){
-    state.presenceYear=Math.min(Math.max(state.presenceYear,years[0]),years[years.length-1]);
-  }
-  const year=state.presenceYear;
-  // Le filtre ne repose plus que sur les personnes masquées. Un ancien réglage
-  // « groupe masqué » (version précédente) est converti une fois en personnes.
-  if(presence.hiddenCats===null || presence.hiddenCats.size){
-    for(const g of presenceGroups()){
-      if(presence.hiddenCats && presence.hiddenCats.has(g.name)){
-        for(const emp of g.people)presence.hiddenPeople.add(presencePersonKey(emp));
-      }
-    }
-    presence.hiddenCats=new Set();
-    savePresenceFilters();
-  }
-  $('presenceYearTitle').textContent=String(year);
-  $('presencePrevBtn').disabled=!years.length || year<=years[0];
-  $('presenceNextBtn').disabled=!years.length || year>=years[years.length-1];
-
-  renderPresenceChips();
-  renderPresenceToolbarState();
-  if(!$('presencePanel').classList.contains('hidden'))renderPresencePanelList();
-
-  const weeks=isoWeeksOfYear(year);
-  presence.weeks=weeks;
-  const today=new Date();
-  const currentWeekIndex=weeks.findIndex(w=>today>=w.monday && today<new Date(w.monday.getFullYear(),w.monday.getMonth(),w.monday.getDate()+7));
-
-  const groups=presenceGroups(true)
-    .map(g=>({name:g.name,people:g.people.filter(isPresenceVisible)}))
-    .filter(g=>g.people.length);
-
-  if(!groups.length){
-    presence.rows=[];
-    $('presenceGrid').innerHTML=`<div class="pv-empty-state">Aucune personne affichée.<br><button type="button" class="pv-link" data-pv-reset>Réinitialiser le filtre</button></div>`;
-    return;
-  }
-
-  // En-tête : mois (selon le jeudi de chaque semaine) puis numéros de semaine.
-  const monthSpans=[];
-  for(const w of weeks){
-    const m=w.thursday.getMonth();
-    const last=monthSpans[monthSpans.length-1];
-    if(last && last.month===m)last.span++;
-    else monthSpans.push({month:m,span:1});
-  }
-
-  let h='<table class="pv-table"><thead><tr><th class="pv-name" rowspan="2"><div class="pv-name-inner"><span>Semaine</span></div></th>';
-  h+=monthSpans.map(ms=>`<th class="pv-month" colspan="${ms.span}">${escapeHTML(MONTH_NAMES[ms.month])}</th>`).join('');
-  h+='</tr><tr>';
-  h+=weeks.map((w,i)=>`<th class="pv-week ${i===currentWeekIndex?'is-current':''}" data-pv-wk="${i}" title="Semaine ${w.num} · ${escapeHTML(presenceWeekRange(w))}">${w.num}</th>`).join('');
-  h+='</tr></thead><tbody>';
-
-  const rows=[];
-  const fullCounts=weeks.map(()=>0);
-  for(const group of groups){
-    if(presence.showTitles){
-      h+=`<tr class="pv-group"><th class="pv-name"><div class="pv-name-inner">${escapeHTML(group.name)}</div></th><td colspan="${weeks.length}"></td></tr>`;
-    }
-    for(const emp of group.people){
-      const rowIndex=rows.length;
-      rows.push(emp);
-      const name=cleanEmployeeName(emp.name);
-      h+=`<tr class="pv-person"><th class="pv-name"><div class="pv-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span><button type="button" class="pv-hide" data-pv-hide="${escapeHTML(presencePersonKey(emp))}" title="Masquer ${escapeHTML(name)}" aria-label="Masquer ${escapeHTML(name)}">${EYE_OFF_ICON}</button></div></th>`;
-      weeks.forEach((w,i)=>{
-        const p=weekPresence(emp,w);
-        if(p.level==='full'||p.level==='reserve')fullCounts[i]++; // = cases vertes (présent ≥ 4 j ou réserve/piquet)
-        const label=p.level==='none'
-          ? 'pas de données'
-          : p.level==='reserve'
-            ? `${reserveBreakdownText(p.reserveBreakdown)}${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}${p.known<5?` (données sur ${p.known} j)`:''}`
-            : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''}${p.known<5?` (données sur ${p.known} j)`:''}`;
-        h+=`<td class="pv-cell pv-${p.level} ${i===currentWeekIndex?'is-current':''}" data-pv-row="${rowIndex}" data-pv-week="${i}" tabindex="-1" title="${escapeHTML(name)} · S${w.num} · ${escapeHTML(label)}"></td>`;
-      });
-      h+='</tr>';
-    }
-  }
-  h+='</tbody><tfoot><tr><th class="pv-name"><div class="pv-name-inner" title="Nombre de personnes affichées en vert cette semaine (présentes au moins 4 jours, ou de piquet)"><span>Présents</span></div></th>';
-  h+=fullCounts.map(n=>`<td class="pv-total">${n}</td>`).join('');
-  h+='</tr></tfoot></table>';
-
-  presence.rows=rows;
-  const wrap=$('presenceGrid');
-  const scrollLeft=wrap.scrollLeft,scrollTop=wrap.scrollTop;
-  const firstRender=!wrap.firstElementChild || !wrap.querySelector('.pv-table') || wrap.dataset.year!==String(year);
-  wrap.innerHTML=h;
-  wrap.dataset.year=String(year);
-
-  if(firstRender && currentWeekIndex>=0){
-    // Centre la semaine en cours à l'ouverture.
-    const cell=wrap.querySelector('.pv-week.is-current');
-    if(cell){
-      const nameWidth=wrap.querySelector('thead .pv-name').offsetWidth;
-      wrap.scrollLeft=Math.max(0,cell.offsetLeft-nameWidth-(wrap.clientWidth-nameWidth)/2);
-    }
-  }else{
-    wrap.scrollLeft=scrollLeft;
-    wrap.scrollTop=scrollTop;
-  }
-}
-
-// État d'un groupe d'après la visibilité réelle de ses membres :
-// 'all' (tous affichés), 'some' (une partie), 'none' (aucun).
-function presenceGroupState(group){
-  const n=group.people.filter(isPresenceVisible).length;
-  return n===0?'none':n===group.people.length?'all':'some';
-}
-
-function renderPresenceChips(){
-  const el=$('presenceChips');
-  const groups=presenceGroups();
-  const allOn=groups.every(g=>presenceGroupState(g)==='all');
-  let h=`<button type="button" class="pv-chip ${allOn?'is-on':''}" data-pv-cat-all aria-pressed="${allOn}" title="Afficher tous les groupes">Tous</button>`;
-  h+=groups.map(g=>{
-    const st=presenceGroupState(g);
-    const cls=st==='all'?'is-on':st==='some'?'is-partial':'';
-    return `<button type="button" class="pv-chip ${cls}" data-pv-cat="${escapeHTML(g.name)}" aria-pressed="${st==='all'}" title="Afficher / masquer ce groupe">${escapeHTML(g.name)}</button>`;
-  }).join('');
-  el.innerHTML=h;
-}
-
-function renderPresenceToolbarState(){
-  const tb=$('presenceTitlesBtn');
-  if(tb){ tb.setAttribute('aria-pressed',String(presence.showTitles)); tb.classList.toggle('is-off',!presence.showTitles); }
-  // Pastille : nombre total de personnes disponibles dans le panneau.
-  // Lien : nombre de personnes actuellement affichées (visible dès que le
-  // filtre diffère de l'affichage par défaut).
-  const everyone=presenceGroups(true).flatMap(g=>g.people);
-  const visible=everyone.filter(isPresenceVisible).length;
-  $('presenceCount').textContent=String(everyone.length);
-  const isDefault=everyone.every(e=>isPresenceVisible(e)===!isPresenceExcludedCategory(e));
-  const btn=$('presenceShowAllBtn');
-  btn.classList.toggle('hidden',isDefault);
-  btn.textContent=`${visible} personne${visible>1?'s':''} affichée${visible>1?'s':''} · Réinitialiser`;
-}
-
-function renderPresencePanelList(){
-  const list=$('presencePanelList');
-  const query=normalizeSearchText(presence.search);
-  let h='';
-  const panelGroups=presenceGroups(true).sort((a,b)=>
-    (isPresenceExcludedCategory(a.people[0])?1:0)-(isPresenceExcludedCategory(b.people[0])?1:0));
-  let extrasTitleDone=false;
-  for(const group of panelGroups){
-    const people=group.people.filter(emp=>!query || normalizeSearchText(emp.name).includes(query));
-    if(!people.length)continue;
-    if(isPresenceExcludedCategory(group.people[0]) && !extrasTitleDone){
-      extrasTitleDone=true;
-      h+='<div class="pv-panel-sep">Masqués par défaut</div>';
-    }
-    const n=people.filter(isPresenceVisible).length;
-    const st=n===0?'none':n===people.length?'all':'some';
-    h+=`<div class="pv-panel-group"><label><input type="checkbox" data-pv-panel-cat="${escapeHTML(group.name)}" ${st==='all'?'checked':''} ${st==='some'?'data-indeterminate="1"':''}>${escapeHTML(group.name)}</label></div>`;
-    for(const emp of people){
-      const key=presencePersonKey(emp);
-      const on=isPresenceVisible(emp);
-      h+=`<label class="pv-panel-person ${on?'':'is-off'}"><input type="checkbox" data-pv-panel-person="${escapeHTML(key)}" ${on?'checked':''}>${escapeHTML(cleanEmployeeName(emp.name))}</label>`;
-    }
-  }
-  if(!h)h='<div class="pv-panel-empty">Aucune personne trouvée.</div>';
-  list.innerHTML=h;
-  list.querySelectorAll('input[data-indeterminate]').forEach(i=>{ i.indeterminate=true; });
-}
-
 function isPhoneLayout(){ return window.matchMedia('(max-width:700px)').matches; }
-
-function openPresencePanel(){
-  $('presencePanel').classList.remove('hidden');
-  $('presenceBackdrop').classList.toggle('hidden',!isPhoneLayout());
-  document.body.classList.toggle('pv-sheet-open',isPhoneLayout());
-  $('presenceFilterBtn').setAttribute('aria-expanded','true');
-  renderPresencePanelList();
-  if(window.matchMedia('(hover:hover)').matches)$('presenceSearch').focus();
-}
-function closePresencePanel(){
-  if(!$('presencePanel'))return;
-  $('presencePanel').classList.add('hidden');
-  $('presenceBackdrop').classList.add('hidden');
-  document.body.classList.remove('pv-sheet-open');
-  $('presenceFilterBtn').setAttribute('aria-expanded','false');
-}
-
-function presenceFinishChange(){
-  savePresenceFilters();
-  renderPresenceView();
-}
-
-// Réinitialise tout le filtre : tout le monde redevient visible.
-function presenceShowAll(){
-  presence.hiddenPeople.clear();
-  presence.shownExtras.clear();
-  presence.hiddenCats=new Set();
-  presenceFinishChange();
-}
-
-function presenceSetVisible(people,visible){
-  for(const emp of people){
-    presenceSetPersonKey(presencePersonKey(emp),visible);
-  }
-}
-
-// « Tout cocher / Tout décocher » : agit sur la liste affichée dans le
-// panneau (donc sur le résultat de la recherche s'il y en a une).
-function presencePanelListedPeople(){
-  const query=normalizeSearchText(presence.search);
-  // Sans recherche : « Tout cocher / décocher » ne touche que les groupes principaux ;
-  // avec une recherche, toute personne trouvée (y compris Équipes / Admin. / Cadres).
-  return presenceGroups(!!query).flatMap(g=>g.people).filter(emp=>!query || normalizeSearchText(emp.name).includes(query));
-}
-
-// Puce d'un groupe : bascule simple. Affiché en entier → on le masque ;
-// masqué ou partiel → on l'affiche en entier.
-function presenceChipClick(category){
-  const group=presenceGroups().find(g=>g.name===category);
-  if(!group)return;
-  presenceSetVisible(group.people,presenceGroupState(group)!=='all');
-  presenceFinishChange();
-}
 
 function openPresenceWeekModal(emp,week){
   const p=weekPresence(emp,week);
@@ -3805,115 +3490,6 @@ function openPresenceWeekModal(emp,week){
   $('dayModalBody').innerHTML=`<div class="pv-week-summary pv-${p.level}">${escapeHTML(summary)}</div>${daysHTML}`;
   $('dayModalBackdrop').classList.toggle('is-team-day',false);$('dayModalBackdrop').classList.add('open');
 }
-
-function presenceShiftYear(amount){
-  const years=presenceYears();
-  const next=state.presenceYear+amount;
-  if(!years.includes(next))return;
-  state.presenceYear=next;
-  renderPresenceView();
-}
-
-$('presencePrevBtn').addEventListener('click',()=>presenceShiftYear(-1));
-$('presenceNextBtn').addEventListener('click',()=>presenceShiftYear(1));
-$('presenceShowAllBtn').addEventListener('click',presenceShowAll);
-$('presenceFilterBtn').addEventListener('click',event=>{
-  event.stopPropagation();
-  if($('presencePanel').classList.contains('hidden'))openPresencePanel();
-  else closePresencePanel();
-});
-$('presencePanelDone2').addEventListener('click',event=>{ event.stopPropagation(); closePresencePanel(); });
-$('presenceSearch').addEventListener('input',event=>{
-  presence.search=event.target.value;
-  renderPresencePanelList();
-});
-
-// Un seul écouteur pour toute la page (plusieurs milliers de cases).
-$('presenceViewSection').addEventListener('click',event=>{
-  const target=event.target;
-
-  const allBtn=target.closest('[data-pv-all]');
-  if(allBtn){
-    presenceSetVisible(presencePanelListedPeople(),allBtn.dataset.pvAll==='show');
-    presenceFinishChange();
-    return;
-  }
-
-  if(target.closest('[data-pv-reset]') || target.closest('[data-pv-cat-all]')){
-    presenceShowAll();
-    return;
-  }
-
-  if(target.closest('#presenceTitlesBtn')){
-    presence.showTitles=!presence.showTitles;
-    savePresenceFilters();
-    renderPresenceView();
-    return;
-  }
-
-  const chip=target.closest('[data-pv-cat]');
-  if(chip){
-    presenceChipClick(chip.dataset.pvCat);
-    return;
-  }
-
-  const hideBtn=target.closest('[data-pv-hide]');
-  if(hideBtn){
-    presenceSetPersonKey(hideBtn.dataset.pvHide,false);
-    savePresenceFilters();
-    renderPresenceView();
-    return;
-  }
-
-  const cell=target.closest('[data-pv-row]');
-  if(cell){
-    const emp=presence.rows[Number(cell.dataset.pvRow)];
-    const week=presence.weeks[Number(cell.dataset.pvWeek)];
-    if(emp && week)openPresenceWeekModal(emp,week);
-  }
-});
-
-// Survol d'une case : le numéro de la semaine correspondante est mis en surbrillance.
-(function(){
-  const grid=$('presenceGrid');
-  if(!grid)return;
-  let current=null;
-  const setWeek=idx=>{
-    grid.querySelectorAll('.pv-week.is-hover').forEach(el=>el.classList.remove('is-hover'));
-    current=idx;
-    if(idx===null)return;
-    const th=grid.querySelector(`.pv-week[data-pv-wk="${idx}"]`);
-    if(th)th.classList.add('is-hover');
-  };
-  grid.addEventListener('mouseover',e=>{
-    const cell=e.target.closest('[data-pv-week]');
-    setWeek(cell?cell.dataset.pvWeek:null);
-  });
-  grid.addEventListener('mouseleave',()=>setWeek(null));
-})();
-
-$('presenceViewSection').addEventListener('change',event=>{
-  const target=event.target;
-  if(target.dataset.pvPanelCat!==undefined){
-    const query=normalizeSearchText(presence.search);
-    const group=presenceGroups(true).find(g=>g.name===target.dataset.pvPanelCat);
-    if(group)presenceSetVisible(group.people.filter(emp=>!query || normalizeSearchText(emp.name).includes(query)),target.checked);
-  }else if(target.dataset.pvPanelPerson!==undefined){
-    presenceSetPersonKey(target.dataset.pvPanelPerson,target.checked);
-  }else{
-    return;
-  }
-  savePresenceFilters();
-  renderPresenceView();
-});
-
-document.addEventListener('click',event=>{
-  const filter=$('presenceFilter');
-  if(filter && !filter.contains(event.target))closePresencePanel();
-});
-document.addEventListener('keydown',event=>{
-  if(event.key==='Escape')closePresencePanel();
-});
 
 // ==========================================================
 // Page « Comparer » : plusieurs collègues côte à côte (semaine / mois /
@@ -3981,7 +3557,11 @@ function cmpColumns(){
 
 function cmpShift(dir){
   const d=new Date(cmp.date);
-  if(cmp.scale==='year')d.setFullYear(d.getFullYear()+dir);
+  if(cmp.scale==='year'){
+    const years=presenceYears(),next=d.getFullYear()+dir;
+    if(years.length && (next<years[0]||next>years[years.length-1]))return;
+    d.setFullYear(next);
+  }
   else if(cmp.scale==='month'){ d.setDate(1); d.setMonth(d.getMonth()+dir); }
   else d.setDate(d.getDate()+7*dir);
   cmp.date=d;
@@ -4046,76 +3626,174 @@ function cmpCardsHTML(view,groups){
   return h;
 }
 
+// Personnes « de métier » (hors Équipes, Admin., Cadres) : sélection rapide « Tous ».
+function cmpMainPeople(){ return presenceGroups(false).flatMap(g=>g.people); }
+function cmpSetPeople(people,on){
+  for(const e of people){
+    const k=presencePersonKey(e);
+    if(on)cmp.people.add(k); else cmp.people.delete(k);
+  }
+  saveCmp();
+  renderCompareView();
+}
+
 function renderCompareView(){
   if(!$('compareViewSection'))return;
   const view=cmpColumns();
+  const isYear=cmp.scale==='year';
   document.body.classList.toggle('cmp-week',cmp.scale==='week');
+  document.body.classList.toggle('cmp-year',isYear);
   $('cmpTitle').textContent=view.title;
+  $('cmpPrintYear').textContent=String(cmp.date.getFullYear());
   document.querySelectorAll('[data-cmp-scale]').forEach(b=>b.classList.toggle('active',b.dataset.cmpScale===cmp.scale));
   $('cmpCount').textContent=String(cmp.people.size);
 
+  // Outils propres à l'année (anciennement page « Maintenance »).
+  for(const id of ['cmpTitlesBtn','cmpExportBtn','cmpLegend'])$(id).classList.toggle('hidden',!isYear);
+  const tb=$('cmpTitlesBtn');
+  tb.setAttribute('aria-pressed',String(presence.showTitles));
+  tb.classList.toggle('is-off',!presence.showTitles);
+  const years=presenceYears(),yr=cmp.date.getFullYear();
+  $('cmpPrevBtn').disabled=isYear && years.length>0 && yr<=years[0];
+  $('cmpNextBtn').disabled=isYear && years.length>0 && yr>=years[years.length-1];
+  const grid=$('cmpGrid');
+  grid.classList.toggle('pv-wrap',isYear);
+  grid.classList.toggle('cmp-wrap',!isYear);
+
   const groups=cmpGroupsOrdered();
 
-  // Raccourcis par groupe (même principe que les filtres de Maintenance).
-  $('cmpGroups').innerHTML=groups.map(g=>{
+  // Raccourcis : « Tous » (métiers) puis un par groupe.
+  const main=cmpMainPeople();
+  const allOn=main.length>0 && main.every(e=>cmp.people.has(presencePersonKey(e)));
+  let chips=`<button type="button" class="pv-chip ${allOn?'is-on':''}" data-cmp-all aria-pressed="${allOn}" title="Tout le personnel de métier (hors Équipes, Admin., Cadres)">Tous</button>`;
+  chips+=groups.map(g=>{
     const n=g.people.filter(e=>cmp.people.has(presencePersonKey(e))).length;
     const cls=n===g.people.length?'is-on':n>0?'is-partial':'';
     return `<button type="button" class="pv-chip ${cls}" data-cmp-grp="${escapeHTML(g.name)}" aria-pressed="${n===g.people.length}" title="Ajouter / retirer tout le groupe">${escapeHTML(g.name)}</button>`;
   }).join('');
+  $('cmpGroups').innerHTML=chips;
 
   const selected=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   if(!$('cmpPanel').classList.contains('hidden'))renderCmpPanelList();
 
   if(!selected.length){
-    $('cmpGrid').innerHTML='<div class="pv-empty-state">Aucune personne sélectionnée.<br>Touchez un groupe ci-dessus, ou « Collègues » pour choisir des personnes.</div>';
+    presence.rows=[];
+    grid.innerHTML='<div class="pv-empty-state">Aucune personne sélectionnée.<br>Touchez un groupe ci-dessus, ou « Collègues » pour choisir des personnes.<br><button type="button" class="pv-link" data-cmp-all>Afficher tout le personnel de métier</button></div>';
     return;
   }
+
+  if(isYear){ renderCmpYear(view,groups); return; }
 
   if(isPhoneLayout()){
-    $('cmpGrid').innerHTML=`<div class="cmpm">${cmpCardsHTML(view,groups)}</div>`;
+    grid.innerHTML=`<div class="cmpm">${cmpCardsHTML(view,groups)}</div>`;
     return;
   }
 
-  const colspan=view.cols.length;
   let h='<table class="cmp-table"><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>';
-  if(view.kind==='year'){
-    h+=view.cols.map(c=>`<th class="cmp-wk ${c.today?'is-today':''}" title="Semaine ${c.week.num} · ${escapeHTML(presenceWeekRange(c.week))}">${c.label}</th>`).join('');
-  }else{
-    h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.today?'is-today':''}"><span>${c.name}</span><b>${c.num}</b></th>`).join('');
-  }
+  h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.today?'is-today':''}"><span>${c.name}</span><b>${c.num}</b></th>`).join('');
   h+='</tr></thead><tbody>';
   for(const group of groups){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
-    if(!people.length)continue;
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<tr class="cmp-person"><th class="cmp-name"><div class="cmp-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span></div></th>`;
-      if(view.kind==='year'){
-        h+=view.cols.map(c=>{
-          const y=cmpYearInfo(emp,c);
-          return `<td class="cmp-cell cmp-yr pv-${y.level} ${c.today?'is-today':''}" title="${escapeHTML(y.title)}"></td>`;
-        }).join('');
-      }else{
-        const wide=cmp.scale==='week';
-        h+=view.cols.map(c=>{
-          const d=cmpDayInfo(emp,c);
-          return `<td class="cmp-cell ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"><b>${escapeHTML(d.code)}</b>${wide&&d.code&&d.info?`<small>${escapeHTML(d.info[0])}</small>`:''}</td>`;
-        }).join('');
-      }
+      const wide=cmp.scale==='week';
+      h+=view.cols.map(c=>{
+        const d=cmpDayInfo(emp,c);
+        return `<td class="cmp-cell ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"><b>${escapeHTML(d.code)}</b>${wide&&d.code&&d.info?`<small>${escapeHTML(d.info[0])}</small>`:''}</td>`;
+      }).join('');
       h+='</tr>';
     }
   }
   h+='</tbody></table>';
-  $('cmpGrid').innerHTML=h;
+  grid.innerHTML=h;
+}
+
+// Vue « Année » : une case par personne et par semaine ISO (vert = présent
+// 4 jours ou plus / piquet, orange = 1 à 3 jours, rouge = aucun), avec le
+// nombre de personnes en vert en bas de chaque semaine.
+function renderCmpYear(view,groups){
+  const year=cmp.date.getFullYear();
+  const weeks=view.weeks;
+  presence.weeks=weeks;
+  const today=new Date();
+  const currentWeekIndex=weeks.findIndex(w=>today>=w.monday && today<new Date(w.monday.getFullYear(),w.monday.getMonth(),w.monday.getDate()+7));
+
+  const monthSpans=[];
+  for(const w of weeks){
+    const m=w.thursday.getMonth();
+    const last=monthSpans[monthSpans.length-1];
+    if(last && last.month===m)last.span++;
+    else monthSpans.push({month:m,span:1});
+  }
+
+  let h='<table class="pv-table"><thead><tr><th class="pv-name" rowspan="2"><div class="pv-name-inner"><span>Semaine</span></div></th>';
+  h+=monthSpans.map(ms=>`<th class="pv-month" colspan="${ms.span}">${escapeHTML(MONTH_NAMES[ms.month])}</th>`).join('');
+  h+='</tr><tr>';
+  h+=weeks.map((w,i)=>`<th class="pv-week ${i===currentWeekIndex?'is-current':''}" data-pv-wk="${i}" title="Semaine ${w.num} · ${escapeHTML(presenceWeekRange(w))}">${w.num}</th>`).join('');
+  h+='</tr></thead><tbody>';
+
+  const rows=[];
+  const fullCounts=weeks.map(()=>0);
+  for(const group of groups){
+    const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
+    if(!people.length)continue;
+    if(presence.showTitles){
+      h+=`<tr class="pv-group"><th class="pv-name"><div class="pv-name-inner">${escapeHTML(group.name)}</div></th><td colspan="${weeks.length}"></td></tr>`;
+    }
+    for(const emp of people){
+      const rowIndex=rows.length;
+      rows.push(emp);
+      const name=cleanEmployeeName(emp.name);
+      h+=`<tr class="pv-person"><th class="pv-name"><div class="pv-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span><button type="button" class="pv-hide" data-pv-hide="${escapeHTML(presencePersonKey(emp))}" title="Retirer ${escapeHTML(name)}" aria-label="Retirer ${escapeHTML(name)}">${EYE_OFF_ICON}</button></div></th>`;
+      weeks.forEach((w,i)=>{
+        const p=weekPresence(emp,w);
+        if(p.level==='full'||p.level==='reserve')fullCounts[i]++; // = cases vertes
+        const label=p.level==='none'
+          ? 'pas de données'
+          : p.level==='reserve'
+            ? `${reserveBreakdownText(p.reserveBreakdown)}${p.present?` + ${p.present} présent${p.present>1?'s':''}`:''}${p.known<5?` (données sur ${p.known} j)`:''}`
+            : `${p.present} jour${p.present>1?'s':''} présent${p.present>1?'s':''}${p.known<5?` (données sur ${p.known} j)`:''}`;
+        h+=`<td class="pv-cell pv-${p.level} ${i===currentWeekIndex?'is-current':''}" data-pv-row="${rowIndex}" data-pv-week="${i}" tabindex="-1" title="${escapeHTML(name)} · S${w.num} · ${escapeHTML(label)}"></td>`;
+      });
+      h+='</tr>';
+    }
+  }
+  h+='</tbody><tfoot><tr><th class="pv-name"><div class="pv-name-inner" title="Nombre de personnes affichées en vert cette semaine (présentes au moins 4 jours, ou de piquet)"><span>Présents</span></div></th>';
+  h+=fullCounts.map(n=>`<td class="pv-total">${n}</td>`).join('');
+  h+='</tr></tfoot></table>';
+
+  presence.rows=rows;
+  const wrap=$('cmpGrid');
+  const scrollLeft=wrap.scrollLeft,scrollTop=wrap.scrollTop;
+  const firstRender=!wrap.querySelector('.pv-table') || wrap.dataset.year!==String(year);
+  wrap.innerHTML=h;
+  wrap.dataset.year=String(year);
+  if(firstRender && currentWeekIndex>=0){
+    // Centre la semaine en cours à l'ouverture.
+    const cell=wrap.querySelector('.pv-week.is-current');
+    if(cell){
+      const nameWidth=wrap.querySelector('thead .pv-name').offsetWidth;
+      wrap.scrollLeft=Math.max(0,cell.offsetLeft-nameWidth-(wrap.clientWidth-nameWidth)/2);
+    }
+  }else{
+    wrap.scrollLeft=scrollLeft;
+    wrap.scrollTop=scrollTop;
+  }
 }
 
 function renderCmpPanelList(){
   const list=$('cmpPanelList');
   const query=normalizeSearchText(cmp.search);
   let h='';
+  let extrasTitleDone=false;
   for(const group of cmpGroupsOrdered()){
     const people=group.people.filter(e=>!query||normalizeSearchText(e.name).includes(query));
     if(!people.length)continue;
+    if(isPresenceExcludedCategory(group.people[0]) && !extrasTitleDone){
+      extrasTitleDone=true;
+      h+='<div class="pv-panel-sep">Équipes, Admin. et Cadres</div>';
+    }
     const n=people.filter(e=>cmp.people.has(presencePersonKey(e))).length;
     h+=`<div class="pv-panel-group"><label><input type="checkbox" data-cmp-cat="${escapeHTML(group.name)}" data-state="${n===0?'none':n===people.length?'all':'some'}" ${n===people.length?'checked':''}>${escapeHTML(group.name)}</label><small>${n}/${people.length}</small></div>`;
     for(const e of people){
@@ -4129,6 +3807,8 @@ function renderCmpPanelList(){
 }
 function openCmpPanel(){
   $('cmpPanel').classList.remove('hidden');
+  $('cmpBackdrop').classList.toggle('hidden',!isPhoneLayout());
+  document.body.classList.toggle('pv-sheet-open',isPhoneLayout());
   $('cmpPickBtn').setAttribute('aria-expanded','true');
   renderCmpPanelList();
   if(window.matchMedia('(hover:hover)').matches)$('cmpSearch').focus();
@@ -4136,8 +3816,26 @@ function openCmpPanel(){
 function closeCmpPanel(){
   if(!$('cmpPanel'))return;
   $('cmpPanel').classList.add('hidden');
+  $('cmpBackdrop').classList.add('hidden');
+  document.body.classList.remove('pv-sheet-open');
   $('cmpPickBtn').setAttribute('aria-expanded','false');
 }
+
+// Survol d'une case de l'année : le numéro de la semaine est mis en surbrillance.
+(function(){
+  const grid=$('cmpGrid');
+  const setWeek=idx=>{
+    grid.querySelectorAll('.pv-week.is-hover').forEach(el=>el.classList.remove('is-hover'));
+    if(idx===null)return;
+    const th=grid.querySelector(`.pv-week[data-pv-wk="${idx}"]`);
+    if(th)th.classList.add('is-hover');
+  };
+  grid.addEventListener('mouseover',e=>{
+    const cell=e.target.closest('[data-pv-week]');
+    setWeek(cell?cell.dataset.pvWeek:null);
+  });
+  grid.addEventListener('mouseleave',()=>setWeek(null));
+})();
 
 $('cmpPrevBtn').addEventListener('click',()=>cmpShift(-1));
 $('cmpNextBtn').addEventListener('click',()=>cmpShift(1));
@@ -4156,6 +3854,31 @@ document.addEventListener('click',event=>{
 $('compareViewSection').addEventListener('click',event=>{
   const scaleBtn=event.target.closest('[data-cmp-scale]');
   if(scaleBtn){ cmp.scale=scaleBtn.dataset.cmpScale; saveCmp(); renderCompareView(); return; }
+  if(event.target.closest('#cmpExportBtn')){ window.print(); return; }
+  if(event.target.closest('#cmpTitlesBtn')){ presence.showTitles=!presence.showTitles; savePresenceTitles(); renderCompareView(); return; }
+  if(event.target.closest('[data-cmp-all]')){
+    const main=cmpMainPeople();
+    const allOn=main.length>0 && main.every(e=>cmp.people.has(presencePersonKey(e)));
+    cmpSetPeople(main,!allOn || !!event.target.closest('.pv-empty-state'));
+    return;
+  }
+  const bulk=event.target.closest('[data-cmp-bulk]');
+  if(bulk){
+    const query=normalizeSearchText(cmp.search);
+    // Sans recherche : seulement les métiers ; avec une recherche : toute personne trouvée.
+    const people=presenceGroups(!!query).flatMap(g=>g.people).filter(e=>!query||normalizeSearchText(e.name).includes(query));
+    cmpSetPeople(people,bulk.dataset.cmpBulk==='show');
+    return;
+  }
+  const hideBtn=event.target.closest('[data-pv-hide]');
+  if(hideBtn){ cmp.people.delete(hideBtn.dataset.pvHide); saveCmp(); renderCompareView(); return; }
+  const yearCell=event.target.closest('[data-pv-row]');
+  if(yearCell){
+    const emp=presence.rows[Number(yearCell.dataset.pvRow)];
+    const week=presence.weeks[Number(yearCell.dataset.pvWeek)];
+    if(emp && week)openPresenceWeekModal(emp,week);
+    return;
+  }
   const grp=event.target.closest('[data-cmp-grp]');
   if(grp){
     const g=presenceGroups(true).find(x=>x.name===grp.dataset.cmpGrp);
@@ -4505,10 +4228,6 @@ function render(){
   if(state.compareMode){
     document.body.classList.toggle('cmp-week',cmp.scale==='week');
     renderCompareView();
-    return;
-  }
-  if(state.presenceMode){
-    renderPresenceView();
     return;
   }
   if(state.teamMode){
@@ -5130,7 +4849,7 @@ document.addEventListener('keydown',event=>{
     const isTyping=['INPUT','TEXTAREA','SELECT'].includes(tag);
     const pickerOpen=$('employeePicker').classList.contains('open');
     const modalOpen=$('dayModalBackdrop').classList.contains('open');
-    if(!isTyping && !pickerOpen && !modalOpen && !state.teamMode && !state.presenceMode && !state.compareMode && !state.statsMode){
+    if(!isTyping && !pickerOpen && !modalOpen && !state.teamMode && !state.compareMode && !state.statsMode){
       shiftDate(event.key==='ArrowLeft'?-1:1);
     }
   }
