@@ -193,7 +193,9 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
   padding:0 11px 0 32px;background:var(--surface);outline:none;font-size:13px;
 }
 .employee-picker-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
-.employee-results{margin-top:6px;max-height:290px;overflow:auto;display:grid;gap:2px}
+.employee-results{margin-top:6px;max-height:290px;overflow:auto;display:grid;gap:2px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.pv-panel,.pv-panel-list{overscroll-behavior:contain}
+.pv-panel-list{-webkit-overflow-scrolling:touch}
 .employee-result{
   width:100%;border:0;background:transparent;border-radius:var(--radius-sm);padding:8px;
   display:flex;align-items:center;gap:9px;text-align:left;
@@ -757,6 +759,14 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .pv-panel-person{padding:9px 6px;font-size:13px}
   .pv-panel input[type=checkbox]{width:18px;height:18px}
   body.pv-sheet-open{overflow:hidden}
+  /* Choix de l'employé (page Individuel) : feuille en bas de l'écran, comme les autres filtres */
+  .employee-picker.open .employee-picker-panel{
+    position:fixed;left:0;right:0;bottom:0;top:auto;z-index:1100;
+    display:flex;flex-direction:column;max-height:82vh;border-radius:18px 18px 0 0;
+    padding:12px 12px calc(12px + env(safe-area-inset-bottom));
+  }
+  .employee-picker-panel .employee-results{flex:1 1 auto;min-height:0;max-height:none}
+  .employee-picker-panel input{font-size:16px}
 }
 
 /* ==========================================================
@@ -1030,6 +1040,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
             </span>
             <span class="employee-picker-chevron">⌄</span>
           </button>
+          <div id="employeeBackdrop" class="pv-backdrop hidden"></div>
           <div id="employeePickerPanel" class="employee-picker-panel">
             <div class="employee-picker-search-wrap">
               <span class="employee-picker-search-icon">⌕</span>
@@ -1212,6 +1223,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
           </span>
           <span class="employee-picker-chevron">⌄</span>
         </button>
+        <div id="stBackdrop" class="pv-backdrop hidden"></div>
         <div id="stPanel" class="pv-panel hidden" role="dialog" aria-label="Choisir une personne">
           <div class="pv-panel-head"><strong>Choisir une personne</strong></div>
           <div class="pv-panel-search"><input id="stSearch" type="search" placeholder="Rechercher une personne…" autocomplete="off"></div>
@@ -1906,11 +1918,17 @@ function openEmployeePicker(){
   $('employeePickerButton').setAttribute('aria-expanded','true');
   $('employeeSearch').value='';
   populateEmployees('');
-  setTimeout(()=>$('employeeSearch').focus(),0);
+  $('employeeBackdrop').classList.toggle('hidden',!isPhoneLayout());
+  lockPageScroll();
+  // Sur téléphone, le clavier cacherait la moitié de la liste : pas de focus automatique.
+  if(window.matchMedia('(hover:hover)').matches)setTimeout(()=>$('employeeSearch').focus(),0);
 }
 
 function closeEmployeePicker(){
+  const wasOpen=$('employeePicker').classList.contains('open');
   $('employeePicker').classList.remove('open');
+  $('employeeBackdrop').classList.add('hidden');
+  if(wasOpen)unlockPageScroll();
   $('employeePickerButton').setAttribute('aria-expanded','false');
 }
 
@@ -3464,6 +3482,25 @@ function presenceWeekRange(week){
 
 function isPhoneLayout(){ return window.matchMedia('(max-width:700px)').matches; }
 
+// Feuille ouverte sur téléphone : la page en arrière-plan est figée (sinon le
+// doigt fait défiler la page au lieu de la liste).
+let scrollLockY=null;
+function lockPageScroll(){
+  if(scrollLockY!==null || !isPhoneLayout())return;
+  scrollLockY=window.scrollY||document.documentElement.scrollTop||0;
+  const b=document.body.style;
+  b.position='fixed'; b.top=`-${scrollLockY}px`; b.left='0'; b.right='0'; b.width='100%';
+  document.body.classList.add('pv-sheet-open');
+}
+function unlockPageScroll(){
+  if(scrollLockY===null)return;
+  const y=scrollLockY; scrollLockY=null;
+  const b=document.body.style;
+  b.position=''; b.top=''; b.left=''; b.right=''; b.width='';
+  document.body.classList.remove('pv-sheet-open');
+  window.scrollTo({top:y,left:0,behavior:'instant'});
+}
+
 function openPresenceWeekModal(emp,week){
   const p=weekPresence(emp,week);
   const name=cleanEmployeeName(emp.name);
@@ -3812,16 +3849,17 @@ function renderCmpPanelList(){
 function openCmpPanel(){
   $('cmpPanel').classList.remove('hidden');
   $('cmpBackdrop').classList.toggle('hidden',!isPhoneLayout());
-  document.body.classList.toggle('pv-sheet-open',isPhoneLayout());
+  lockPageScroll();
   $('cmpPickBtn').setAttribute('aria-expanded','true');
   renderCmpPanelList();
   if(window.matchMedia('(hover:hover)').matches)$('cmpSearch').focus();
 }
 function closeCmpPanel(){
   if(!$('cmpPanel'))return;
+  const wasOpen=!$('cmpPanel').classList.contains('hidden');
   $('cmpPanel').classList.add('hidden');
   $('cmpBackdrop').classList.add('hidden');
-  document.body.classList.remove('pv-sheet-open');
+  if(wasOpen)unlockPageScroll();
   $('cmpPickBtn').setAttribute('aria-expanded','false');
 }
 
@@ -4181,19 +4219,25 @@ function renderStPanelList(){
 }
 function openStPanel(){
   $('stPanel').classList.remove('hidden');
+  $('stBackdrop').classList.toggle('hidden',!isPhoneLayout());
+  lockPageScroll();
   $('stPersonBtn').setAttribute('aria-expanded','true');
   renderStPanelList();
   if(window.matchMedia('(hover:hover)').matches)$('stSearch').focus();
 }
 function closeStPanel(){
   if(!$('stPanel'))return;
+  const wasOpen=!$('stPanel').classList.contains('hidden');
   $('stPanel').classList.add('hidden');
+  $('stBackdrop').classList.add('hidden');
+  if(wasOpen)unlockPageScroll();
   $('stPersonBtn').setAttribute('aria-expanded','false');
 }
 $('stPersonBtn').addEventListener('click',event=>{
   event.stopPropagation();
   if($('stPanel').classList.contains('hidden'))openStPanel(); else closeStPanel();
 });
+$('stBackdrop').addEventListener('click',event=>{ event.stopPropagation(); closeStPanel(); });
 $('stSearch').addEventListener('input',event=>{ st.search=event.target.value; renderStPanelList(); });
 $('stPanel').addEventListener('click',event=>{
   event.stopPropagation();
@@ -4835,6 +4879,7 @@ $('employeePickerButton').addEventListener('click',()=>{
   else openEmployeePicker();
 });
 
+$('employeeBackdrop').addEventListener('click',event=>{ event.stopPropagation(); closeEmployeePicker(); });
 if($('noEmployeeStateBtn'))$('noEmployeeStateBtn').addEventListener('click',openEmployeePicker);
 
 $('employeeSearch').addEventListener('input',event=>{
