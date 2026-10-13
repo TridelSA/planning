@@ -1788,6 +1788,8 @@ function persistSelectedEmployee(employee){
     localStorage.setItem('planningEmployee',employee.id);
     localStorage.setItem(EMPLOYEE_NAME_KEY,cleanEmployeeName(employee.name));
   }catch(e){ /* stockage indisponible : tant pis, pas bloquant */ }
+  // La personne choisie est aussi ajoutée à la sélection de « Comparer ».
+  try{ cmp.people.add(presencePersonKey(employee)); saveCmp(); }catch(e){ /* « Comparer » pas encore initialisé */ }
 }
 
 function initializeState(preferredId){
@@ -3267,6 +3269,8 @@ function setPage(page){
   document.body.classList.toggle('cmp-week',page==='compare' && cmp.scale==='week');
   closeEmployeePicker();
   closeCmpPanel();
+  // Arrivée sur « Comparer » sans sélection : on y met la personne déjà choisie ailleurs.
+  if(page==='compare' && cmp.people.size===0){ const me=selectedEmployee(); if(me){ cmp.people.add(presencePersonKey(me)); saveCmp(); } }
 
   const controls=document.querySelector('.controls');
   if(controls)controls.classList.toggle('hidden',alternate);
@@ -3905,7 +3909,16 @@ $('compareViewSection').addEventListener('change',event=>{
       if(t.checked)cmp.people.add(key); else cmp.people.delete(key);
     }
   }else if(t.dataset.cmpPerson!==undefined){
-    if(t.checked)cmp.people.add(t.dataset.cmpPerson); else cmp.people.delete(t.dataset.cmpPerson);
+    if(t.checked){
+      cmp.people.add(t.dataset.cmpPerson);
+      // Dernière personne cochée = personne affichée sur les autres pages.
+      const emp=planning.employees.find(e=>presencePersonKey(e)===t.dataset.cmpPerson);
+      if(emp){
+        state.employeeId=emp.id;
+        persistSelectedEmployee(emp);
+        try{ updateEmployeePicker(); }catch(e){ /* ignoré */ }
+      }
+    }else cmp.people.delete(t.dataset.cmpPerson);
   }else{
     return;
   }
@@ -3922,8 +3935,9 @@ document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeCmpPan
 const ST_KEY='statsState';
 const ST_VAC=['VA','VJ','HSR','HOR']; // « congés » = vacances + récupérations (HSR, HOR)
 const ST_REC=[];
+const ST_AFF=['CA','PO','EN','GR']; // affectations : Camion, Portes, Entretien, Groupe
 const ST_OTHER=['MS','MC','AP','MI','EM','PC','PI','FE','PR','AN','NS','PA','DE','DL','DC','JT'];
-const ST_COLORS={vac:'#E0566A',oth:'#6B7A90',rot:'#4545AA',piq:'#63428E'};
+const ST_COLORS={vac:'#E0566A',oth:'#6B7A90',rot:'#4545AA',piq:'#63428E',aff:'#3E8E6B'};
 const st={month:'all',metric:'',search:'',mode:'month',more:false};
 const ST_MON_SHORT=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
 try{ const m=JSON.parse(localStorage.getItem(ST_KEY)||'{}'); if(m&&(m.month==='all'||(Number.isInteger(m.month)&&m.month>=0&&m.month<12)))st.month=m.month; }catch(e){ /* ignoré */ }
@@ -3998,7 +4012,7 @@ function stChartHTML(months,metrics){
   const vals=cum?per.map(v=>(acc+=v)):per;
   const niceMax=v=>{ if(v<=4)return 4; const step=Math.pow(10,Math.floor(Math.log10(v/4))); const r=v/4/step; const k=r<=1?1:r<=2?2:r<=2.5?2.5:r<=5?5:10; return Math.ceil(v/(k*step))*k*step/1; };
   const top=niceMax(Math.max(1,...vals));
-  const W=640,H=230,L=34,R=14,T=22,B=28,cw=(W-L-R)/12,ch=H-T-B;
+  const W=640,H=240,L=34,R=14,T=32,B=28,cw=(W-L-R)/12,ch=H-T-B;
   const X=i=>L+(i+0.5)*cw, Y=v=>T+ch-(v/top)*ch;
   const pts=vals.map((v,i)=>[X(i),Y(v)]);
   const line=stSmoothPath(pts);
@@ -4014,7 +4028,7 @@ function stChartHTML(months,metrics){
     return `<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="${sel?5:3}" fill="${sel?'#fff':metric.color}" stroke="${metric.color}" stroke-width="${sel?3:0}"/>`+
       ((per[i]>0||cum&&i===11)?`<text x="${X(i).toFixed(1)}" y="${(Y(v)-9).toFixed(1)}" text-anchor="middle" class="st-val">${v}</text>`:'');
   }).join('');
-  const nowLine=(xNow>L&&xNow<W-R)?`<line x1="${xNow.toFixed(1)}" x2="${xNow.toFixed(1)}" y1="${T-6}" y2="${T+ch}" class="st-now"/><text x="${xNow.toFixed(1)}" y="${T-9}" text-anchor="middle" class="st-nowlab">Aujourd'hui</text>`:'';
+  const nowLine=(xNow>L&&xNow<W-R)?`<line x1="${xNow.toFixed(1)}" x2="${xNow.toFixed(1)}" y1="${T-16}" y2="${T+ch}" class="st-now"/><text x="${xNow.toFixed(1)}" y="${T-20}" text-anchor="middle" class="st-nowlab">Aujourd'hui</text>`:'';
   const chips=metrics.map(x=>`<button type="button" class="pv-chip ${x.id===metric.id?'is-on':''}" data-st-metric="${x.id}" aria-pressed="${x.id===metric.id}">${x.label}</button>`).join('');
   const seg=`<div class="cmp-tabs" role="tablist" aria-label="Affichage"><button type="button" class="cmp-tab ${cum?'':'active'}" data-st-mode="month">Par mois</button><button type="button" class="cmp-tab ${cum?'active':''}" data-st-mode="cum">Cumul</button></div>`;
   const title=cum?`${metric.label} cumulés depuis janvier`:`${metric.label} par mois`;
@@ -4110,6 +4124,14 @@ function renderStatsView(){
   </div>`;
 
   const blocks=[];
+  const affYear=stSum(months,ST_AFF,'all');
+  if(affYear>0){
+    const rows=[['CA','Camion','#D9A400'],['PO','Portes','#4F8FC0'],['EN','Entretien','#5E9E3C'],['GR','Groupe','#23647E']]
+      .filter(([c])=>stSum(months,[c],'all')>0)
+      .map(([c,l,col])=>({label:l,n:stSum(months,[c],sub),color:col}));
+    const tot=rows.reduce((a,r)=>a+r.n,0);
+    blocks.push(`<div class="st-block"><h3>Affectations</h3><div class="st-big">${tot}<small>${tot>1?'jours d\'affectation':'jour d\'affectation'}</small></div>${stBarRows(rows,tot)}</div>`);
+  }
   if(rotYear>0){
     const rows=[['RM','Matin','#8F8AE8'],['RA','Après-midi','#5AA9E6'],['RN','Nuit','#E8A33D']].map(([c,l,col])=>({label:l,n:stSum(months,[c],sub),color:col}));
     const tot=rows.reduce((a,r)=>a+r.n,0);
@@ -4136,6 +4158,7 @@ function renderStatsView(){
   ];
   if(rotYear>0)metrics.push({id:'rot',label:'Rotations',codes:ROTATION_CODES,color:ST_COLORS.rot});
   if(piqYear>0)metrics.push({id:'piq',label:'Piquet',codes:['PIQ'],color:ST_COLORS.piq});
+  if(affYear>0)metrics.push({id:'aff',label:'Affectations',codes:ST_AFF,color:ST_COLORS.aff});
   h+=stChartHTML(months,metrics);
   h+=`<details class="st-more"${st.more?' open':''}><summary>Voir le détail des congés et absences</summary><div class="st-blocks">${detailBlocks.join('')}</div></details>`;
   body.innerHTML=h;
