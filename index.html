@@ -3537,6 +3537,15 @@ const CMP_KEY='compareState';
 const cmp=(()=>{
   let s={};
   try{ s=JSON.parse(localStorage.getItem(CMP_KEY)||'{}')||{}; }catch(e){ s={}; }
+  // Remise à zéro unique de la sélection : une ancienne version y ajoutait
+  // automatiquement la personne choisie dans les autres pages.
+  try{
+    if(localStorage.getItem('compareSelV')!=='2'){
+      s.people=[];
+      localStorage.setItem('compareSelV','2');
+      localStorage.setItem(CMP_KEY,JSON.stringify({scale:s.scale,people:[]}));
+    }
+  }catch(e){ /* stockage indisponible */ }
   return {
     scale:['week','month','year'].includes(s.scale)?s.scale:'week',
     date:new Date(),
