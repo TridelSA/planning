@@ -1800,8 +1800,6 @@ function persistSelectedEmployee(employee){
     localStorage.setItem('planningEmployee',employee.id);
     localStorage.setItem(EMPLOYEE_NAME_KEY,cleanEmployeeName(employee.name));
   }catch(e){ /* stockage indisponible : tant pis, pas bloquant */ }
-  // La personne choisie est aussi ajoutée à la sélection de « Comparer ».
-  try{ cmp.people.add(presencePersonKey(employee)); saveCmp(); }catch(e){ /* « Comparer » pas encore initialisé */ }
 }
 
 function initializeState(preferredId){
@@ -3287,8 +3285,6 @@ function setPage(page){
   document.body.classList.toggle('cmp-week',page==='compare' && cmp.scale==='week');
   closeEmployeePicker();
   closeCmpPanel();
-  // Arrivée sur « Comparer » sans sélection : on y met la personne déjà choisie ailleurs.
-  if(page==='compare' && cmp.people.size===0){ const me=selectedEmployee(); if(me){ cmp.people.add(presencePersonKey(me)); saveCmp(); } }
 
   const controls=document.querySelector('.controls');
   if(controls)controls.classList.toggle('hidden',alternate);
