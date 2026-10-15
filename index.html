@@ -1014,11 +1014,12 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .week-day strong{font-size:12px}
   .week-day span{font-size:11px}
   /* Carte compacte : code + libellé + horaire sur une ligne, collègues dessous */
-  .week-shift{height:auto;min-height:46px;padding:7px 11px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:'main time badge' 'team team team';column-gap:9px;row-gap:3px;align-items:center;text-align:left;overflow:hidden}
-  .shift-mainline{grid-area:main;justify-content:flex-start;width:auto;margin-top:0}
+  .week-shift{height:auto;min-height:46px;padding:7px 11px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'main main' 'time badge' 'team team';column-gap:8px;row-gap:2px;align-items:center;text-align:left;overflow:hidden}
+  .shift-mainline{grid-area:main;justify-content:flex-start;align-items:baseline;flex-wrap:wrap;column-gap:7px;row-gap:1px;width:100%;margin-top:0;min-width:0}
+  .shift-mainline span{line-height:1.25;min-width:0}
   .shift-mainline b{font-size:17px}
-  .shift-time{grid-area:time;margin-top:0;text-align:left;font-size:10px;line-height:1.3}
-  .week-shift-badge-stack{grid-area:badge;position:static;max-width:none;align-items:flex-end;flex-direction:column;gap:2px}
+  .shift-time{grid-area:time;margin-top:0;text-align:left;font-size:10px;line-height:1.3;min-width:0;overflow-wrap:anywhere}
+  .week-shift-badge-stack{grid-area:badge;position:static;max-width:60vw;align-items:flex-end;flex-direction:column;gap:2px;align-self:end}
   .week-shift-holiday-badge,.week-shift-school-badge,.week-shift-travaux-badge{font-size:8px}
   .shift-team.compact-team{grid-area:team;justify-content:flex-start;margin-top:0;padding-top:4px;min-height:0}
   .shift-team.compact-team.no-mates{display:none}
