@@ -574,10 +574,10 @@ body.compare-mode .app{max-width:1680px}
 .cmp-selected{margin-bottom:10px}
 .cmp-selected .pv-chip span{opacity:.6;margin-left:2px}
 .cmp-wrap{overflow:auto;max-height:calc(100vh - 300px);min-height:120px;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface)}
-.cmp-table{border-collapse:separate;border-spacing:2px;font:600 10px/1 var(--font-body)}
+.cmp-table{table-layout:fixed;border-collapse:separate;border-spacing:2px;font:600 10px/1 var(--font-body)}
 .cmp-table th,.cmp-table td{padding:0}
 .cmp-table thead th{position:sticky;top:0;z-index:2;background:var(--surface);box-shadow:0 0 0 2px var(--surface)}
-.cmp-name{position:sticky;left:0;z-index:1;background:var(--surface);min-width:170px;max-width:210px;text-align:left;box-shadow:2px 0 0 2px var(--surface)}
+.cmp-name{position:sticky;left:0;z-index:1;background:var(--surface);width:190px;min-width:190px;max-width:190px;text-align:left;box-shadow:2px 0 0 2px var(--surface)}
 .cmp-table thead .cmp-name{z-index:3}
 .cmp-name-inner{display:flex;align-items:center;gap:6px;padding:0 6px 0 8px;min-height:30px;font:700 11.5px/1.2 var(--font-body);color:var(--ink)}
 .cmp-name-inner span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -589,10 +589,10 @@ body.compare-mode .app{max-width:1680px}
 .cmp-day.is-hol b{color:var(--danger)}
 .cmp-day.is-today,.cmp-wk.is-today{background:var(--accent-tint);border-radius:6px}
 .cmp-wk{min-width:15px;text-align:center;color:var(--muted);font-weight:700;font-size:10px;padding:4px 0!important}
-body.cmp-week .cmp-day{min-width:96px}
+body.cmp-week .cmp-day{min-width:0}
 .cmp-cell{height:46px;min-width:30px;text-align:center;border-radius:6px;vertical-align:middle}
 .cmp-cell b{display:block;font:800 13px/1.1 var(--font-display)}
-.cmp-cell small{display:block;margin-top:3px;font:600 9px/1.2 var(--font-body);opacity:.8;padding:0 3px}
+.cmp-cell small{display:block;margin-top:3px;font:600 9px/1.2 var(--font-body);opacity:.8;padding:0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmp-cell.is-we{opacity:.55}
 .cmp-cell.is-today{box-shadow:inset 0 0 0 2px var(--ink)}
 body:not(.cmp-week) .cmp-cell{height:30px}
@@ -3734,7 +3734,8 @@ function renderCompareView(){
     return;
   }
 
-  let h='<table class="cmp-table"><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>';
+  const colW=cmp.scale==='week'?104:36;
+  let h=`<table class="cmp-table" style="width:${190+view.cols.length*(colW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>`<col style="width:${colW}px">`).join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
   h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.today?'is-today':''}"><span>${c.name}</span><b>${c.num}</b></th>`).join('');
   h+='</tr></thead><tbody>';
   for(const group of groups){
