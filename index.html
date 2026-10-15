@@ -105,56 +105,65 @@
 .theme-label{display:block;margin:8px 10px 0;font:800 9.5px/1 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 
 
-/* Rotations : vue Mois (tableau d'équipe) */
+/* Rotations : vue Semaine (jours en colonnes, équipes en lignes) */
 .tm-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tm-today{height:36px;padding:0 14px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font:800 12px/1 var(--font-body);cursor:pointer}
 .tm-today:hover{background:var(--paper)}
-.tm-list{border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;background:var(--surface)}
-.tm-head,.tm-row{display:grid;grid-template-columns:112px repeat(3,minmax(0,1fr))}
-.tm-head{position:sticky;top:0;z-index:2;background:var(--surface);border-bottom:1px solid var(--line-strong)}
-.tm-head b{padding:10px 12px;font:800 10.5px/1 var(--font-body);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px}
-.tm-head b::before{content:'';width:9px;height:9px;border-radius:3px;background:currentColor}
-.tm-h-rm{color:var(--c-rm-ink)}.tm-h-ra{color:var(--c-ra-ink)}.tm-h-rn{color:var(--c-rn-ink)}
-.tm-row{border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s var(--ease)}
-.tm-row:last-child{border-bottom:0}
-.tm-row:hover{background:var(--paper)}
-.tm-row.is-we{background:var(--outside-bg)}
-.tm-row.is-past{opacity:.62}
-.tm-row.is-today{background:var(--accent-tint);box-shadow:inset 4px 0 0 var(--accent);opacity:1}
-.tm-row.is-monday{border-top:2px solid var(--line-strong)}
-.tm-row.is-monday:first-of-type{border-top:0}
-.tm-date{padding:9px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0}
-.tm-date .tm-dn{display:flex;align-items:baseline;gap:7px;font:700 11px/1 var(--font-body);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.tm-date .tm-dn b{font:700 19px/1 var(--font-display);color:var(--ink);letter-spacing:0}
-.tm-row.is-we .tm-dn b{color:var(--ink-soft)}
-.tm-row.is-today .tm-dn b{color:var(--accent-ink)}
-.tm-badge{display:inline-block;max-width:100%;font:700 9px/1.25 var(--font-body);padding:2px 6px;border-radius:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tm-badge.hol{background:var(--danger-bg);color:var(--danger)}
-.tm-badge.sch{background:var(--school-tint);color:var(--school-dot)}
-.tm-badge.trv{background:var(--signal-tint);color:var(--signal-ink)}
-.tm-shift{padding:8px 10px;display:flex;align-items:center;min-width:0}
-.tm-lab{display:none}
-.tm-names{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.tm-chip{padding:4px 9px;border-radius:999px;font:700 11.5px/1.2 var(--font-body);white-space:nowrap}
-.tm-chip.rm{background:var(--c-rm-bg);color:var(--c-rm-ink)}
-.tm-chip.ra{background:var(--c-ra-bg);color:var(--c-ra-ink)}
-.tm-chip.rn{background:var(--c-rn-bg);color:var(--c-rn-ink)}
-.tm-chip.is-me{box-shadow:0 0 0 2px var(--accent);font-weight:800}
-.tm-none{color:var(--empty-ink);font:600 12px/1 var(--font-body);padding-left:4px}
-.tm-plus{font:800 9px/1 var(--font-body);color:var(--signal-ink);background:var(--signal-tint);padding:3px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em}
+.tw-grid{display:grid;grid-template-columns:92px repeat(7,minmax(0,1fr));gap:6px}
+.tw-corner{min-height:1px}
+.tw-dayh{padding:9px 6px 8px;text-align:center;border-radius:var(--radius-sm);background:var(--paper);display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.tw-dayh small{font:800 10px/1 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.tw-dayh b{font:700 22px/1 var(--font-display);color:var(--ink)}
+.tw-dayh.is-we b{color:var(--ink-soft)}
+.tw-dayh.is-today{background:var(--accent-solid)}
+.tw-dayh.is-today small,.tw-dayh.is-today b{color:#fff}
+.tw-badge{display:block;max-width:100%;font:700 9px/1.25 var(--font-body);padding:2px 6px;border-radius:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tw-badge.hol{background:var(--danger-bg);color:var(--danger)}
+.tw-badge.sch{background:var(--school-tint);color:var(--school-dot)}
+.tw-badge.trv{background:var(--signal-tint);color:var(--signal-ink)}
+.tw-rowh{display:flex;align-items:center;gap:8px;padding:0 6px;font:800 11px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.06em}
+.tw-rowh::before{content:'';flex:0 0 auto;width:10px;height:10px;border-radius:3px;background:currentColor}
+.tw-rowh.rm,.tw-card.rm header{color:var(--c-rm-ink)}
+.tw-rowh.ra,.tw-card.ra header{color:var(--c-ra-ink)}
+.tw-rowh.rn,.tw-card.rn header{color:var(--c-rn-ink)}
+.tw-cell{padding:8px;border-radius:var(--radius-sm);display:flex;flex-direction:column;gap:5px;min-width:0;cursor:pointer;border:1px solid var(--line);background:var(--surface);transition:border-color .12s var(--ease)}
+.tw-cell:hover{border-color:var(--line-strong)}
+.tw-cell.is-we{background:var(--outside-bg)}
+.tw-cell.is-today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tw-name{padding:6px 8px;border-radius:7px;font:700 12px/1.2 var(--font-body);overflow-wrap:anywhere}
+.rm .tw-name,.tw-name.rm{background:var(--c-rm-bg);color:var(--c-rm-ink)}
+.ra .tw-name,.tw-name.ra{background:var(--c-ra-bg);color:var(--c-ra-ink)}
+.rn .tw-name,.tw-name.rn{background:var(--c-rn-bg);color:var(--c-rn-ink)}
+.tw-name.is-me{box-shadow:0 0 0 2px var(--accent);font-weight:800}
+.tw-none{color:var(--empty-ink);font:600 12px/1 var(--font-body);text-align:center;padding:6px 0}
+.tw-plus{align-self:flex-start;font:800 8.5px/1 var(--font-body);color:var(--signal-ink);background:var(--signal-tint);padding:3px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.05em}
+.tw-mobile{display:none}
 @media (max-width:700px){
-  .tm-head{display:none}
-  .tm-row{grid-template-columns:58px 1fr;grid-template-rows:auto}
-  .tm-date{grid-row:1/span 3;padding:10px 6px 10px 12px;border-right:1px solid var(--line)}
-  .tm-shift{grid-column:2;padding:5px 10px;gap:8px;align-items:flex-start}
-  .tm-shift:first-of-type{padding-top:10px}.tm-shift:last-child{padding-bottom:10px}
-  .tm-lab{display:block;flex:0 0 54px;padding-top:5px;font:800 9.5px/1 var(--font-body);text-transform:uppercase;letter-spacing:.05em}
-  .tm-shift.rm .tm-lab{color:var(--c-rm-ink)}.tm-shift.ra .tm-lab{color:var(--c-ra-ink)}.tm-shift.rn .tm-lab{color:var(--c-rn-ink)}
-  .tm-chip{font-size:12px}
   .team-view-head{flex-direction:column;align-items:stretch}
   .tm-tools{width:100%;flex-wrap:nowrap}.tm-tools .cmp-tabs{flex:1}.tm-tools .cmp-tab{flex:1}.tm-tools .tm-today{flex:0 0 auto}
+  .tw-grid{display:none}
+  .tw-mobile{display:block}
+  .tw-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:14px}
+  .tw-sd{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-body);color:var(--ink);position:relative}
+  .tw-sd small{font:800 10px/1 var(--font-body);text-transform:uppercase;color:var(--muted)}
+  .tw-sd b{font:700 17px/1 var(--font-display)}
+  .tw-sd.is-we b{color:var(--ink-soft)}
+  .tw-sd.is-today small{color:var(--accent-ink)}
+  .tw-sd.is-today::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+  .tw-sd.is-hol::before{content:'';position:absolute;top:4px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--danger)}
+  .tw-sd.is-sel{background:var(--accent-solid);border-color:var(--accent-solid)}
+  .tw-sd.is-sel small,.tw-sd.is-sel b{color:#fff}
+  .tw-sd.is-sel.is-today::after{background:#fff}
+  .tw-daytitle{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 2px 10px}
+  .tw-daytitle strong{font:700 17px/1.2 var(--font-display);color:var(--ink)}
+  .tw-card{border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);margin-bottom:10px;overflow:hidden}
+  .tw-card header{display:flex;align-items:center;gap:8px;padding:11px 14px 9px;font:800 12px/1 var(--font-body);text-transform:uppercase;letter-spacing:.06em}
+  .tw-card header::before{content:'';width:10px;height:10px;border-radius:3px;background:currentColor}
+  .tw-card header em{margin-left:auto;font:600 11px/1 var(--font-body);text-transform:none;letter-spacing:0;color:var(--muted)}
+  .tw-card ul{list-style:none;margin:0;padding:0 10px 10px;display:flex;flex-direction:column;gap:6px}
+  .tw-card .tw-name{padding:11px 12px;font-size:15px;border-radius:9px;white-space:normal}
+  .tw-card .tw-none{padding:6px 14px 14px;text-align:left}
 }
-
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
@@ -1231,7 +1240,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
       </div>
       <div class="tm-tools">
         <div class="cmp-tabs" role="tablist" aria-label="Échelle">
-          <button type="button" class="cmp-tab" data-team-scale="month">Mois</button>
+          <button type="button" class="cmp-tab" data-team-scale="week">Semaine</button>
           <button type="button" class="cmp-tab" data-team-scale="year">Année</button>
         </div>
         <button id="teamTodayBtn" class="tm-today" type="button">Aujourd’hui</button>
@@ -3198,52 +3207,76 @@ function teamCountsFor(dISO){
 }
 
 const TEAM_SCALE_KEY='teamScale';
-state.teamScale=(()=>{ try{ return localStorage.getItem(TEAM_SCALE_KEY)==='year'?'year':'month'; }catch(e){ return 'month'; } })();
-state.teamMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+state.teamScale=(()=>{ try{ return localStorage.getItem(TEAM_SCALE_KEY)==='year'?'year':'week'; }catch(e){ return 'week'; } })();
+state.teamDate=new Date();state.teamDate.setHours(0,0,0,0);
 
-function renderTeamMonth(){
-  const first=state.teamMonth,y=first.getFullYear(),m=first.getMonth();
-  const last=new Date(y,m+1,0).getDate();
-  const today=todayISO();
-  const me=state.employeeId;
-  const SHIFTS=[['RM','rm','Matin'],['RA','ra','Après-midi'],['RN','rn','Nuit']];
-  let h='<div class="tm-list"><div class="tm-head"><span></span>'+SHIFTS.map(x=>`<b class="tm-h-${x[1]}">${x[2]}</b>`).join('')+'</div>';
-  for(let day=1;day<=last;day++){
-    const d=new Date(y,m,day),dISO=isoDate(d);
-    const dow=(d.getDay()+6)%7;
-    const hol=swissHolidayName(dISO),sch=schoolHolidayName(dISO),trv=isInTravaux(dISO);
-    const cls=['tm-row',dow>=5?'is-we':'',dow===0&&day>1?'is-monday':'',dISO===today?'is-today':'',dISO<today?'is-past':''].filter(Boolean).join(' ');
-    const badges=(hol?`<span class="tm-badge hol" title="${escapeHTML(hol)}">${escapeHTML(hol)}</span>`:'')+(sch?`<span class="tm-badge sch" title="Vacances scolaires VD — ${escapeHTML(sch)}">Vacances scol.</span>`:'')+(trv?'<span class="tm-badge trv">Travaux</span>':'');
-    h+=`<div class="${cls}" data-team-date="${dISO}" tabindex="0" role="button" aria-label="Équipe du ${escapeHTML(formatDateWithYear(d))}">
-      <div class="tm-date"><span class="tm-dn">${DAY_NAMES[dow]} <b>${day}</b></span>${badges}</div>`;
-    for(const [code,k,label] of SHIFTS){
-      const team=teamFor(dISO,code).filter(e=>!isVacantEmployee(e.name))
-        .sort((a,b)=>cleanEmployeeName(a.name).localeCompare(cleanEmployeeName(b.name),'fr'));
-      h+=`<div class="tm-shift ${k}"><span class="tm-lab">${label}</span><div class="tm-names">`
-        +(team.length?team.map(e=>`<span class="tm-chip ${k} ${e.id===me?'is-me':''}">${escapeHTML(cleanEmployeeName(e.name))}</span>`).join('')+(team.length>3?'<span class="tm-plus" title="Effectif renforcé">Renforcé</span>':''):'<span class="tm-none">—</span>')
-        +'</div></div>';
-    }
-    h+='</div>';
+const TEAM_SHIFTS=[['RM','rm','Matin'],['RA','ra','Après-midi'],['RN','rn','Nuit']];
+function teamPeople(dISO,code){
+  return teamFor(dISO,code).filter(e=>!isVacantEmployee(e.name))
+    .sort((a,b)=>cleanEmployeeName(a.name).localeCompare(cleanEmployeeName(b.name),'fr'));
+}
+function teamBadges(dISO){
+  const hol=swissHolidayName(dISO),sch=schoolHolidayName(dISO),trv=isInTravaux(dISO);
+  return (hol?`<span class="tw-badge hol" title="${escapeHTML(hol)}">${escapeHTML(hol)}</span>`:'')
+    +(sch?`<span class="tw-badge sch" title="Vacances scolaires VD — ${escapeHTML(sch)}">Vacances scol.</span>`:'')
+    +(trv?'<span class="tw-badge trv">Travaux</span>':'');
+}
+
+function renderTeamWeek(){
+  const monday=mondayOf(state.teamDate);
+  const days=Array.from({length:7},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);return d;});
+  const today=todayISO(),me=state.employeeId;
+  const sunday=days[6];
+  const mo=d=>d.toLocaleDateString('fr-CH',{month:'short'}).replace('.','');
+  $('teamYearTitle').textContent=`Semaine ${isoWeek(monday)} · ${monday.getDate()}${monday.getMonth()!==sunday.getMonth()?' '+mo(monday):''} – ${sunday.getDate()} ${mo(sunday)} ${sunday.getFullYear()}`;
+  const {min,max}=navBounds();
+  $('teamPrevBtn').disabled=monday<=mondayOf(min);
+  $('teamNextBtn').disabled=monday>=mondayOf(max);
+
+  // --- Ordinateur : jours en colonnes, Matin / Après-midi / Nuit en lignes
+  let g='<div class="tw-grid"><div class="tw-corner"></div>';
+  g+=days.map((d,i)=>{const iso=isoDate(d);return `<div class="tw-dayh ${i>=5?'is-we':''} ${iso===today?'is-today':''}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b>${teamBadges(iso)}</div>`;}).join('');
+  for(const [code,k,label] of TEAM_SHIFTS){
+    g+=`<div class="tw-rowh ${k}">${label}</div>`;
+    g+=days.map((d,i)=>{
+      const iso=isoDate(d),team=teamPeople(iso,code);
+      return `<div class="tw-cell ${k} ${i>=5?'is-we':''} ${iso===today?'is-today':''}" data-team-date="${iso}" tabindex="0" role="button" aria-label="${label}, ${escapeHTML(formatDateWithYear(d))}">`
+        +(team.length?team.map(e=>`<span class="tw-name ${e.id===me?'is-me':''}" title="${escapeHTML(cleanEmployeeName(e.name))}">${escapeHTML(cleanEmployeeName(e.name))}</span>`).join('')+(team.length>3?'<span class="tw-plus">Renforcé</span>':''):'<span class="tw-none">—</span>')
+        +'</div>';
+    }).join('');
   }
-  h+='</div>';
-  $('teamViewContainer').innerHTML=h;
+  g+='</div>';
+
+  // --- Téléphone : bandeau des 7 jours + détail du jour choisi
+  const sel=new Date(state.teamDate);sel.setHours(0,0,0,0);
+  const selISO=isoDate(sel);
+  let m='<div class="tw-mobile"><div class="tw-strip">';
+  m+=days.map((d,i)=>{const iso=isoDate(d);return `<button type="button" class="tw-sd ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${iso===selISO?'is-sel':''} ${swissHolidayName(iso)?'is-hol':''}" data-team-pick="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b></button>`;}).join('');
+  m+='</div>';
+  const long=sel.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
+  m+=`<div class="tw-daytitle"><strong>${escapeHTML(long.charAt(0).toUpperCase()+long.slice(1))}</strong>${teamBadges(selISO)}</div>`;
+  for(const [code,k,label] of TEAM_SHIFTS){
+    const team=teamPeople(selISO,code);
+    m+=`<section class="tw-card ${k}"><header>${label}<em>${team.length?team.length+' personne'+(team.length>1?'s':''):''}${team.length>3?' · renforcé':''}</em></header>`
+      +(team.length?'<ul>'+team.map(e=>`<li class="tw-name ${k} ${e.id===me?'is-me':''}">${escapeHTML(cleanEmployeeName(e.name))}</li>`).join('')+'</ul>':'<div class="tw-none">Personne en rotation</div>')
+      +'</section>';
+  }
+  m+='</div>';
+  $('teamViewContainer').innerHTML=g+m;
   attachTeamDayClickHandlers();
 }
 
 function renderTeamView(){
   if(!$('teamViewSection'))return;
   const {min,max}=navBounds();
-  const isMonth=state.teamScale==='month';
+  const isWeek=state.teamScale==='week';
   document.querySelectorAll('[data-team-scale]').forEach(b=>b.classList.toggle('active',b.dataset.teamScale===state.teamScale));
-  $('teamLegend').classList.toggle('hidden',isMonth);
-  if(isMonth){
-    let key=monthKey(state.teamMonth);
-    key=Math.min(Math.max(key,monthKey(min)),monthKey(max));
-    state.teamMonth=new Date(Math.floor(key/12),key%12,1);
-    $('teamYearTitle').textContent=`${MONTH_NAMES[state.teamMonth.getMonth()]} ${state.teamMonth.getFullYear()}`;
-    $('teamPrevBtn').disabled=key<=monthKey(min);
-    $('teamNextBtn').disabled=key>=monthKey(max);
-    renderTeamMonth();
+  $('teamLegend').classList.toggle('hidden',isWeek);
+  if(isWeek){
+    const t=new Date(state.teamDate);
+    if(t<min)state.teamDate=new Date(min);
+    else if(t>max)state.teamDate=new Date(max);
+    renderTeamWeek();
     return;
   }
   const y=Math.min(Math.max(state.teamYear,min.getFullYear()),max.getFullYear());
@@ -3319,16 +3352,22 @@ function openTeamDayModal(dateObj){
 }
 
 document.querySelectorAll('[data-team-scale]').forEach(b=>b.addEventListener('click',()=>{
-  state.teamScale=b.dataset.teamScale==='year'?'year':'month';
+  state.teamScale=b.dataset.teamScale==='year'?'year':'week';
   try{ localStorage.setItem(TEAM_SCALE_KEY,state.teamScale); }catch(e){ /* ignoré */ }
+  state.teamYear=state.teamDate.getFullYear();
   renderTeamView();
 }));
 $('teamTodayBtn').addEventListener('click',()=>{
-  const n=new Date();
-  state.teamMonth=new Date(n.getFullYear(),n.getMonth(),1);state.teamYear=n.getFullYear();
+  const n=new Date();n.setHours(0,0,0,0);
+  state.teamDate=n;state.teamYear=n.getFullYear();
   renderTeamView();
-  const row=document.querySelector('.tm-row.is-today');
-  if(row)row.scrollIntoView({block:'center',behavior:'smooth'});
+});
+$('teamViewContainer').addEventListener('click',event=>{
+  const b=event.target.closest('[data-team-pick]');
+  if(!b)return;
+  const [y,m,d]=b.dataset.teamPick.split('-').map(Number);
+  state.teamDate=new Date(y,m-1,d);
+  renderTeamView();
 });
 function attachTeamDayClickHandlers(){
   document.querySelectorAll('[data-team-date]').forEach(el=>{
@@ -3348,13 +3387,20 @@ function attachTeamDayClickHandlers(){
   });
 }
 
+// Flèches : une semaine (ou une année). Balayage sur téléphone : un jour.
+function teamShiftDay(dir){
+  const {min,max}=navBounds();
+  const d=new Date(state.teamDate);d.setDate(d.getDate()+dir);
+  if(d<min||d>max)return;
+  state.teamDate=d;
+  renderTeamView();
+}
 function teamShiftYear(amount){
-  if(state.teamScale==='month'){
+  if(state.teamScale==='week'){
     const {min,max}=navBounds();
-    const d=new Date(state.teamMonth.getFullYear(),state.teamMonth.getMonth()+amount,1);
-    const k=monthKey(d);
-    if(k<monthKey(min)||k>monthKey(max))return;
-    state.teamMonth=d;
+    const d=new Date(state.teamDate);d.setDate(d.getDate()+7*amount);
+    if(mondayOf(d)<mondayOf(min)||mondayOf(d)>mondayOf(max))return;
+    state.teamDate=d;
     renderTeamView();
     return;
   }
@@ -5106,7 +5152,7 @@ function addSwipe(el,onSwipe,canSwipe){
     if(Math.abs(dx)>56&&Math.abs(dx)>Math.abs(dy)*1.6)onSwipe(dx<0?1:-1);
   },{passive:true});
 }
-addSwipe($('teamViewContainer'),dir=>teamShiftYear(dir));
+addSwipe($('teamViewContainer'),dir=>{ if(state.teamScale==='week'&&isPhoneLayout())teamShiftDay(dir); else teamShiftYear(dir); });
 addSwipe($('cmpGrid'),dir=>cmpShift(dir),e=>{
   if(cmp.scale==='year')return false;
   const wrap=e.target.closest('.cmp-wrap');
