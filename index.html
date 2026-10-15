@@ -2375,6 +2375,14 @@ function inferGenericEventTitle(rawText,fallbackTitle){
   return (words.length>8 ? words.slice(0,8).join(' ') : cleaned) || fallbackTitle;
 }
 
+// « du 12 au 20 octobre », « du 30 octobre au 11 novembre », « du 28 décembre 2026 au 4 janvier 2027 »
+function longDateRange(a,b){
+  const mo=d=>MONTH_NAMES[d.getMonth()].toLowerCase();
+  if(a.getFullYear()!==b.getFullYear())return `du ${a.getDate()} ${mo(a)} ${a.getFullYear()} au ${b.getDate()} ${mo(b)} ${b.getFullYear()}`;
+  if(a.getMonth()===b.getMonth())return `du ${a.getDate()} au ${b.getDate()} ${mo(b)}`;
+  return `du ${a.getDate()} ${mo(a)} au ${b.getDate()} ${mo(b)}`;
+}
+
 function enrichEventForCalendar(ev){
   const sourceText=normalizeEventText(
     ev.originalDetail ||
@@ -2606,14 +2614,22 @@ function buildUpcomingEvents(employee){
       // Durée affichée : toute la période, week-ends et jours de repos inclus.
       const totalDays=Math.round((vacEnd-vacStart)/86400000)+1;
 
+      // « Vacances » si le bloc ne contient que des VA / VJ ; « Congé » dès qu'il
+      // mélange des récupérations (HOR / HSR).
+      const vacOnly=recupDays===0;
+      const range=longDateRange(vacStart,vacEnd);
+
       if(leaveDays>=5){
         pushUnique({
           type:'vacation',
           date:new Date(vacStart),
           endDate:new Date(vacEnd),
           allDay:true,
-          title:`Congé du ${formatShortDate(vacStart)} au ${formatShortDate(vacEnd)}`,
-          detail:`${totalDays} jours de congé, week-ends compris${(recupDays && recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
+          title:vacOnly?`Vacances ${range}`:`Congé ${range}`,
+          calendarTitle:vacOnly?`🏖️ Vacances ${range}`:`🌴 Congé ${range}`,
+          detail:vacOnly
+            ? `${totalDays} jours de vacances, week-ends compris · Profitez-en bien !`
+            : `${totalDays} jours de congé, week-ends compris${(recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
         },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
       }
 
@@ -2892,7 +2908,7 @@ function calendarEventData(ev){
   inclusiveEnd.setHours(0,0,0,0);
 
   return {
-    title:intelligentEvent.title,
+    title:ev.calendarTitle||intelligentEvent.title,
     start,
     end:nextCalendarDay(inclusiveEnd),
     allDay:true,
