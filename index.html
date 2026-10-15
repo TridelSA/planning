@@ -2347,7 +2347,8 @@ function buildUpcomingEvents(employee){
   // elle n'apparaît volontairement pas dans la liste ci-dessous, aussi
   // lointaine soit-elle.
 
-  const isVacationCode=code=>code==='VA' || code==='VJ';
+  // « Congé » = vacances (VA, VJ) + récupérations d'heures (HOR, HSR), cumulés en un seul bloc.
+  const isVacationCode=code=>code==='VA' || code==='VJ' || code==='HOR' || code==='HSR';
 
   // Jours qui peuvent relier deux blocs de vacances :
   // cellule vide / repos explicite.
@@ -2403,7 +2404,13 @@ function buildUpcomingEvents(employee){
     return realStart;
   };
 
-  // VACANCES
+  // Jours qui peuvent relier deux blocs de congé : cellule vide, repos (R) ou repos férié (RF).
+  const isLeaveBridgeCode=code=>{
+    const c=safeCode(code);
+    return c==='' || c==='R' || c==='RF';
+  };
+
+  // CONGÉS (vacances + récupérations)
   // Fusionne les périodes quand les jours intermédiaires sont uniquement des repos / cellules vides.
   let cursor=new Date(start);
 
@@ -2412,7 +2419,7 @@ function buildUpcomingEvents(employee){
 
     if(isVacationCode(code)){
       const vacStart = cursor.getTime()===start.getTime()
-        ? findRealStart(cursor,isVacationCode,isVacationBridgeCode)
+        ? findRealStart(cursor,isVacationCode,isLeaveBridgeCode)
         : new Date(cursor);
       let vacEnd=new Date(cursor);
 
@@ -2430,12 +2437,12 @@ function buildUpcomingEvents(employee){
         }
 
         // Trouver le prochain jour non-repos
-        if(isVacationBridgeCode(probeCode)){
+        if(isLeaveBridgeCode(probeCode)){
           let bridgeEnd=new Date(probe);
           let gapDays=0;
           let exceededLimit=false;
 
-          while(bridgeEnd<=probeLimit && isVacationBridgeCode(employee.schedule[isoDate(bridgeEnd)])){
+          while(bridgeEnd<=probeLimit && isLeaveBridgeCode(employee.schedule[isoDate(bridgeEnd)])){
             bridgeEnd.setDate(bridgeEnd.getDate()+1);
             gapDays++;
             if(gapDays>MAX_BRIDGE_DAYS){ exceededLimit=true; break; }
@@ -2454,17 +2461,25 @@ function buildUpcomingEvents(employee){
         break;
       }
 
-      const duration=daysBetweenInclusive(vacStart,vacEnd);
+      // Nombre de jours de congé réellement posés dans le bloc (week-ends et
+      // jours fériés intercalés non comptés). Seuls les blocs de 5 jours et
+      // plus sont annoncés dans les 30 prochains jours.
+      let leaveDays=0,recupDays=0;
+      for(let d=new Date(vacStart);d<=vacEnd;d.setDate(d.getDate()+1)){
+        const c=safeCode(employee.schedule[isoDate(d)]);
+        if(isVacationCode(c)){ leaveDays++; if(c==='HOR'||c==='HSR')recupDays++; }
+      }
 
-      pushUnique({
-        type:'vacation',
-        date:new Date(vacStart),
-        endDate:new Date(vacEnd),
-        title: vacStart.getTime()===vacEnd.getTime()
-          ? `Vacances le ${formatShortDate(vacStart)}`
-          : `Vacances du ${formatShortDate(vacStart)} au ${formatShortDate(vacEnd)}`,
-        detail:`${duration} jour${duration>1?'s':''}`
-      },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
+      if(leaveDays>=5){
+        pushUnique({
+          type:'vacation',
+          date:new Date(vacStart),
+          endDate:new Date(vacEnd),
+          allDay:true,
+          title:`Congé du ${formatShortDate(vacStart)} au ${formatShortDate(vacEnd)}`,
+          detail:`${leaveDays} jours de congé${recupDays?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
+        },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
+      }
 
       cursor=new Date(vacEnd);
       cursor.setDate(cursor.getDate()+1);
@@ -2538,25 +2553,55 @@ function buildUpcomingEvents(employee){
     cursor.setDate(cursor.getDate()+1);
   }
 
-  // FORMATION EXTERNE : tout code FE est un événement.
-  let day=new Date(start);
-
-  while(day<=end){
-    const dateISO=isoDate(day);
-    const code=safeCode(employee.schedule[dateISO]);
-
-    if(code==='FE'){
-      const comment=stripEmployeeNamePrefix(String(comments[dateISO]||'').trim(),employee);
-
+  // FORMATION EXTERNE : les jours FE qui se suivent forment UN bloc. Un jour
+  // avec commentaire ouvre un bloc ; les jours FE suivants sans commentaire
+  // (ou avec le même texte) en font partie, un week-end ou un jour férié
+  // intercalé ne coupe pas le bloc.
+  const feKey=text=>String(text||'').toLocaleLowerCase('fr').replace(/\s+/g,' ').trim();
+  const feComment=iso=>stripEmployeeNamePrefix(String(comments[iso]||'').trim(),employee);
+  const feGapOk=(fromISO,toISO)=>{
+    const d=parseLocalISO(fromISO);
+    d.setDate(d.getDate()+1);
+    while(isoDate(d)<toISO){
+      const iso=isoDate(d);
+      const dow=d.getDay();
+      if(!(dow===0 || dow===6 || swissHolidayName(iso) || safeCode(employee.schedule[iso])==='RF'))return false;
+      d.setDate(d.getDate()+1);
+    }
+    return true;
+  };
+  const feBlocks=[];
+  for(const iso of Object.keys(employee.schedule).filter(k=>safeCode(employee.schedule[k])==='FE').sort()){
+    const last=feBlocks[feBlocks.length-1];
+    const c=feComment(iso);
+    if(last && feGapOk(last.end,iso) && (!c || feKey(c)===feKey(last.comment))){
+      last.end=iso;
+      last.days++;
+    }else{
+      feBlocks.push({start:iso,end:iso,days:1,comment:c});
+    }
+  }
+  const windowStartISO=isoDate(start),windowEndISO=isoDate(end);
+  for(const blk of feBlocks){
+    if(blk.end<windowStartISO || blk.start>windowEndISO)continue;
+    const bStart=parseLocalISO(blk.start),bEnd=parseLocalISO(blk.end);
+    if(blk.start===blk.end){
       pushUnique({
         type:'training',
-        date:new Date(day),
-        title:`Formation externe — ${formatLongDate(day)}`,
-        detail:comment || 'Formation externe'
-      },`formation-${dateISO}`);
+        date:new Date(bStart),
+        title:`Formation externe — ${formatLongDate(bStart)}`,
+        detail:blk.comment || 'Formation externe'
+      },`formation-${blk.start}`);
+    }else{
+      pushUnique({
+        type:'training',
+        date:new Date(bStart),
+        endDate:new Date(bEnd),
+        allDay:true,
+        title:`Formation externe du ${formatShortDate(bStart)} au ${formatShortDate(bEnd)}`,
+        detail:[blk.comment,`${blk.days} jours`].filter(Boolean).join(' · ')
+      },`formation-${blk.start}-${blk.end}`);
     }
-
-    day.setDate(day.getDate()+1);
   }
 
   // COMMENTAIRES IMPORTANTS
