@@ -324,12 +324,6 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
 .period-jump-chevron{position:absolute;right:2px;top:50%;transform:translateY(-50%);color:var(--accent);pointer-events:none}
 
 .panel-top{display:none}
-.stats-grid{display:none;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:7px;margin:0 0 10px}
-body.view-year .stats-grid{display:grid}
-.stat-card{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius-md);padding:9px 11px;min-width:0}
-.stat-card .stat-label{display:block;color:var(--muted);font:800 9px/1 var(--font-body);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-.stat-card strong{font:700 19px/1 var(--font-display)}
-.stat-card small{color:var(--muted);font-size:9px;margin-left:4px}
 
 /* ==========================================================
    Vue Semaine
@@ -1110,7 +1104,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
         </div>
         <button id="nextBtn" class="nav-btn" type="button" aria-label="Période suivante"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg></button>
       </div>
-<div id="statsGrid" class="stats-grid"></div>
 <div class="panel-top">
         <div>
           <span id="viewOverline" class="overline"></span>
@@ -1436,45 +1429,6 @@ function periodDates(){
   }
   return dates;
 }
-
-function annualStats(employee){
-  const counts={RM:0,RA:0,RN:0,PIQ:0,VA:0};
-  const y=state.date.getFullYear();
-  const d=new Date(y,0,1);
-
-  while(d.getFullYear()===y){
-    const code=safeCode(employee.schedule[isoDate(d)]);
-    if(Object.prototype.hasOwnProperty.call(counts,code))counts[code]++;
-    d.setDate(d.getDate()+1);
-  }
-  return counts;
-}
-
-function renderStats(employee){
-  const s=annualStats(employee);
-  const cards=[];
-
-  const add=(code,label,unit)=>{
-    if(s[code] <= 0)return;
-    cards.push(`
-      <div class="stat-card ${classFor(code)}">
-        <span class="stat-label">${label}</span>
-        <strong>${s[code]}</strong>
-        <small>${unit}</small>
-      </div>`);
-  };
-
-  add('RM','RM','jours');
-  add('RA','RA','jours');
-  add('RN','RN','jours');
-  add('PIQ','PIQ','jours');
-  add('VA','VA','jours');
-
-  $('statsGrid').innerHTML=cards.join('');
-  $('statsGrid').style.display=cards.length?'':'none';
-}
-
-
 
 function cleanEmployeeName(name){
   return String(name||'')
@@ -4378,16 +4332,11 @@ function render(){
 
   if($('employeeName')) $('employeeName').textContent=cleanEmployeeName(e.name);
 
-  if($('statsGrid')){
-    $('statsGrid').style.display = state.view==='year' ? '' : 'none';
-  }
-
   if(state.view==='week'){
     renderWeek(e);
   }else if(state.view==='month'){
     renderMonth(e);
   }else{
-    renderStats(e);
     renderYear(e);
   }
 
