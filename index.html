@@ -105,6 +105,56 @@
 .theme-label{display:block;margin:8px 10px 0;font:800 9.5px/1 var(--font-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 
 
+/* Rotations : vue Mois (tableau d'équipe) */
+.tm-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tm-today{height:36px;padding:0 14px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font:800 12px/1 var(--font-body);cursor:pointer}
+.tm-today:hover{background:var(--paper)}
+.tm-list{border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;background:var(--surface)}
+.tm-head,.tm-row{display:grid;grid-template-columns:112px repeat(3,minmax(0,1fr))}
+.tm-head{position:sticky;top:0;z-index:2;background:var(--surface);border-bottom:1px solid var(--line-strong)}
+.tm-head b{padding:10px 12px;font:800 10.5px/1 var(--font-body);text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:7px}
+.tm-head b::before{content:'';width:9px;height:9px;border-radius:3px;background:currentColor}
+.tm-h-rm{color:var(--c-rm-ink)}.tm-h-ra{color:var(--c-ra-ink)}.tm-h-rn{color:var(--c-rn-ink)}
+.tm-row{border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s var(--ease)}
+.tm-row:last-child{border-bottom:0}
+.tm-row:hover{background:var(--paper)}
+.tm-row.is-we{background:var(--outside-bg)}
+.tm-row.is-past{opacity:.62}
+.tm-row.is-today{background:var(--accent-tint);box-shadow:inset 4px 0 0 var(--accent);opacity:1}
+.tm-row.is-monday{border-top:2px solid var(--line-strong)}
+.tm-row.is-monday:first-of-type{border-top:0}
+.tm-date{padding:9px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0}
+.tm-date .tm-dn{display:flex;align-items:baseline;gap:7px;font:700 11px/1 var(--font-body);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tm-date .tm-dn b{font:700 19px/1 var(--font-display);color:var(--ink);letter-spacing:0}
+.tm-row.is-we .tm-dn b{color:var(--ink-soft)}
+.tm-row.is-today .tm-dn b{color:var(--accent-ink)}
+.tm-badge{display:inline-block;max-width:100%;font:700 9px/1.25 var(--font-body);padding:2px 6px;border-radius:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tm-badge.hol{background:var(--danger-bg);color:var(--danger)}
+.tm-badge.sch{background:var(--school-tint);color:var(--school-dot)}
+.tm-badge.trv{background:var(--signal-tint);color:var(--signal-ink)}
+.tm-shift{padding:8px 10px;display:flex;align-items:center;min-width:0}
+.tm-lab{display:none}
+.tm-names{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tm-chip{padding:4px 9px;border-radius:999px;font:700 11.5px/1.2 var(--font-body);white-space:nowrap}
+.tm-chip.rm{background:var(--c-rm-bg);color:var(--c-rm-ink)}
+.tm-chip.ra{background:var(--c-ra-bg);color:var(--c-ra-ink)}
+.tm-chip.rn{background:var(--c-rn-bg);color:var(--c-rn-ink)}
+.tm-chip.is-me{box-shadow:0 0 0 2px var(--accent);font-weight:800}
+.tm-none{color:var(--empty-ink);font:600 12px/1 var(--font-body);padding-left:4px}
+.tm-plus{font:800 9px/1 var(--font-body);color:var(--signal-ink);background:var(--signal-tint);padding:3px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em}
+@media (max-width:700px){
+  .tm-head{display:none}
+  .tm-row{grid-template-columns:58px 1fr;grid-template-rows:auto}
+  .tm-date{grid-row:1/span 3;padding:10px 6px 10px 12px;border-right:1px solid var(--line)}
+  .tm-shift{grid-column:2;padding:5px 10px;gap:8px;align-items:flex-start}
+  .tm-shift:first-of-type{padding-top:10px}.tm-shift:last-child{padding-bottom:10px}
+  .tm-lab{display:block;flex:0 0 54px;padding-top:5px;font:800 9.5px/1 var(--font-body);text-transform:uppercase;letter-spacing:.05em}
+  .tm-shift.rm .tm-lab{color:var(--c-rm-ink)}.tm-shift.ra .tm-lab{color:var(--c-ra-ink)}.tm-shift.rn .tm-lab{color:var(--c-rn-ink)}
+  .tm-chip{font-size:12px}
+  .team-view-head{flex-direction:column;align-items:stretch}
+  .tm-tools{width:100%;flex-wrap:nowrap}.tm-tools .cmp-tabs{flex:1}.tm-tools .cmp-tab{flex:1}.tm-tools .tm-today{flex:0 0 auto}
+}
+
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
@@ -1176,8 +1226,15 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   <section id="teamViewSection" class="card main-card hidden">
     <div class="team-view-head">
       <div class="team-view-title">
-        <h2>Planning d'équipe</h2>
-        <p>Qui est en rotation, jour par jour, sur toute l'année</p>
+        <h2>Rotations</h2>
+        <p>Qui est en rotation matin, après-midi et nuit, jour par jour</p>
+      </div>
+      <div class="tm-tools">
+        <div class="cmp-tabs" role="tablist" aria-label="Échelle">
+          <button type="button" class="cmp-tab" data-team-scale="month">Mois</button>
+          <button type="button" class="cmp-tab" data-team-scale="year">Année</button>
+        </div>
+        <button id="teamTodayBtn" class="tm-today" type="button">Aujourd’hui</button>
       </div>
     </div>
 
@@ -1187,7 +1244,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
       <button id="teamNextBtn" class="nav-btn" type="button" aria-label="Année suivante"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg></button>
     </div>
 
-    <div class="team-legend">
+    <div class="team-legend" id="teamLegend">
       <span class="team-legend-item"><i class="team-legend-dot dot-rm"></i>Matin</span>
       <span class="team-legend-item"><i class="team-legend-dot dot-ra"></i>Après-midi</span>
       <span class="team-legend-item"><i class="team-legend-dot dot-rn"></i>Nuit</span>
@@ -3129,9 +3186,9 @@ function attachDayClickHandlers(){
 // ==========================================================
 function teamCellStyle(counts){
   const bg=[
-    counts[0]>0?TEAM_BAND_COLORS.RM:TEAM_BAND_EMPTY,
-    counts[1]>0?TEAM_BAND_COLORS.RA:TEAM_BAND_EMPTY,
-    counts[2]>0?TEAM_BAND_COLORS.RN:TEAM_BAND_EMPTY
+    counts[0]>0?'var(--c-rm-bg)':'var(--c-off-bg)',
+    counts[1]>0?'var(--c-ra-bg)':'var(--c-off-bg)',
+    counts[2]>0?'var(--c-rn-bg)':'var(--c-off-bg)'
   ];
   return `background:linear-gradient(90deg,${bg[0]} 0%,${bg[0]} 30%,${bg[1]} 36%,${bg[1]} 64%,${bg[2]} 70%,${bg[2]} 100%)`;
 }
@@ -3140,9 +3197,55 @@ function teamCountsFor(dISO){
   return ROTATION_CODES.map(code=>teamFor(dISO,code).filter(e=>!isVacantEmployee(e.name)).length);
 }
 
+const TEAM_SCALE_KEY='teamScale';
+state.teamScale=(()=>{ try{ return localStorage.getItem(TEAM_SCALE_KEY)==='year'?'year':'month'; }catch(e){ return 'month'; } })();
+state.teamMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+
+function renderTeamMonth(){
+  const first=state.teamMonth,y=first.getFullYear(),m=first.getMonth();
+  const last=new Date(y,m+1,0).getDate();
+  const today=todayISO();
+  const me=state.employeeId;
+  const SHIFTS=[['RM','rm','Matin'],['RA','ra','Après-midi'],['RN','rn','Nuit']];
+  let h='<div class="tm-list"><div class="tm-head"><span></span>'+SHIFTS.map(x=>`<b class="tm-h-${x[1]}">${x[2]}</b>`).join('')+'</div>';
+  for(let day=1;day<=last;day++){
+    const d=new Date(y,m,day),dISO=isoDate(d);
+    const dow=(d.getDay()+6)%7;
+    const hol=swissHolidayName(dISO),sch=schoolHolidayName(dISO),trv=isInTravaux(dISO);
+    const cls=['tm-row',dow>=5?'is-we':'',dow===0&&day>1?'is-monday':'',dISO===today?'is-today':'',dISO<today?'is-past':''].filter(Boolean).join(' ');
+    const badges=(hol?`<span class="tm-badge hol" title="${escapeHTML(hol)}">${escapeHTML(hol)}</span>`:'')+(sch?`<span class="tm-badge sch" title="Vacances scolaires VD — ${escapeHTML(sch)}">Vacances scol.</span>`:'')+(trv?'<span class="tm-badge trv">Travaux</span>':'');
+    h+=`<div class="${cls}" data-team-date="${dISO}" tabindex="0" role="button" aria-label="Équipe du ${escapeHTML(formatDateWithYear(d))}">
+      <div class="tm-date"><span class="tm-dn">${DAY_NAMES[dow]} <b>${day}</b></span>${badges}</div>`;
+    for(const [code,k,label] of SHIFTS){
+      const team=teamFor(dISO,code).filter(e=>!isVacantEmployee(e.name))
+        .sort((a,b)=>cleanEmployeeName(a.name).localeCompare(cleanEmployeeName(b.name),'fr'));
+      h+=`<div class="tm-shift ${k}"><span class="tm-lab">${label}</span><div class="tm-names">`
+        +(team.length?team.map(e=>`<span class="tm-chip ${k} ${e.id===me?'is-me':''}">${escapeHTML(cleanEmployeeName(e.name))}</span>`).join('')+(team.length>3?'<span class="tm-plus" title="Effectif renforcé">Renforcé</span>':''):'<span class="tm-none">—</span>')
+        +'</div></div>';
+    }
+    h+='</div>';
+  }
+  h+='</div>';
+  $('teamViewContainer').innerHTML=h;
+  attachTeamDayClickHandlers();
+}
+
 function renderTeamView(){
   if(!$('teamViewSection'))return;
   const {min,max}=navBounds();
+  const isMonth=state.teamScale==='month';
+  document.querySelectorAll('[data-team-scale]').forEach(b=>b.classList.toggle('active',b.dataset.teamScale===state.teamScale));
+  $('teamLegend').classList.toggle('hidden',isMonth);
+  if(isMonth){
+    let key=monthKey(state.teamMonth);
+    key=Math.min(Math.max(key,monthKey(min)),monthKey(max));
+    state.teamMonth=new Date(Math.floor(key/12),key%12,1);
+    $('teamYearTitle').textContent=`${MONTH_NAMES[state.teamMonth.getMonth()]} ${state.teamMonth.getFullYear()}`;
+    $('teamPrevBtn').disabled=key<=monthKey(min);
+    $('teamNextBtn').disabled=key>=monthKey(max);
+    renderTeamMonth();
+    return;
+  }
   const y=Math.min(Math.max(state.teamYear,min.getFullYear()),max.getFullYear());
   state.teamYear=y;
   $('teamYearTitle').textContent=String(y);
@@ -3215,6 +3318,18 @@ function openTeamDayModal(dateObj){
   $('dayModalBackdrop').classList.toggle('is-team-day',true);$('dayModalBackdrop').classList.add('open');
 }
 
+document.querySelectorAll('[data-team-scale]').forEach(b=>b.addEventListener('click',()=>{
+  state.teamScale=b.dataset.teamScale==='year'?'year':'month';
+  try{ localStorage.setItem(TEAM_SCALE_KEY,state.teamScale); }catch(e){ /* ignoré */ }
+  renderTeamView();
+}));
+$('teamTodayBtn').addEventListener('click',()=>{
+  const n=new Date();
+  state.teamMonth=new Date(n.getFullYear(),n.getMonth(),1);state.teamYear=n.getFullYear();
+  renderTeamView();
+  const row=document.querySelector('.tm-row.is-today');
+  if(row)row.scrollIntoView({block:'center',behavior:'smooth'});
+});
 function attachTeamDayClickHandlers(){
   document.querySelectorAll('[data-team-date]').forEach(el=>{
     if(!el.dataset.teamDate)return;
@@ -3234,6 +3349,15 @@ function attachTeamDayClickHandlers(){
 }
 
 function teamShiftYear(amount){
+  if(state.teamScale==='month'){
+    const {min,max}=navBounds();
+    const d=new Date(state.teamMonth.getFullYear(),state.teamMonth.getMonth()+amount,1);
+    const k=monthKey(d);
+    if(k<monthKey(min)||k>monthKey(max))return;
+    state.teamMonth=d;
+    renderTeamView();
+    return;
+  }
   const {min,max}=navBounds();
   const next=state.teamYear+amount;
   if(next<min.getFullYear() || next>max.getFullYear())return;
@@ -3294,7 +3418,7 @@ function updateTeamToggleLabel(){
   </button>`).join('')+themeSegHTML();
   const subtitle=$('heroSubtitle');
   if(subtitle){
-    subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?"Planning d'équipe":'Planning individuel';
+    subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
   }
 }
 
@@ -4982,6 +5106,7 @@ function addSwipe(el,onSwipe,canSwipe){
     if(Math.abs(dx)>56&&Math.abs(dx)>Math.abs(dy)*1.6)onSwipe(dx<0?1:-1);
   },{passive:true});
 }
+addSwipe($('teamViewContainer'),dir=>teamShiftYear(dir));
 addSwipe($('cmpGrid'),dir=>cmpShift(dir),e=>{
   if(cmp.scale==='year')return false;
   const wrap=e.target.closest('.cmp-wrap');
