@@ -2603,6 +2603,9 @@ function buildUpcomingEvents(employee){
         if(isVacationCode(c)){ leaveDays++; if(c==='HOR'||c==='HSR')recupDays++; }
       }
 
+      // Durée affichée : toute la période, week-ends et jours de repos inclus.
+      const totalDays=Math.round((vacEnd-vacStart)/86400000)+1;
+
       if(leaveDays>=5){
         pushUnique({
           type:'vacation',
@@ -2610,7 +2613,7 @@ function buildUpcomingEvents(employee){
           endDate:new Date(vacEnd),
           allDay:true,
           title:`Congé du ${formatShortDate(vacStart)} au ${formatShortDate(vacEnd)}`,
-          detail:`${leaveDays} jours de congé${(recupDays && recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
+          detail:`${totalDays} jours de congé, week-ends compris${(recupDays && recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
         },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
       }
 
