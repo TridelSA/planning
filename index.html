@@ -3871,9 +3871,10 @@ function setPage(page){
   const controls=document.querySelector('.controls');
   if(controls)controls.classList.toggle('hidden',alternate);
   if(alternate){
-    if($('rotationCard'))$('rotationCard').classList.add('hidden');
     if($('upcomingEventsCard'))$('upcomingEventsCard').classList.add('hidden');
   }
+  // « En poste / Ensuite » : affiché tout de suite sur Individuel et Comparer.
+  renderRotationWidget();
   const mainCard=document.querySelector('main.main-card');
   if(mainCard)mainCard.classList.toggle('hidden',alternate);
   $('teamViewSection').classList.toggle('hidden',page!=='team');
@@ -5248,7 +5249,10 @@ function rotationBlockData(pointer){
 
 function renderRotationWidget(){
   const card=$('rotationCard');
-  if(!card || !planning.employees.length)return;
+  if(!card)return;
+  // Visible seulement sur Individuel et Comparer (jamais par surprise ailleurs).
+  const pg=typeof currentPage==='function'?currentPage():'individual';
+  if(!planning.employees.length || (pg!=='individual' && pg!=='compare')){ card.classList.add('hidden'); return; }
 
   const now=currentShiftPointer();
   const next=nextShiftPointer(now);
