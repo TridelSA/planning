@@ -4302,7 +4302,8 @@ function renderCompareView(){
     const cls=n===g.people.length?'is-on':n>0?'is-partial':'';
     return `<button type="button" class="pv-chip ${cls}" data-cmp-grp="${escapeHTML(g.name)}" aria-pressed="${n===g.people.length}" title="Ajouter / retirer tout le groupe">${escapeHTML(g.name)}</button>`;
   }).join('');
-  $('cmpGroups').innerHTML=chips+cmpSavedChipsHTML();
+  // Groupes enregistrés en premier, tout à gauche.
+  $('cmpGroups').innerHTML=cmpSavedChipsHTML()+chips+cmpSaveChipHTML();
 
   const selected=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   if(!$('cmpPanel').classList.contains('hidden'))renderCmpPanelList();
@@ -5783,6 +5784,10 @@ function cmpSavedChipsHTML(){
     const on=g.people.length===cmp.people.size&&g.people.every(k=>cmp.people.has(k));
     return `<span class="pv-saved"><button type="button" class="pv-chip ${on?'is-on':''}" data-cmp-saved="${i}" aria-pressed="${on}" title="Afficher ce groupe">★ ${escapeHTML(g.name)}</button><button type="button" class="pv-saved-x" data-cmp-saved-del="${i}" aria-label="Supprimer le groupe ${escapeHTML(g.name)}">×</button></span>`;
   }).join('');
+  return h;
+}
+function cmpSaveChipHTML(){
+  let h='';
   if(cmp.people.size)h+=`<button type="button" class="pv-chip pv-save" data-cmp-save title="Enregistrer la sélection actuelle comme groupe">＋ Enregistrer la sélection</button>`;
   return h;
 }
