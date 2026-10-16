@@ -3640,14 +3640,25 @@ function pageTransitionRun(t){
   if(!t)return;
   const order=NAV_PAGES.map(p=>p.id);
   const dir=order.indexOf(t.page)>=order.indexOf(t.prev)?1:-1;
-  const dx=(innerWidth<=700?22:44)*dir;
+  const phone=innerWidth<=700;
+  const dx=44*dir;
   const els=[...t.app.children].filter(el=>!el.classList.contains('hero')&&!el.classList.contains('hidden')&&el.offsetParent!==null&&el.tagName!=='SCRIPT');
-  els.forEach((el,i)=>{
-    el.animate(
-      [{opacity:0,transform:`translateX(${dx}px) scale(.985)`,transformOrigin:'50% 0'},
-       {opacity:1,transform:'none',transformOrigin:'50% 0'}],
-      {duration:480,delay:i*50,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
-  });
+  if(phone){
+    // Mobile : simple et fluide — tout le contenu monte d'un bloc en fondu,
+    // sans glissement latéral ni décalage entre les cartes.
+    if(window.scrollY>40)window.scrollTo({top:0,behavior:'smooth'});
+    els.forEach(el=>{
+      el.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'none'}],
+        {duration:340,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'});
+    });
+  }else{
+    els.forEach((el,i)=>{
+      el.animate(
+        [{opacity:0,transform:`translateX(${dx}px) scale(.985)`,transformOrigin:'50% 0'},
+         {opacity:1,transform:'none',transformOrigin:'50% 0'}],
+        {duration:480,delay:i*50,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+    });
+  }
   // Pendant l'élargissement, on recale l'illustration du bandeau à chaque image.
   const t0=performance.now(),key=heroFocusCurrent;
   const stage=document.getElementById('heroArtStage');
