@@ -1147,6 +1147,26 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .tw-grid,.month-grid,.st-card{break-inside:avoid}
 }
 @media print{#statsViewSection{display:none!important}}
+
+/* ---------- Barre d'onglets mobile, groupes enregistrés ---------- */
+.tabbar{display:none}
+.pv-saved{display:inline-flex;align-items:center;gap:0;flex:0 0 auto}
+.pv-saved .pv-chip{border-top-right-radius:0;border-bottom-right-radius:0;border-right:0}
+.pv-saved-x{height:30px;width:26px;border:1px solid var(--line-strong);border-left:0;border-radius:0 999px 999px 0;background:var(--surface);color:var(--muted);font:700 14px/1 var(--font-body);cursor:pointer}
+.pv-saved-x:hover{color:var(--ink)}
+.pv-save{border-style:dashed;color:var(--accent-ink)}
+@media (max-width:700px){
+  .tabbar:not([hidden]){display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;gap:4px;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));
+    background:color-mix(in srgb,var(--surface) 94%,transparent);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line-strong)}
+  .tabbar-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--muted);
+    font:700 10px/1.1 var(--font-body);padding:7px 2px 6px;border-radius:12px;min-width:0}
+  .tabbar-btn svg{width:22px;height:22px}
+  .tabbar-btn.is-active{color:var(--accent-ink);background:var(--accent-tint)}
+  .app{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+}
+@media print{.tabbar{display:none!important}}
 </style>
 </head>
 <body>
@@ -3601,7 +3621,7 @@ function updateTeamToggleLabel(){
     <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.icon}</svg></span>
     <span class="navm-txt"><b>${x.label}</b><small>${x.desc}</small></span>
     ${x.id===page?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
-  </button>`).join('')+themeSegHTML()+installHTML();
+  </button>`).join('')+themeSegHTML()+shareHTML()+installHTML();
   const subtitle=$('heroSubtitle');
   if(subtitle){
     subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
@@ -3625,6 +3645,7 @@ $('navMenuBtn').addEventListener('click',event=>{
   if($('navMenuPanel').classList.contains('hidden'))openNavMenu(); else closeNavMenu();
 });
 $('navMenuPanel').addEventListener('click',async event=>{
+  if(event.target.closest('[data-share-link]')){ shareCurrentView(); return; }
   if(event.target.closest('[data-install]')){
     if(deferredInstall){
       deferredInstall.prompt();
@@ -3663,7 +3684,15 @@ function restoreSavedPage(){
   let saved='individual';
   try{ saved=localStorage.getItem(PAGE_KEY)||'individual'; }catch(e){ saved='individual'; }
   if(saved==='presence'){ saved='compare'; cmp.scale='year'; saveCmp(); }  // ancienne page Maintenance
+  const shared=readSharedHash();
+  if(shared){
+    applySharedState(shared);
+    saved=shared.get('p');
+    try{ history.replaceState(history.state,'',location.pathname+location.search); }catch(e){ /* ignoré */ }
+  }else periodRestore();
+  periodReady=true;
   if(saved==='individual' || !NAV_PAGES.some(x=>x.id===saved))return false;
+  histMode='replace';
   setPage(saved);
   return true;
 }
@@ -3672,6 +3701,7 @@ updateTeamToggleLabel();
 
 // Accessibilité : rôles et états des onglets, page courante dans le menu.
 function a11ySync(){
+  if(typeof tabBarSync==='function')tabBarSync();
   document.querySelectorAll('.tab,.cmp-tab').forEach(b=>{
     b.setAttribute('role','tab');
     b.setAttribute('aria-selected',b.classList.contains('active')?'true':'false');
@@ -3774,6 +3804,7 @@ function setPage(page){
 
   updateTeamToggleLabel();
   try{ localStorage.setItem(PAGE_KEY,page); }catch(e){ /* stockage indisponible */ }
+  histNote(page);
   render();
   pageTransitionRun(pageTrans);
 }
@@ -4192,7 +4223,7 @@ function renderCompareView(){
     const cls=n===g.people.length?'is-on':n>0?'is-partial':'';
     return `<button type="button" class="pv-chip ${cls}" data-cmp-grp="${escapeHTML(g.name)}" aria-pressed="${n===g.people.length}" title="Ajouter / retirer tout le groupe">${escapeHTML(g.name)}</button>`;
   }).join('');
-  $('cmpGroups').innerHTML=chips;
+  $('cmpGroups').innerHTML=chips+cmpSavedChipsHTML();
 
   const selected=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   if(!$('cmpPanel').classList.contains('hidden'))renderCmpPanelList();
@@ -5536,6 +5567,168 @@ setInterval(()=>loadPlanning(true),60000);
 setInterval(renderRotationWidget,60000);
 
 loadPlanning(false);
+
+// ==========================================================
+// Ergonomie : barre d'onglets mobile, raccourcis clavier, bouton Retour,
+// mémoire de la période, groupes enregistrés (Comparer), lien partageable.
+// ==========================================================
+try{ history.replaceState({tr:1,page:'individual'},''); }catch(e){ /* ignoré */ }
+var histMode='push',histPopping=false;
+function histNote(page){
+  try{
+    if(histPopping)return;
+    if(histMode==='replace'){ history.replaceState({tr:1,page},''); histMode='push'; return; }
+    const st=history.state;
+    if(!st||st.page!==page)history.pushState({tr:1,page},'');
+  }catch(e){ /* ignoré */ }
+}
+window.addEventListener('popstate',e=>{
+  const st=e.state;
+  if(!st||!st.tr)return;
+  histPopping=true;
+  try{ if(st.page!==currentPage())setPage(st.page); }finally{ histPopping=false; }
+});
+
+// --- Barre d'onglets (téléphone) ---
+(function(){
+  const nav=document.createElement('nav');
+  nav.id='tabBar';nav.className='tabbar';nav.hidden=true;
+  nav.setAttribute('aria-label','Pages');
+  nav.innerHTML=NAV_PAGES.map(x=>`<button type="button" class="tabbar-btn" data-tab-page="${x.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.icon}</svg><span>${x.label}</span></button>`).join('');
+  document.body.appendChild(nav);
+  nav.addEventListener('click',e=>{
+    const b=e.target.closest('[data-tab-page]');
+    if(b&&b.dataset.tabPage!==currentPage())setPage(b.dataset.tabPage);
+  });
+})();
+function tabBarSync(){
+  const nav=document.getElementById('tabBar');
+  if(!nav)return;
+  nav.hidden=!(planning&&planning.employees&&planning.employees.length);
+  const page=currentPage();
+  nav.querySelectorAll('[data-tab-page]').forEach(b=>{
+    const on=b.dataset.tabPage===page;
+    b.classList.toggle('is-active',on);
+    if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+  });
+}
+
+// --- Raccourcis clavier (ordinateur) ---
+document.addEventListener('keydown',e=>{
+  if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey)return;
+  const t=e.target;
+  if(t&&(/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)||t.isContentEditable))return;
+  if(document.querySelector('.day-modal-backdrop.open'))return;
+  if(!(planning&&planning.employees&&planning.employees.length))return;
+  const k=e.key;
+  if(/^[1-4]$/.test(k)&&NAV_PAGES[+k-1]){ setPage(NAV_PAGES[+k-1].id); e.preventDefault(); return; }
+  const ids={individual:['previousBtn','nextBtn','todayBtn'],team:['teamPrevBtn','teamNextBtn','teamTodayBtn'],compare:['cmpPrevBtn','cmpNextBtn','cmpTodayBtn']}[currentPage()];
+  if(!ids)return;
+  const id=k==='ArrowLeft'?ids[0]:k==='ArrowRight'?ids[1]:(k==='t'||k==='T')?ids[2]:null;
+  if(!id)return;
+  const b=document.getElementById(id);
+  if(b&&!b.disabled&&b.offsetParent!==null){ b.click(); e.preventDefault(); }
+});
+
+// --- Lien partageable + mémoire de la période ---
+const parseYMD=s=>{ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m?new Date(+m[1],+m[2]-1,+m[3]):null; };
+function shareHTML(){
+  return `<button type="button" class="install-btn share-btn" data-share-link><span style="font-size:16px;line-height:1">🔗</span><span>Copier le lien de cette vue<small>Page, période et personnes affichées</small></span></button><div id="shareHint" class="install-hint hidden"></div>`;
+}
+function shareURL(){
+  const q=new URLSearchParams();
+  const page=currentPage();
+  q.set('p',page);
+  if(page==='individual'){ q.set('v',state.view); q.set('d',isoDate(state.date)); if(state.employeeId)q.set('e',state.employeeId); }
+  else if(page==='compare'){ q.set('s',cmp.scale); q.set('cd',isoDate(cmp.date)); q.set('c',[...cmp.people].join('|')); }
+  else if(page==='team'){ q.set('ts',state.teamScale); q.set('td',isoDate(state.teamDate)); }
+  else if(page==='stats'){ if(state.employeeId)q.set('e',state.employeeId); }
+  return location.origin+location.pathname+'#'+q.toString();
+}
+async function shareCurrentView(){
+  const url=shareURL(),h=document.getElementById('shareHint');
+  const say=t=>{ if(h){ h.textContent=t; h.classList.remove('hidden'); } };
+  try{
+    if(navigator.share&&matchMedia('(max-width:700px)').matches){ await navigator.share({title:'Planning Tridel',url}); return; }
+  }catch(e){ if(e&&e.name==='AbortError')return; }
+  try{ await navigator.clipboard.writeText(url); say('Lien copié ✓'); }
+  catch(e){ say(url); }
+}
+function readSharedHash(){
+  const h=location.hash.replace(/^#/,'');
+  if(!h)return null;
+  const q=new URLSearchParams(h);
+  return NAV_PAGES.some(x=>x.id===q.get('p'))?q:null;
+}
+function applySharedState(q){
+  const has=k=>planning.employees.some(x=>x.id===k);
+  const e=q.get('e'); if(e&&has(e)){ state.employeeId=e; try{ updateEmployeePicker(); }catch(_){ /* ignoré */ } }
+  const v=q.get('v'); if(['week','month','year'].includes(v))state.view=v;
+  const d=parseYMD(q.get('d')); if(d)state.date=d;
+  const s=q.get('s'); if(['week','month','year'].includes(s))cmp.scale=s;
+  const cd=parseYMD(q.get('cd')); if(cd)cmp.date=cd;
+  if(q.has('c')){
+    const ks=q.get('c').split('|').filter(Boolean);
+    cmp.people=new Set(ks.filter(k=>planning.employees.some(x=>presencePersonKey(x)===k)));
+  }
+  const ts=q.get('ts'); if(ts==='week'||ts==='year')state.teamScale=ts;
+  const td=parseYMD(q.get('td')); if(td)state.teamDate=td;
+}
+const PERIOD_KEY='lastPeriod';
+var periodReady=false;
+function periodSave(){
+  if(!periodReady)return;
+  try{ localStorage.setItem(PERIOD_KEY,JSON.stringify({ts:Date.now(),d:isoDate(state.date),cd:isoDate(cmp.date),td:isoDate(state.teamDate)})); }catch(e){ /* ignoré */ }
+}
+function periodRestore(){
+  try{
+    const o=JSON.parse(localStorage.getItem(PERIOD_KEY)||'null');
+    if(!o||Date.now()-o.ts>20*60*1000)return;   // au-delà de 20 min : on repart d'aujourd'hui
+    const d=parseYMD(o.d),cd=parseYMD(o.cd),td=parseYMD(o.td);
+    if(d)state.date=d; if(cd)cmp.date=cd; if(td)state.teamDate=td;
+  }catch(e){ /* ignoré */ }
+}
+setInterval(periodSave,2500);
+window.addEventListener('pagehide',periodSave);
+
+// --- Comparer : groupes enregistrés ---
+const CMP_SAVED_KEY='cmpSavedGroups';
+function cmpSavedLoad(){
+  try{ const a=JSON.parse(localStorage.getItem(CMP_SAVED_KEY)||'[]'); return Array.isArray(a)?a.filter(g=>g&&typeof g.name==='string'&&Array.isArray(g.people)):[]; }
+  catch(e){ return []; }
+}
+function cmpSavedStore(a){ try{ localStorage.setItem(CMP_SAVED_KEY,JSON.stringify(a)); }catch(e){ /* ignoré */ } }
+function cmpSavedChipsHTML(){
+  const a=cmpSavedLoad();
+  let h=a.map((g,i)=>{
+    const on=g.people.length===cmp.people.size&&g.people.every(k=>cmp.people.has(k));
+    return `<span class="pv-saved"><button type="button" class="pv-chip ${on?'is-on':''}" data-cmp-saved="${i}" aria-pressed="${on}" title="Afficher ce groupe">★ ${escapeHTML(g.name)}</button><button type="button" class="pv-saved-x" data-cmp-saved-del="${i}" aria-label="Supprimer le groupe ${escapeHTML(g.name)}">×</button></span>`;
+  }).join('');
+  if(cmp.people.size)h+=`<button type="button" class="pv-chip pv-save" data-cmp-save title="Enregistrer la sélection actuelle comme groupe">＋ Enregistrer la sélection</button>`;
+  return h;
+}
+$('cmpGroups').addEventListener('click',e=>{
+  const ap=e.target.closest('[data-cmp-saved]'),del=e.target.closest('[data-cmp-saved-del]'),sv=e.target.closest('[data-cmp-save]');
+  if(!ap&&!del&&!sv)return;
+  e.stopPropagation();
+  const a=cmpSavedLoad();
+  if(ap){
+    const g=a[+ap.dataset.cmpSaved]; if(!g)return;
+    cmp.people=new Set(g.people.filter(k=>planning.employees.some(x=>presencePersonKey(x)===k)));
+    saveCmp(); renderCompareView(); return;
+  }
+  if(del){
+    const g=a[+del.dataset.cmpSavedDel]; if(!g)return;
+    if(!confirm(`Supprimer le groupe « ${g.name} » ?`))return;
+    a.splice(+del.dataset.cmpSavedDel,1); cmpSavedStore(a); renderCompareView(); return;
+  }
+  const name=(prompt('Nom du groupe (ex. Mon équipe) :')||'').trim().slice(0,24);
+  if(!name)return;
+  const entry={name,people:[...cmp.people]};
+  const i=a.findIndex(g=>g.name.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));
+  if(i>=0)a[i]=entry;else a.push(entry);
+  cmpSavedStore(a); renderCompareView();
+});
 </script>
 
 
