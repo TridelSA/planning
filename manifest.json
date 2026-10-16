@@ -1,0 +1,13 @@
+{
+  "name": "Planning Tridel",
+  "short_name": "Planning",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1F5C2C",
+  "theme_color": "#1F5C2C",
+  "icons": [
+    { "src": "icon-192-v4.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-v4.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
