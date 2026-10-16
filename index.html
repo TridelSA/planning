@@ -1149,6 +1149,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media print{#statsViewSection{display:none!important}}
 
 /* ---------- Barre d'onglets mobile, groupes enregistrés ---------- */
+.navm-ico-phone{display:none}
 .tabbar{display:none}
 .pv-saved{display:inline-flex;align-items:center;gap:0;flex:0 0 auto}
 .pv-saved .pv-chip{border-top-right-radius:0;border-bottom-right-radius:0;border-right:0}
@@ -1165,6 +1166,12 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .tabbar-btn svg{width:22px;height:22px}
   .tabbar-btn.is-active{color:var(--accent-ink);background:var(--accent-tint)}
   .app{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+  /* La barre du bas gère déjà les pages : le bouton du bandeau ne garde que les réglages. */
+  .tabbar:not([hidden]) ~ .app .navm-ico-desk,.hero .navm-ico-desk{display:none}
+  .hero .navm-ico-phone{display:block}
+  .hero #navMenuLabel{display:none}
+  .hero .navm-btn{width:34px;height:34px;padding:0;justify-content:center}
+  .navm-panel .navm-item{display:none}
 }
 @media print{.tabbar{display:none!important}}
 </style>
@@ -1190,8 +1197,9 @@ body:not(.cmp-week) .cmp-cell{height:30px}
           <span id="updateStatus"></span>
         </div>
         <div class="hero-actions">
-          <button id="navMenuBtn" class="navm-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="navMenuPanel">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <button id="navMenuBtn" class="navm-btn" type="button" aria-label="Menu et réglages" aria-haspopup="true" aria-expanded="false" aria-controls="navMenuPanel">
+            <svg class="navm-ico-desk" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            <svg class="navm-ico-phone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
             <span id="navMenuLabel">Individuel</span>
           </button>
         </div>
