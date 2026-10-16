@@ -768,7 +768,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmp-tab{flex:1;padding:10px 0;font-size:12.5px}
   .cmp-nav{order:2;flex:1 0 100%;min-width:0;justify-content:space-between;gap:6px;padding:4px;background:var(--paper);border-radius:12px}
   .cmp-nav .nav-btn{width:40px;height:40px;border:0;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.06)}
-  .cmp-nav strong{flex:1;min-width:0;font-size:13px}
+  .cmp-nav strong{flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .cmp-actions{order:3;flex:1 0 100%;gap:8px}
   .cmp-actions>*{flex:1 1 calc(50% - 4px)}
   .cmp-actions .pv-filter-btn{width:100%;height:40px;justify-content:center;font-size:12px}
@@ -4169,8 +4169,8 @@ function cmpColumns(){
     const mo=d=>d.toLocaleDateString('fr-CH',{month:'short'});
     const range=monday.getMonth()===sunday.getMonth()
       ? `${monday.getDate()}–${sunday.getDate()} ${mo(sunday)}`
-      : `${monday.getDate()} ${mo(monday)} – ${sunday.getDate()} ${mo(sunday)}`;
-    title=`Semaine ${isoWeek(monday)} · ${range} ${sunday.getFullYear()}`;
+      : `${monday.getDate()} ${mo(monday)}–${sunday.getDate()} ${mo(sunday)}`;
+    title=`Sem. ${isoWeek(monday)} · ${range} ${sunday.getFullYear()}`;
   }
   return {kind:'day',title,cols};
 }
