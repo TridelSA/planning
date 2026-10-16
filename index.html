@@ -1650,9 +1650,56 @@ const VD_SCHOOL_HOLIDAYS=[
   ["Vacances d'été",'2031-07-05','2031-08-24']
 ];
 
+// Au-delà (ou avant) la période publiée par l'État de Vaud, les vacances sont
+// ESTIMÉES d'après les règles observées sur les calendriers officiels 2023-2031 :
+//  - automne : du premier samedi dès le 9 octobre, sur 16 jours
+//  - Noël : du samedi qui précède le 25 déc. (le 24 si Noël tombe un ven./sam./dim.), jusqu'au 2e dimanche suivant
+//  - Pâques : du vendredi saint au dimanche 14 jours après Pâques
+//  - Ascension : jeudi + vendredi
+//  - été : 7 semaines, jusqu'au dimanche avant la rentrée (lundi dès le 17 août)
+//  - relâches : semaine du lundi compris entre le 12 et le 18 février (vrai 8 années sur 9 ; décalée d'une semaine en 2027)
+// Dès que l'État de Vaud publie le calendrier suivant, l'ajouter dans VD_SCHOOL_HOLIDAYS.
+const VD_SCHOOL_OFFICIAL_FIRST='2023-01-01',VD_SCHOOL_OFFICIAL_LAST='2031-08-24';
+const _schoolEstCache={};
+function estimateSchoolHolidays(year){
+  if(_schoolEstCache[year])return _schoolEstCache[year];
+  const D=(y,m,d)=>new Date(y,m-1,d,12);
+  const add=(d,n)=>{ const x=new Date(d);x.setDate(x.getDate()+n);return x; };
+  const iso=d=>isoDate(d);
+  const nextDow=(d,dow)=>add(d,(dow-d.getDay()+7)%7);        // 0 = dimanche … 6 = samedi
+  const prevDow=(d,dow)=>add(d,-((d.getDay()-dow+7)%7));
+  const out=[];
+  const easter=easterSunday(year);
+  // Noël de l'année précédente (partie de janvier) et de cette année
+  const xmas=y=>{
+    const c=D(y,12,25),wd=c.getDay();               // 1..4 = lun..jeu
+    if(wd>=1&&wd<=4){ const st=prevDow(c,6); return [iso(st),iso(add(st,15))]; }
+    const st=D(y,12,24), end=nextDow(D(y+1,1,6),0);
+    return [iso(st),iso(end)];
+  };
+  const x0=xmas(year-1),x1=xmas(year);
+  out.push(['Vacances de Noël',x0[0],x0[1]],['Vacances de Noël',x1[0],x1[1]]);
+  const mon7=nextDow(D(year,2,12),1);   // lundi entre le 12 et le 18 février
+  out.push(['Relâches',iso(add(mon7,-2)),iso(add(mon7,6))]);
+  out.push(['Vacances de Pâques',iso(add(easter,-2)),iso(add(easter,14))]);
+  const asc=add(easter,39);
+  out.push(["Pont de l'Ascension",iso(asc),iso(add(asc,1))]);
+  const rentree=nextDow(D(year,8,17),1);
+  out.push(["Vacances d'été",iso(add(rentree,-51)),iso(add(rentree,-1))]);
+  const aut=nextDow(D(year,10,9),6);
+  out.push(["Vacances d'automne",iso(aut),iso(add(aut,15))]);
+  return _schoolEstCache[year]=out;
+}
 function schoolHolidayName(dISO){
   const found=VD_SCHOOL_HOLIDAYS.find(([,start,end])=>dISO>=start && dISO<=end);
-  return found?found[0]:null;
+  if(found)return found[0];
+  if(dISO>=VD_SCHOOL_OFFICIAL_FIRST && dISO<=VD_SCHOOL_OFFICIAL_LAST)return null;
+  const y=Number(dISO.slice(0,4));
+  for(const yy of [y,y+1]){
+    const e=estimateSchoolHolidays(yy).find(([,a,b])=>dISO>=a && dISO<=b);
+    if(e)return e[0];
+  }
+  return null;
 }
 
 function codeMatchesFilter(code){return true;}
