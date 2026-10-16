@@ -4431,14 +4431,8 @@ $('compareViewSection').addEventListener('change',event=>{
     }
   }else if(t.dataset.cmpPerson!==undefined){
     if(t.checked){
+      // La sélection du Comparer est indépendante de la personne du planning individuel.
       cmp.people.add(t.dataset.cmpPerson);
-      // Dernière personne cochée = personne affichée sur les autres pages.
-      const emp=planning.employees.find(e=>presencePersonKey(e)===t.dataset.cmpPerson);
-      if(emp){
-        state.employeeId=emp.id;
-        persistSelectedEmployee(emp);
-        try{ updateEmployeePicker(); }catch(e){ /* ignoré */ }
-      }
     }else cmp.people.delete(t.dataset.cmpPerson);
   }else{
     return;
