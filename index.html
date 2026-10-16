@@ -1173,6 +1173,13 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .hero .navm-btn{width:34px;height:34px;padding:0;justify-content:center}
   .navm-panel .navm-item{display:none}
   .navm-panel .install-btn{padding:7px 9px;margin:5px 6px 2px}
+  /* Bandeau compact : plus de logo, titre à gauche, mise à jour + réglages côte à côte à droite. */
+  .hero .logo{display:none}
+  .hero{min-height:96px;padding:12px 12px}
+  .hero-inner{flex-wrap:nowrap;gap:8px;align-items:center}
+  .hero .update-wrap{flex-direction:row;align-items:center;gap:6px;margin-left:auto}
+  .hero .update-chip{max-width:130px;text-align:right}
+  .hero-actions{flex-wrap:nowrap}
 }
 @media print{.tabbar{display:none!important}}
 </style>
