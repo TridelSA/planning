@@ -738,6 +738,8 @@ body.cmp-week .cmp-day{min-width:0}
 .cmp-cell b{display:block;font:800 13px/1.1 var(--font-display)}
 .cmp-cell small{display:block;margin-top:3px;font:600 9px/1.2 var(--font-body);opacity:.8;padding:0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmp-cell.is-we{opacity:.55}
+[data-cmp-iso]{cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-cmp-iso]:active{filter:brightness(.92)}
 .cmp-cell.is-today{box-shadow:inset 0 0 0 2px var(--ink)}
 body:not(.cmp-week) .cmp-cell{height:30px}
 .cmp-yr{height:22px;min-width:15px;width:15px}
@@ -932,7 +934,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .status-box.error{color:var(--danger);background:var(--danger-bg);border:1px solid var(--danger-line);border-radius:var(--radius-md);line-height:1.5}
 #noEmployeeState{padding:40px 20px}
 #noEmployeeState p{margin:0 0 16px;font:700 13px/1.5 var(--font-body);color:var(--ink-soft)}
-#noEmployeeStateBtn{margin:0 auto}
 .status-warning{color:var(--warn-ink);background:var(--warn-bg);border-radius:8px;padding:4px 8px;font-size:9px;font-weight:800}
 
 /* ==========================================================
@@ -1290,7 +1291,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
     <div id="planningUI" class="hidden">
       <div id="noEmployeeState" class="status-box hidden">
         <p>Choisis ton nom pour afficher ton planning.</p>
-        <button id="noEmployeeStateBtn" class="today-btn" type="button">Choisir une personne</button>
       </div>
 
       <div id="employeeContent">
@@ -3329,6 +3329,16 @@ function openDayModal(dateObj,employee=selectedEmployee()){
   $('dayModalBackdrop').classList.toggle('is-team-day',false);$('dayModalBackdrop').classList.add('open');
 }
 
+// Comparer (semaine) : toucher une case ouvre le détail du jour (code, remarque, avec qui).
+function openCmpDay(el){
+  const emp=cmpGroupsOrdered().flatMap(g=>g.people).find(e=>presencePersonKey(e)===el.dataset.cmpKey);
+  if(!emp)return;
+  const [y,m,d]=el.dataset.cmpIso.split('-').map(Number);
+  openDayModal(new Date(y,m-1,d),emp);
+}
+$('cmpGrid').addEventListener('click',e=>{ const el=e.target.closest('[data-cmp-iso]'); if(el)openCmpDay(el); });
+$('cmpGrid').addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' ')return; const el=e.target.closest('[data-cmp-iso]'); if(el){ e.preventDefault(); openCmpDay(el); } });
+
 function closeDayModal(){ $('dayModalBackdrop').classList.remove('open'); $('dayModalBackdrop').classList.remove('is-team-day'); }
 $('dayModalClose').addEventListener('click',closeDayModal);
 $('dayModalBackdrop').addEventListener('click',e=>{ if(e.target===$('dayModalBackdrop'))closeDayModal(); });
@@ -4235,7 +4245,8 @@ function cmpCardsHTML(view,groups){
         for(let i=0;i<lead;i++)h+='<span></span>';
         h+=view.cols.map(c=>{
           const d=cmpDayInfo(emp,c);
-          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"><small>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
+          const tap=cmp.scale==='week'?` data-cmp-key="${escapeHTML(presencePersonKey(emp))}" data-cmp-iso="${c.iso}" role="button" tabindex="0"`:'';
+          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"${tap}><small>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
         }).join('');
         h+='</div>';
       }
@@ -4323,7 +4334,8 @@ function renderCompareView(){
       const wide=cmp.scale==='week';
       h+=view.cols.map(c=>{
         const d=cmpDayInfo(emp,c);
-        return `<td class="cmp-cell ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"><b>${escapeHTML(d.code)}</b>${wide&&d.code&&d.info?`<small>${escapeHTML(d.info[0])}</small>`:''}</td>`;
+        const tap=wide?` data-cmp-key="${escapeHTML(presencePersonKey(emp))}" data-cmp-iso="${c.iso}" role="button" tabindex="0"`:'';
+        return `<td class="cmp-cell ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"${tap}><b>${escapeHTML(d.code)}</b>${wide&&d.code&&d.info?`<small>${escapeHTML(d.info[0])}</small>`:''}</td>`;
       }).join('');
       h+='</tr>';
     }
@@ -5571,7 +5583,6 @@ $('employeePickerButton').addEventListener('click',()=>{
 });
 
 $('employeeBackdrop').addEventListener('click',event=>{ event.stopPropagation(); closeEmployeePicker(); });
-if($('noEmployeeStateBtn'))$('noEmployeeStateBtn').addEventListener('click',openEmployeePicker);
 
 $('employeeSearch').addEventListener('input',event=>{
   const query=event.target.value;
