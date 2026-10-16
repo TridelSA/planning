@@ -1157,21 +1157,22 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .pv-saved-x:hover{color:var(--ink)}
 .pv-save{border-style:dashed;color:var(--accent-ink)}
 @media (max-width:700px){
-  .tabbar:not([hidden]){display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;gap:4px;
-    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));
+  .tabbar:not([hidden]){display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;gap:2px;
+    padding:3px 8px calc(3px + env(safe-area-inset-bottom,0px));
     background:color-mix(in srgb,var(--surface) 94%,transparent);
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line-strong)}
-  .tabbar-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--muted);
-    font:700 10px/1.1 var(--font-body);padding:7px 2px 6px;border-radius:12px;min-width:0}
-  .tabbar-btn svg{width:22px;height:22px}
+  .tabbar-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:transparent;color:var(--muted);
+    font:700 9.5px/1.1 var(--font-body);padding:5px 2px 4px;border-radius:10px;min-width:0}
+  .tabbar-btn svg{width:19px;height:19px}
   .tabbar-btn.is-active{color:var(--accent-ink);background:var(--accent-tint)}
-  .app{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+  .app{padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
   /* La barre du bas gère déjà les pages : le bouton du bandeau ne garde que les réglages. */
   .tabbar:not([hidden]) ~ .app .navm-ico-desk,.hero .navm-ico-desk{display:none}
   .hero .navm-ico-phone{display:block}
   .hero #navMenuLabel{display:none}
   .hero .navm-btn{width:34px;height:34px;padding:0;justify-content:center}
   .navm-panel .navm-item{display:none}
+  .navm-panel .install-btn{padding:7px 9px;margin:5px 6px 2px}
 }
 @media print{.tabbar{display:none!important}}
 </style>
