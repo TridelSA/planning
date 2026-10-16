@@ -4081,8 +4081,10 @@ function renderCompareView(){
     return;
   }
 
-  const colW=cmp.scale==='week'?104:36;
-  let h=`<table class="cmp-table" style="width:${190+view.cols.length*(colW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>`<col style="width:${colW}px">`).join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
+  // La table occupe toute la largeur disponible ; les colonnes de jours se
+  // partagent l'espace à parts égales (largeur minimale = défilement horizontal).
+  const minW=cmp.scale==='week'?96:34;
+  let h=`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
   h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.today?'is-today':''}"><span>${c.name}</span><b>${c.num}</b></th>`).join('');
   h+='</tr></thead><tbody>';
   for(const group of groups){
