@@ -3104,6 +3104,19 @@ function downloadCalendarICS(ev){
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
+// Android : Google Agenda n'importe pas les fichiers .ics, on ouvre donc
+// directement la fiche « nouvel événement » de Google Agenda (appli ou web).
+const isAndroid=()=>/android/i.test(navigator.userAgent);
+function openGoogleCalendar(ev){
+  const data=calendarEventData(ev);
+  const dates=data.allDay
+    ? `${calendarDateOnly(data.start)}/${calendarDateOnly(data.end)}`
+    : `${calendarLocalDateTime(data.start)}/${calendarLocalDateTime(data.end)}`;
+  const params=new URLSearchParams({action:'TEMPLATE',text:data.title,dates,details:data.description,ctz:'Europe/Zurich'});
+  if(data.location)params.set('location',data.location);
+  window.open(`https://calendar.google.com/calendar/render?${params.toString()}`,'_blank','noopener');
+}
+
 function openOutlookCalendar(ev){
   const data=calendarEventData(ev);
 
@@ -3152,7 +3165,9 @@ function addUpcomingEventToCalendar(index){
 
   calendarButtonFeedback(index);
 
-  if(isMobileCalendarDevice()){
+  if(isAndroid()){
+    openGoogleCalendar(ev);
+  }else if(isMobileCalendarDevice()){
     downloadCalendarICS(ev);
   }else{
     openOutlookCalendar(ev);
@@ -3190,7 +3205,9 @@ function addTravauxToCalendar(){
     },1300);
   }
 
-  if(isMobileCalendarDevice()){
+  if(isAndroid()){
+    openGoogleCalendar(ev);
+  }else if(isMobileCalendarDevice()){
     downloadCalendarICS(ev);
   }else{
     openOutlookCalendar(ev);
@@ -3679,7 +3696,7 @@ window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredI
 window.addEventListener('appinstalled',()=>{ deferredInstall=null; updateTeamToggleLabel(); });
 function installHTML(){
   if(isStandalone())return '';
-  if(!deferredInstall&&!isIOS())return '';
+  if(!deferredInstall&&!isIOS()&&!/android/i.test(navigator.userAgent))return '';
   return `<button type="button" class="install-btn" data-install><span style="font-size:18px;line-height:1">＋</span><span>Installer l'appli<small>Ajouter le planning à l'écran d'accueil</small></span></button><div id="installHint" class="install-hint hidden"></div>`;
 }
 function themeSegHTML(){
@@ -3731,7 +3748,8 @@ $('navMenuPanel').addEventListener('click',async event=>{
       deferredInstall=null; closeNavMenu(); updateTeamToggleLabel();
     }else{
       const h=$('installHint');
-      if(h){ h.innerHTML="Dans Safari, appuie sur <b>le menu</b> (les trois traits ou points en bas de l'écran), puis sur <b>Partager</b>, puis sur <b>« Sur l'écran d'accueil »</b>."; h.classList.toggle('hidden'); }
+      if(h&&/android/i.test(navigator.userAgent)){ h.innerHTML="Ouvre le menu du navigateur (<b>⋮</b> en haut à droite), puis appuie sur <b>« Installer l'application »</b> ou <b>« Ajouter à l'écran d'accueil »</b>."; h.classList.toggle('hidden'); }
+      else if(h){ h.innerHTML="Dans Safari, appuie sur <b>le menu</b> (les trois traits ou points en bas de l'écran), puis sur <b>Partager</b>, puis sur <b>« Sur l'écran d'accueil »</b>."; h.classList.toggle('hidden'); }
     }
     return;
   }
@@ -3873,7 +3891,7 @@ function setPage(page){
   if(alternate){
     if($('upcomingEventsCard'))$('upcomingEventsCard').classList.add('hidden');
   }
-  // « En poste / Ensuite » : affiché tout de suite sur Individuel et Comparer.
+  // « En poste / Ensuite » : affiché tout de suite sur Individuel, masqué ailleurs.
   renderRotationWidget();
   const mainCard=document.querySelector('main.main-card');
   if(mainCard)mainCard.classList.toggle('hidden',alternate);
@@ -5250,9 +5268,15 @@ function rotationBlockData(pointer){
 function renderRotationWidget(){
   const card=$('rotationCard');
   if(!card)return;
-  // Visible seulement sur Individuel et Comparer (jamais par surprise ailleurs).
-  const pg=typeof currentPage==='function'?currentPage():'individual';
-  if(!planning.employees.length || (pg!=='individual' && pg!=='compare')){ card.classList.add('hidden'); return; }
+  // Visible seulement sur Individuel (jamais ailleurs, même après rafraîchissement).
+  let pg=typeof currentPage==='function'?currentPage():'individual';
+  // Avant la restauration de la page au chargement : on se fie à la page mémorisée,
+  // pour ne pas faire clignoter le bandeau après un rafraîchissement.
+  if(typeof pageRestored!=='undefined' && !pageRestored){
+    try{ const sv=localStorage.getItem(PAGE_KEY); if(sv&&sv!=='individual')pg=sv; }catch(e){ /* ignoré */ }
+    if(/[#&]p=(?!individual)/.test(location.hash))pg='other';
+  }
+  if(!planning.employees.length || pg!=='individual'){ card.classList.add('hidden'); return; }
 
   const now=currentShiftPointer();
   const next=nextShiftPointer(now);
