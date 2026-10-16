@@ -177,6 +177,8 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
   outline:2px solid var(--accent);outline-offset:2px;
 }
 .app{max-width:1120px;margin:auto;padding:16px}
+.app.app-anim{transition:max-width .55s cubic-bezier(.22,1,.36,1)}
+@media (prefers-reduced-motion:reduce){.app.app-anim{transition:none}}
 .hidden{display:none!important}
 
 /* ==========================================================
@@ -3616,8 +3618,48 @@ function restoreSavedPage(){
 
 updateTeamToggleLabel();
 
+let pageAnimReady=false;
+setTimeout(()=>{ pageAnimReady=true; },1200);
+// Transition douce entre onglets : la page s'élargit / se rétrécit, et le
+// contenu glisse + apparaît en fondu depuis le côté de l'onglet choisi.
+function pageTransitionStart(prev,page){
+  if(!pageAnimReady||prev===page)return null;
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return null;
+  const app=document.querySelector('.app');
+  if(!app||!app.animate)return null;
+  app.classList.add('app-anim');
+  clearTimeout(pageTransitionStart.t);
+  pageTransitionStart.t=setTimeout(()=>{
+    app.classList.remove('app-anim');
+    const st=document.getElementById('heroArtStage');
+    if(st&&heroFocusReady)st.style.transform=heroArtTransform(heroFocusCurrent||'full');
+  },640);
+  return {app,prev,page};
+}
+function pageTransitionRun(t){
+  if(!t)return;
+  const order=NAV_PAGES.map(p=>p.id);
+  const dir=order.indexOf(t.page)>=order.indexOf(t.prev)?1:-1;
+  const dx=(innerWidth<=700?22:44)*dir;
+  const els=[...t.app.children].filter(el=>!el.classList.contains('hero')&&!el.classList.contains('hidden')&&el.offsetParent!==null&&el.tagName!=='SCRIPT');
+  els.forEach((el,i)=>{
+    el.animate(
+      [{opacity:0,transform:`translateX(${dx}px) scale(.985)`,transformOrigin:'50% 0'},
+       {opacity:1,transform:'none',transformOrigin:'50% 0'}],
+      {duration:480,delay:i*50,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+  });
+  // Pendant l'élargissement, on recale l'illustration du bandeau à chaque image.
+  const t0=performance.now(),key=heroFocusCurrent;
+  const stage=document.getElementById('heroArtStage');
+  (function tick(){
+    if(!stage||!heroFocusReady||performance.now()-t0>640)return;
+    if(heroFocusKey()===key&&!stage.classList.contains('is-anim'))stage.style.transform=heroArtTransform(key);
+    requestAnimationFrame(tick);
+  })();
+}
 function setPage(page){
   if(page!=='individual' && (!planning.employees || !planning.employees.length))return;
+  const pageTrans=pageTransitionStart(currentPage(),page);
   state.teamMode=page==='team';
   state.compareMode=page==='compare';
   state.statsMode=page==='stats';
@@ -3647,6 +3689,7 @@ function setPage(page){
   updateTeamToggleLabel();
   try{ localStorage.setItem(PAGE_KEY,page); }catch(e){ /* stockage indisponible */ }
   render();
+  pageTransitionRun(pageTrans);
 }
 
 function toggleTeamView(){ setPage(state.teamMode?'individual':'team'); }
