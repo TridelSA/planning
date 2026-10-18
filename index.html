@@ -3704,7 +3704,7 @@ const NAV_PAGES=[
 // « Équipe » (rotations par poste + comparer par personne).
 const NAV_GROUPS=[
   {id:'me',label:'Mon planning',desc:'Planning et statistiques',pages:['individual','stats']},
-  {id:'team',label:'Équipe',desc:'Rotations par poste ou comparer des personnes',pages:['team','compare']}
+  {id:'team',label:'Équipe',desc:'Rotations ou comparer des personnes',pages:['team','compare']}
 ];
 NAV_GROUPS[0].icon=NAV_PAGES[0].icon;
 NAV_GROUPS[1].icon=NAV_PAGES[2].icon;
@@ -5784,7 +5784,7 @@ function tabBarSync(){
 // --- Sélecteurs de page : « Planning | Statistiques » et « Par poste | Par personne » ---
 (function(){
   const mk=(items,active)=>`<div class="seg" role="tablist">${items.map(([id,l])=>`<button type="button" role="tab" aria-selected="${id===active}" class="seg-btn ${id===active?'is-on':''}" data-go="${id}">${l}</button>`).join('')}</div>`;
-  const ME=[['individual','Planning'],['stats','Statistiques']],TEAM=[['team','Par poste'],['compare','Par personne']];
+  const ME=[['individual','Planning'],['stats','Statistiques']],TEAM=[['team','Par rotation'],['compare','Par personne']];
   const put=(sel,html)=>{ const el=document.querySelector(sel); if(el)el.innerHTML=html; };
   put('#teamViewSection .team-view-title',mk(TEAM,'team'));
   put('#compareViewSection .team-view-title',mk(TEAM,'compare'));
