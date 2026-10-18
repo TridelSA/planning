@@ -1188,6 +1188,28 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media (max-width:380px){
   .hero h1{font-size:16px}
 }
+
+/* ---------- Refonte : sélecteurs de page, barre du bas à 3 entrées ---------- */
+.seg{display:flex;gap:3px;padding:3px;background:var(--paper);border-radius:12px;max-width:340px}
+.seg-btn{flex:1;white-space:nowrap;border:0;background:transparent;color:var(--muted);font:700 12.5px/1 var(--font-body);padding:9px 12px;border-radius:9px;cursor:pointer}
+.seg-btn.is-on{background:var(--surface);color:var(--accent-ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.seg-wrap{margin:0 0 10px}
+.team-view-title .seg{margin:0}
+@media (max-width:700px){
+  .seg{max-width:none}
+  #navMenuBtn{display:none}
+  .tabbar-btn{min-width:0}
+  body.team-mode .rotation-item-next,body.team-mode .rotation-sep,
+  body.compare-mode .rotation-item-next,body.compare-mode .rotation-sep{display:none}
+  body.compare-mode .cmp-bar{gap:6px;margin-bottom:6px}
+  body.compare-mode .cmp-tab{padding:8px 0;font-size:12px}
+  body.compare-mode .cmp-nav .nav-btn{width:34px;height:34px}
+  body.compare-mode .cmp-actions .pv-filter-btn{height:34px}
+  body.compare-mode .cmp-groups .pv-chip{height:28px}
+  .cmpm-card{padding:5px 10px 7px}
+  .cmpm-name{margin-bottom:3px}
+  .cmpm-days.is-week .cmpm-day{min-height:38px}
+}
 @media print{.tabbar{display:none!important}}
 </style>
 </head>
@@ -3678,6 +3700,17 @@ const NAV_PAGES=[
   {id:'stats',label:'Statistiques',desc:'Mes rotations, piquets, congés, absences',
    icon:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'}
 ];
+// Regroupement de l'interface : « Mon planning » (planning + statistiques) et
+// « Équipe » (rotations par poste + comparer par personne).
+const NAV_GROUPS=[
+  {id:'me',label:'Mon planning',desc:'Planning et statistiques',pages:['individual','stats']},
+  {id:'team',label:'Équipe',desc:'Rotations par poste ou comparer des personnes',pages:['team','compare']}
+];
+NAV_GROUPS[0].icon=NAV_PAGES[0].icon;
+NAV_GROUPS[1].icon=NAV_PAGES[2].icon;
+var lastInGroup={me:'individual',team:'team'};
+function groupOf(page){ return NAV_GROUPS.find(g=>g.pages.includes(page))||NAV_GROUPS[0]; }
+
 const PAGE_KEY='planningPage';
 
 // ---- Thème : Auto (suit l'appareil) / Clair / Sombre -------------------
@@ -3710,13 +3743,15 @@ window.addEventListener('afterprint',applyTheme);
 
 function updateTeamToggleLabel(){
   const page=currentPage();
-  const current=NAV_PAGES.find(x=>x.id===page)||NAV_PAGES[0];
-  $('navMenuLabel').textContent=current.label;
-  $('navMenuPanel').innerHTML=NAV_PAGES.map(x=>`<button type="button" class="navm-item ${x.id===page?'is-active':''}" role="menuitem" data-nav-page="${x.id}">
-    <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.icon}</svg></span>
-    <span class="navm-txt"><b>${x.label}</b><small>${x.desc}</small></span>
-    ${x.id===page?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
-  </button>`).join('')+themeSegHTML()+shareHTML()+installHTML();
+  const grp=groupOf(page);
+  $('navMenuLabel').textContent=grp.label;
+  $('navMenuPanel').innerHTML=NAV_GROUPS.map(g=>{
+    const on=g.id===grp.id;
+    return `<button type="button" class="navm-item ${on?'is-active':''}" role="menuitem" data-nav-page="${on?g.pages[0]:lastInGroup[g.id]}">
+    <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g.icon}</svg></span>
+    <span class="navm-txt"><b>${g.label}</b><small>${g.desc}</small></span>
+    ${on?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
+  </button>`;}).join('')+themeSegHTML()+shareHTML()+installHTML();
   const subtitle=$('heroSubtitle');
   if(subtitle){
     subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
@@ -3727,13 +3762,24 @@ function openNavMenu(){
   const btn=$('navMenuBtn'),panel=$('navMenuPanel');
   const r=btn.getBoundingClientRect();
   panel.classList.remove('hidden');
-  panel.style.top=`${Math.round(r.bottom+8)}px`;
-  panel.style.right=`${Math.max(10,Math.round(window.innerWidth-r.right))}px`;
+  if(window.innerWidth<=700){
+    // Téléphone : volet au-dessus de la barre d'onglets.
+    const tb=document.getElementById('tabBar');
+    const h=tb&&!tb.hidden?tb.getBoundingClientRect().height:0;
+    panel.style.top='auto';panel.style.left='10px';panel.style.width='auto';
+    panel.style.right='10px';panel.style.bottom=`${Math.round(h+8)}px`;
+  }else{
+    panel.style.bottom='auto';panel.style.left='auto';panel.style.width='';
+    panel.style.top=`${Math.round(r.bottom+8)}px`;
+    panel.style.right=`${Math.max(10,Math.round(window.innerWidth-r.right))}px`;
+  }
   btn.setAttribute('aria-expanded','true');
+  const st=document.getElementById('tabSettings');if(st)st.setAttribute('aria-expanded','true');
 }
 function closeNavMenu(){
   $('navMenuPanel').classList.add('hidden');
   $('navMenuBtn').setAttribute('aria-expanded','false');
+  const st=document.getElementById('tabSettings');if(st)st.setAttribute('aria-expanded','false');
 }
 $('navMenuBtn').addEventListener('click',event=>{
   event.stopPropagation();
@@ -3888,6 +3934,7 @@ function setPage(page){
 
   const controls=document.querySelector('.controls');
   if(controls)controls.classList.toggle('hidden',alternate);
+  lastInGroup[groupOf(page).id]=page;
   if(alternate){
     if($('upcomingEventsCard'))$('upcomingEventsCard').classList.add('hidden');
   }
@@ -4988,6 +5035,7 @@ window.addEventListener('resize',()=>{ if(heroFocusReady)updateHeroFocus(true); 
 
 function render(){
   updateHeroFocus();
+  try{ renderRotationWidget(); }catch(e){ /* ignoré */ }
   if(state.statsMode){ renderStatsView(); return; }
   if(state.compareMode){
     document.body.classList.toggle('cmp-week',cmp.scale==='week');
@@ -5274,9 +5322,10 @@ function renderRotationWidget(){
   // pour ne pas faire clignoter le bandeau après un rafraîchissement.
   if(typeof pageRestored!=='undefined' && !pageRestored){
     try{ const sv=localStorage.getItem(PAGE_KEY); if(sv&&sv!=='individual')pg=sv; }catch(e){ /* ignoré */ }
-    if(/[#&]p=(?!individual)/.test(location.hash))pg='other';
+    if(/[#&]p=stats/.test(location.hash))pg='stats';
   }
-  if(!planning.employees.length || pg!=='individual'){ card.classList.add('hidden'); return; }
+  // Visible sur Mon planning et Équipe ; masqué sur les statistiques.
+  if(!planning.employees.length || pg==='stats' || pg==='presence'){ card.classList.add('hidden'); return; }
 
   const now=currentShiftPointer();
   const next=nextShiftPointer(now);
@@ -5697,29 +5746,56 @@ window.addEventListener('popstate',e=>{
   try{ if(st.page!==currentPage())setPage(st.page); }finally{ histPopping=false; }
 });
 
-// --- Barre d'onglets (téléphone) ---
+// --- Barre d'onglets (téléphone) : Mon planning · Équipe · Réglages ---
 (function(){
   const nav=document.createElement('nav');
   nav.id='tabBar';nav.className='tabbar';nav.hidden=true;
-  nav.setAttribute('aria-label','Pages');
-  nav.innerHTML=NAV_PAGES.map(x=>`<button type="button" class="tabbar-btn" data-tab-page="${x.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${x.icon}</svg><span>${x.label}</span></button>`).join('');
+  nav.setAttribute('aria-label','Navigation');
+  const ico=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  nav.innerHTML=NAV_GROUPS.map(g=>`<button type="button" class="tabbar-btn" data-tab-group="${g.id}">${ico(g.icon)}<span>${g.label}</span></button>`).join('')
+    +`<button type="button" class="tabbar-btn" id="tabSettings" aria-haspopup="true" aria-expanded="false">${ico('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>')}<span>Réglages</span></button>`;
   document.body.appendChild(nav);
   nav.addEventListener('click',e=>{
-    const b=e.target.closest('[data-tab-page]');
-    if(b&&b.dataset.tabPage!==currentPage())setPage(b.dataset.tabPage);
+    const st=e.target.closest('#tabSettings');
+    if(st){
+      e.stopPropagation();
+      if($('navMenuPanel').classList.contains('hidden'))openNavMenu(); else closeNavMenu();
+      return;
+    }
+    const b=e.target.closest('[data-tab-group]');
+    if(!b)return;
+    const g=NAV_GROUPS.find(x=>x.id===b.dataset.tabGroup);
+    const cur=currentPage();
+    setPage(g.pages.includes(cur)?g.pages[0]:lastInGroup[g.id]);
   });
 })();
 function tabBarSync(){
   const nav=document.getElementById('tabBar');
   if(!nav)return;
   nav.hidden=!(planning&&planning.employees&&planning.employees.length);
-  const page=currentPage();
-  nav.querySelectorAll('[data-tab-page]').forEach(b=>{
-    const on=b.dataset.tabPage===page;
+  const gid=groupOf(currentPage()).id;
+  nav.querySelectorAll('[data-tab-group]').forEach(b=>{
+    const on=b.dataset.tabGroup===gid;
     b.classList.toggle('is-active',on);
     if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
   });
 }
+
+// --- Sélecteurs de page : « Planning | Statistiques » et « Par poste | Par personne » ---
+(function(){
+  const mk=(items,active)=>`<div class="seg" role="tablist">${items.map(([id,l])=>`<button type="button" role="tab" aria-selected="${id===active}" class="seg-btn ${id===active?'is-on':''}" data-go="${id}">${l}</button>`).join('')}</div>`;
+  const ME=[['individual','Planning'],['stats','Statistiques']],TEAM=[['team','Par poste'],['compare','Par personne']];
+  const put=(sel,html)=>{ const el=document.querySelector(sel); if(el)el.innerHTML=html; };
+  put('#teamViewSection .team-view-title',mk(TEAM,'team'));
+  put('#compareViewSection .team-view-title',mk(TEAM,'compare'));
+  put('#statsViewSection .team-view-title',mk(ME,'stats'));
+  const ctl=document.querySelector('section.controls');
+  if(ctl){ const w=document.createElement('div'); w.className='seg-wrap'; w.innerHTML=mk(ME,'individual'); ctl.insertBefore(w,ctl.firstChild); }
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-go]');
+    if(b&&b.dataset.go!==currentPage())setPage(b.dataset.go);
+  });
+})();
 
 // --- Raccourcis clavier (ordinateur) ---
 document.addEventListener('keydown',e=>{
