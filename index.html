@@ -1199,8 +1199,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .seg{max-width:none}
   #navMenuBtn{display:none}
   .tabbar-btn{min-width:0}
-  body.team-mode .rotation-item-next,body.team-mode .rotation-sep,
-  body.compare-mode .rotation-item-next,body.compare-mode .rotation-sep{display:none}
   body.compare-mode .cmp-bar{gap:6px;margin-bottom:6px}
   body.compare-mode .cmp-tab{padding:8px 0;font-size:12px}
   body.compare-mode .cmp-nav .nav-btn{width:34px;height:34px}
@@ -5330,7 +5328,7 @@ function renderRotationWidget(){
     if(/[#&]p=stats/.test(location.hash))pg='stats';
   }
   // Visible sur Mon planning et Équipe ; masqué sur les statistiques.
-  if(!planning.employees.length || pg==='stats' || pg==='presence'){ card.classList.add('hidden'); return; }
+  if(!planning.employees.length){ card.classList.add('hidden'); return; }
 
   const now=currentShiftPointer();
   const next=nextShiftPointer(now);
