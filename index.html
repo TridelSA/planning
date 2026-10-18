@@ -3712,6 +3712,9 @@ const NAV_GROUPS=[
 NAV_GROUPS[0].icon=NAV_PAGES[0].icon;
 NAV_GROUPS[1].icon=NAV_PAGES[2].icon;
 var lastInGroup={me:'individual',team:'team'};
+try{ const li=JSON.parse(localStorage.getItem('planningLastInGroup')||'{}');
+  if(NAV_GROUPS[0].pages.includes(li.me))lastInGroup.me=li.me;
+  if(NAV_GROUPS[1].pages.includes(li.team))lastInGroup.team=li.team; }catch(e){ /* ignoré */ }
 function groupOf(page){ return NAV_GROUPS.find(g=>g.pages.includes(page))||NAV_GROUPS[0]; }
 
 const PAGE_KEY='planningPage';
@@ -3938,6 +3941,7 @@ function setPage(page){
   const controls=document.querySelector('.controls');
   if(controls)controls.classList.toggle('hidden',alternate);
   lastInGroup[groupOf(page).id]=page;
+  try{ localStorage.setItem('planningLastInGroup',JSON.stringify(lastInGroup)); }catch(e){ /* ignoré */ }
   if(alternate){
     if($('upcomingEventsCard'))$('upcomingEventsCard').classList.add('hidden');
   }
