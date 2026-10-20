@@ -1201,3 +1201,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 
 /* Trait dégradé tout en haut de l'en-tête : retiré (un seul dégradé dans l'ensemble) */
 .hero-stripe{display:none}
+
+.no-emp-import{margin:8px 0 0}
+.link-btn{border:0;background:none;color:var(--accent-ink);font:700 13px/1.2 var(--font-body);text-decoration:underline;cursor:pointer;padding:6px}

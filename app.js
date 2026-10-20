@@ -2288,7 +2288,7 @@ function updateTeamToggleLabel(){
     <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g.icon}</svg></span>
     <span class="navm-txt"><b>${g.label}</b><small>${g.desc}</small></span>
     ${on?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
-  </button>`;}).join('')+themeSegHTML()+shareHTML()+installHTML();
+  </button>`;}).join('')+themeSegHTML()+shareHTML()+profileHTML()+installHTML();
   const subtitle=$('heroSubtitle');
   if(subtitle){
     subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
@@ -2324,6 +2324,8 @@ $('navMenuBtn').addEventListener('click',event=>{
 });
 $('navMenuPanel').addEventListener('click',async event=>{
   if(event.target.closest('[data-share-link]')){ shareCurrentView(); return; }
+  if(event.target.closest('[data-profile-export]')){ profileExport(); return; }
+  if(event.target.closest('[data-profile-import]')){ profileImport(); return; }
   if(event.target.closest('[data-install]')){
     if(deferredInstall){
       deferredInstall.prompt();
@@ -4469,3 +4471,35 @@ $('cmpGroups').addEventListener('click',e=>{
   if(i>=0)a[i]=entry;else a.push(entry);
   cmpSavedStore(a); renderCompareView();
 });
+
+// --- Code profil : transférer personne, groupes et apparence vers un autre appareil ou
+// vers l'application installée (qui a sa propre mémoire, vide au départ).
+const PROFILE_KEYS=['planningEmployee','planningEmployeeName','cmpSavedGroups','compareState','themeMode','planningLastInGroup'];
+function profileHTML(){
+  return `<button type="button" class="install-btn share-btn" data-profile-export><span style="font-size:16px;line-height:1">👤</span><span>Copier mon code profil<small>Ma personne, mes groupes, l'apparence</small></span></button>`
+   +`<button type="button" class="install-btn share-btn" data-profile-import><span style="font-size:16px;line-height:1">📥</span><span>Importer un code profil<small>À coller ici depuis l'autre appareil</small></span></button><div id="profileHint" class="install-hint hidden"></div>`;
+}
+function profileSay(t){ const h=document.getElementById('profileHint'); if(h){ h.textContent=t; h.classList.remove('hidden'); } }
+function profileEncode(){
+  const o={};
+  for(const k of PROFILE_KEYS){ try{ const v=localStorage.getItem(k); if(v!=null)o[k]=v; }catch(e){ /* ignoré */ } }
+  return 'TRIDEL:'+btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/,'');
+}
+async function profileExport(){
+  const code=profileEncode();
+  try{ await navigator.clipboard.writeText(code); profileSay('Code copié ✓ — colle-le dans l\'autre appareil (Importer un code profil).'); }
+  catch(e){ prompt('Copie ce code :',code); }
+}
+function profileImport(text){
+  let code=typeof text==='string'?text:prompt('Colle ici ton code profil :');
+  if(!code)return;
+  try{
+    code=code.trim().replace(/^.*?(TRIDEL:)/s,'$1');
+    if(!code.startsWith('TRIDEL:'))throw new Error('format');
+    const o=JSON.parse(decodeURIComponent(escape(atob(code.slice(7)))));
+    for(const k of PROFILE_KEYS){ if(typeof o[k]==='string')localStorage.setItem(k,o[k]); }
+    localStorage.setItem('compareSelV','2');
+    location.reload();
+  }catch(e){ profileSay('Code non reconnu. Copie-le à nouveau depuis l\'autre appareil.'); if(typeof text!=='string')alert('Code non reconnu.'); }
+}
+document.addEventListener('click',e=>{ if(e.target.closest('.no-emp-import [data-profile-import]'))profileImport(); });
