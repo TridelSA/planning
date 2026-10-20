@@ -365,11 +365,11 @@ select:focus-visible,a:focus-visible,summary:focus-visible,[role="tab"]:focus-vi
    ========================================================== */
 .rotation-strip{
   display:none;align-items:center;flex-wrap:wrap;gap:5px 12px;
-  margin-bottom:10px;padding:0;gap:6px;
+  margin-bottom:10px;padding:6px 12px;border-radius:10px;
+  background:linear-gradient(155deg,var(--rotation-tint,var(--signal-tint)),var(--rotation-tint-next,var(--surface)));
 }
 .rotation-strip:not(.hidden){display:flex}
-.rotation-item{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;flex:1 1 260px;padding:6px 12px;border-radius:10px;
-  background:linear-gradient(155deg,var(--rotation-tint,var(--signal-tint)),var(--surface) 82%)}
+.rotation-item{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
 .rotation-tag{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;font:800 8.5px/1 var(--font-body);letter-spacing:.04em;text-transform:uppercase;color:var(--signal-ink)}
 .rotation-dot{width:5px;height:5px;flex:0 0 auto;border-radius:50%;background:var(--signal)}
 .rotation-item-next .rotation-tag{color:var(--ink-soft)}
@@ -377,7 +377,7 @@ select:focus-visible,a:focus-visible,summary:focus-visible,[role="tab"]:focus-vi
 .rotation-chip{flex:0 0 auto;padding:1px 6px;border-radius:5px;font:800 9.5px/1.5 var(--font-body)}
 .rotation-names{min-width:0;font:500 10.5px/1.4 var(--font-body);color:var(--muted)}
 .rotation-empty{font-style:italic}
-.rotation-sep{display:none}
+.rotation-sep{width:1px;align-self:stretch;flex:0 0 auto;background:var(--rotation-sep);margin:1px 0}
 
 /* ==========================================================
    Prochains événements
@@ -1003,8 +1003,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .today-btn{height:44px;padding:0 12px;font-size:11px}
   .employee-picker-button{min-height:44px}
 
-  .rotation-strip{padding:0;gap:4px;flex-direction:column;align-items:stretch}
-  .rotation-item{flex:0 0 auto;padding:6px 10px}
+  .rotation-strip{padding:6px 10px;gap:4px 9px}
   .rotation-sep{display:none}
 
   .upcoming-card{padding:10px}
