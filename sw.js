@@ -2,7 +2,7 @@
 // Réseau d'abord (les données et le code restent toujours à jour) ;
 // la copie en cache ne sert que si le réseau est indisponible.
 const CACHE='planning-shell-v1';
-const SHELL=['./','index.html','style.css','app.js','manifest.json','icon-192-v5.png'];
+const SHELL=['./','index.html','style.css','app.js','manifest.json','icon-192-v6.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).catch(()=>{}).then(()=>self.skipWaiting()));
 });
