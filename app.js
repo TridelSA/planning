@@ -498,6 +498,20 @@ async function loadPlanning(preserve=true){
       throw new Error('Aucun employé visible n’a été publié.');
     }
 
+    // Garde-fou : un export qui perd d'un coup une grande part des employés
+    // ou des dates est probablement cassé -> on garde la version précédente.
+    {
+      let ref=null;
+      if(planning.employees&&planning.employees.length)ref={e:planning.employees.length,d:planning.dateCount};
+      else{ const c=loadCachedPlanning(); if(c&&c.employees.length)ref={e:c.employees.length,d:c.dateCount}; }
+      if(ref&&ref.e>=10&&next.employees.length<ref.e*0.7){
+        throw new Error(`Données suspectes : ${next.employees.length} employés au lieu de ${ref.e}.`);
+      }
+      if(ref&&ref.d>=100&&next.dateCount<ref.d*0.8){
+        throw new Error(`Données suspectes : ${next.dateCount} dates au lieu de ${ref.d}.`);
+      }
+    }
+
     const rawText=JSON.stringify(valid.map(v=>v.raw));
 
     // Copie de secours pour un accès hors-ligne ultérieur (uniquement une fois validée).
@@ -568,8 +582,26 @@ async function loadPlanning(preserve=true){
     }
 
     showError(error);
+  }finally{
+    try{ updateOfflineBadge(); }catch(e){ /* ignoré */ }
   }
 }
+
+// Indique discrètement quand l'appareil n'a pas de réseau : les données
+// affichées sont alors la dernière copie reçue (date visible dans la pastille).
+function updateOfflineBadge(){
+  const el=$('sourceStatus'); if(!el)return;
+  if(navigator.onLine===false){
+    el.textContent='Hors ligne';
+    el.classList.remove('status-warning');
+    el.classList.add('is-offline');
+  }else if(el.textContent==='Hors ligne'){
+    el.textContent='';
+    el.classList.remove('is-offline');
+  }
+}
+window.addEventListener('offline',()=>{ try{ updateOfflineBadge(); }catch(e){} });
+window.addEventListener('online',()=>{ try{ updateOfflineBadge(); loadPlanning(true); }catch(e){} });
 
 function loadCachedPlanning(){
   try{

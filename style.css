@@ -1,6 +1,6 @@
 :root{
   /* Couleurs de base — identité Tridel : vert forêt + accent orange/or du logo */
-  --ink:#17211C;--ink-soft:#47594E;--muted:#7C8C82;
+  --ink:#17211C;--ink-soft:#47594E;--muted:#5E6E64;
   --paper:#F1F4F1;--surface:#FFFFFF;
   --line:#E1E8E2;--line-strong:#C9D9CC;
   --accent:#1F7A4D;--accent-ink:#155C39;--accent-tint:#E7F4EC;
@@ -49,7 +49,7 @@
   --paper:#0F1512;--surface:#18211C;
   --line:#26332B;--line-strong:#344439;
   --accent:#4CC184;--accent-ink:#7FD8A8;--accent-tint:#16322550;
-  --accent-solid:#238C58;--accent-solid-hover:#2AA468;
+  --accent-solid:#1E7E4F;--accent-solid-hover:#2AA468;
   --signal:#F09A47;--signal-tint:#3A2A18;--signal-ink:#F2B176;
   --school-dot:#9A92E0;--school-tint:#25233F;
   --danger:#F0707C;--danger-bg:#3A1A1F;--danger-line:#5A2A31;
@@ -1190,3 +1190,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .pv-panel,.employee-picker.open .employee-picker-panel{bottom:var(--kb,0px)!important;max-height:min(82vh,calc(var(--vvh,100vh) - 16px))!important}
 }
 @media print{.tabbar{display:none!important}}
+
+/* Pastille « Hors ligne » : texte ambre lisible sur le fond sombre du bandeau */
+#sourceStatus.is-offline{color:#FFD58A;font-weight:800}
