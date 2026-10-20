@@ -4476,8 +4476,7 @@ $('cmpGroups').addEventListener('click',e=>{
 // vers l'application installée (qui a sa propre mémoire, vide au départ).
 const PROFILE_KEYS=['planningEmployee','planningEmployeeName','cmpSavedGroups','compareState','themeMode','planningLastInGroup'];
 function profileHTML(){
-  return `<button type="button" class="install-btn share-btn" data-profile-export><span style="font-size:16px;line-height:1">👤</span><span>Copier mon code profil<small>Ma personne, mes groupes, l'apparence</small></span></button>`
-   +`<button type="button" class="install-btn share-btn" data-profile-import><span style="font-size:16px;line-height:1">📥</span><span>Importer un code profil<small>À coller ici depuis l'autre appareil</small></span></button><div id="profileHint" class="install-hint hidden"></div>`;
+  return `<div class="profile-row"><span class="profile-lab"><span style="font-size:16px;line-height:1">👤</span><span>Code profil<small>Changer d'appareil ou d'application</small></span></span><span class="profile-btns"><button type="button" data-profile-export>Copier</button><button type="button" data-profile-import>Importer</button></span></div><div id="profileHint" class="install-hint hidden"></div>`;
 }
 function profileSay(t){ const h=document.getElementById('profileHint'); if(h){ h.textContent=t; h.classList.remove('hidden'); } }
 function profileEncode(){

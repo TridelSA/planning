@@ -1204,3 +1204,9 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 
 .no-emp-import{margin:8px 0 0}
 .link-btn{border:0;background:none;color:var(--accent-ink);font:700 13px/1.2 var(--font-body);text-decoration:underline;cursor:pointer;padding:6px}
+
+.profile-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.profile-lab{display:flex;align-items:center;gap:8px;min-width:0;font:700 12.5px/1.2 var(--font-body);color:var(--ink)}
+.profile-lab small{display:block;margin-top:2px;font:500 10.5px/1.2 var(--font-body);color:var(--muted)}
+.profile-btns{display:flex;gap:4px;flex:0 0 auto}
+.profile-btns button{height:30px;padding:0 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--paper);color:var(--accent-ink);font:800 11.5px/1 var(--font-body);cursor:pointer}
