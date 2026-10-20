@@ -1159,14 +1159,14 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .pv-save{border-style:dashed;color:var(--accent-ink)}
 @media (max-width:700px){
   .tabbar:not([hidden]){display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;gap:2px;
-    padding:3px 8px calc(3px + env(safe-area-inset-bottom,0px));
+    padding:3px 8px calc(2px + env(safe-area-inset-bottom,0px)*.35);
     background:color-mix(in srgb,var(--surface) 94%,transparent);
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line-strong)}
   .tabbar-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:transparent;color:var(--muted);
     font:700 9.5px/1.1 var(--font-body);padding:5px 2px 4px;border-radius:10px;min-width:0}
   .tabbar-btn svg{width:19px;height:19px}
   .tabbar-btn.is-active{color:var(--accent-ink);background:var(--accent-tint)}
-  .app{padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  .app{padding-bottom:calc(58px + env(safe-area-inset-bottom,0px)*.35)}
   /* La barre du bas gère déjà les pages : le bouton du bandeau ne garde que les réglages. */
   .tabbar:not([hidden]) ~ .app .navm-ico-desk,.hero .navm-ico-desk{display:none}
   .hero .navm-ico-phone{display:block}
