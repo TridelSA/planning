@@ -3906,7 +3906,7 @@ function renderRotationWidget(){
   card.innerHTML=
     item(nowData,'En poste','') +
     '<span class="rotation-sep" aria-hidden="true"></span>' +
-    item(nextData,'Ensuite','rotation-item-next');
+    item(nextData,'Ensuite','rotation-item-next') + travauxLineHTML();
 
   card.classList.remove('hidden');
 }
@@ -4514,3 +4514,16 @@ function profileImport(text){
   }catch(e){ profileSay('Code non reconnu. Copie-le à nouveau depuis l\'autre appareil.'); if(typeof text!=='string')alert('Code non reconnu.'); }
 }
 document.addEventListener('click',e=>{ if(e.target.closest('.no-emp-import [data-profile-import]'))profileImport(); });
+
+// Période de travaux : une ligne discrète dans le bandeau En poste / Ensuite.
+function travauxLineHTML(){
+  const t=travauxPeriod();
+  if(!t||t.end<todayISO())return '';
+  const a=parseISODateOnly(t.start),b=parseISODateOnly(t.end);
+  if(!a||!b)return '';
+  const yr=new Date().getFullYear();
+  const f=(d,y)=>d.toLocaleDateString('fr-CH',y?{day:'numeric',month:'short',year:'numeric'}:{day:'numeric',month:'short'});
+  const showYear=a.getFullYear()!==yr||b.getFullYear()!==yr;
+  const label=`Travaux · ${f(a,showYear&&a.getFullYear()!==b.getFullYear())} → ${f(b,showYear)}`;
+  return `<button type="button" class="rotation-travaux" onclick="addTravauxToCalendar()" title="Ajouter la période de travaux au calendrier" aria-label="${label} — ajouter au calendrier"><span class="rt-ico" aria-hidden="true">⚒️</span><span>${label}</span><span class="rt-cal" aria-hidden="true">📅</span></button>`;
+}

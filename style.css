@@ -1213,3 +1213,10 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 
 /* Téléphone : pas d'icône « masquer » dans les tableaux, on gagne de la largeur pour les noms et les cases */
 @media (max-width:700px){.pv-hide{display:none!important}:root{--pv-name:100px}}
+
+/* Travaux : la carte dédiée est remplacée par une ligne dans le bandeau */
+.travaux-section,.travaux-section:not(.hidden){display:none!important}
+.rotation-travaux{flex:1 1 100%;display:flex;align-items:center;gap:6px;margin-top:1px;padding:5px 0 0;border:0;border-top:1px solid var(--rotation-sep);background:none;color:var(--signal-ink);font:700 10.5px/1.2 var(--font-body);text-align:left;cursor:pointer}
+.rotation-travaux .rt-ico{font-size:11px}
+.rotation-travaux .rt-cal{margin-left:auto;opacity:.7;font-size:11px}
+@media print{.rotation-travaux{display:none}}
