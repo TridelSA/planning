@@ -3009,6 +3009,18 @@ function renderCmpYear(view,groups){
   const wrap=$('cmpGrid');
   const scrollLeft=wrap.scrollLeft,scrollTop=wrap.scrollTop;
   const firstRender=!wrap.querySelector('.pv-table') || wrap.dataset.year!==String(year);
+  // Largeur de la colonne des noms : ajustée au nom le plus long affiché.
+  try{
+    const phone=window.matchMedia('(max-width:700px)').matches;
+    const cv=document.createElement('canvas').getContext('2d');
+    cv.font=`600 ${phone?10.5:11.5}px Inter, system-ui, sans-serif`;
+    let wmax=0;
+    for(const emp of rows){ wmax=Math.max(wmax,cv.measureText(cleanEmployeeName(emp.name)).width); }
+    wmax=Math.max(wmax,cv.measureText('Semaine').width,cv.measureText('Présents').width);
+    const extra=phone?14:8+4+22+4+6;
+    const w=Math.round(Math.min(phone?150:220,Math.max(phone?66:110,wmax+extra)));
+    wrap.style.setProperty('--pv-name',w+'px');
+  }catch(e){ /* ignoré : largeur par défaut */ }
   wrap.innerHTML=h;
   wrap.dataset.year=String(year);
   if(firstRender && currentWeekIndex>=0){
