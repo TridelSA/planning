@@ -1198,3 +1198,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .hero:has(+ .rotation-strip:not(.hidden)){margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}
 .hero + .rotation-strip:not(.hidden){margin-top:0;margin-bottom:10px;padding:9px 14px 10px;border-radius:0 0 16px 16px;box-shadow:var(--shadow-card,0 4px 14px rgba(0,0,0,.08))}
 @media print{.hero + .rotation-strip{box-shadow:none}}
+
+/* Trait dégradé tout en haut de l'en-tête : retiré (un seul dégradé dans l'ensemble) */
+.hero-stripe{display:none}
