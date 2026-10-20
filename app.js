@@ -1808,10 +1808,15 @@ function selectedEmployee(){
 function mondayOf(date){const d=new Date(date);const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);d.setHours(0,0,0,0);return d}
 function isoWeek(date){const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));const day=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-day);const start=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil((((d-start)/86400000)+1)/7)}
 
-// Plage de navigation autorisée : 1 mois avant aujourd'hui, jusqu'à 1 an après.
+// Plage de navigation autorisée : 1 mois avant aujourd'hui, jusqu'à la fin de l'année
+// (fin de l'année suivante à partir de décembre).
 function navBounds(){
   const min=new Date();min.setHours(0,0,0,0);min.setMonth(min.getMonth()-1);
-  const max=new Date();max.setHours(0,0,0,0);max.setFullYear(max.getFullYear()+1);
+  // Confidentialité : le planning de l'année suivante n'est affiché qu'à partir
+  // de décembre (même s'il est publié plus tôt). Avant, la limite est le 31 décembre.
+  const now=new Date();
+  const lastYear=now.getMonth()===11?now.getFullYear()+1:now.getFullYear();
+  const max=new Date(lastYear,11,31);
   return {min,max};
 }
 
