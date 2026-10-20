@@ -3874,14 +3874,15 @@ function renderRotationWidget(){
   // (RM/RA/RN), au lieu d'une teinte fixe.
   const TINT_VAR_BY_CODE={RM:'--c-rm-bg',RA:'--c-ra-bg',RN:'--c-rn-bg'};
   const tintVar=TINT_VAR_BY_CODE[nowData.code];
-  card.style.setProperty('--rotation-tint', tintVar ? `var(${tintVar})` : 'var(--signal-tint)');
+  card.style.removeProperty('--rotation-tint');
+  const tintOf=code=>TINT_VAR_BY_CODE[code]?`var(${TINT_VAR_BY_CODE[code]})`:'var(--signal-tint)';
 
   const namesHTML=names=>names.length
     ? escapeHTML(names.join(', '))
     : '<span class="rotation-empty">aucune personne assignée</span>';
 
   const item=(data,tag,extraClass)=>`
-    <span class="rotation-item ${extraClass}">
+    <span class="rotation-item ${extraClass}" style="--rotation-tint:${tintOf(data.code)}">
       <span class="rotation-tag"><span class="rotation-dot"></span>${tag}</span>
       <span class="rotation-chip ${classFor(data.code)}">${escapeHTML(data.code)}</span>
       <span class="rotation-names">${namesHTML(data.names)}</span>
