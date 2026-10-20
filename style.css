@@ -1193,3 +1193,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 
 /* Pastille « Hors ligne » : texte ambre lisible sur le fond sombre du bandeau */
 #sourceStatus.is-offline{color:#FFD58A;font-weight:800}
+
+/* Bandeau En poste / Ensuite : prolonge l'en-tête (un seul grand bloc) */
+.hero:has(+ .rotation-strip:not(.hidden)){margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}
+.hero + .rotation-strip:not(.hidden){margin-top:0;margin-bottom:10px;padding:9px 14px 10px;border-radius:0 0 16px 16px;box-shadow:var(--shadow-card,0 4px 14px rgba(0,0,0,.08))}
+@media print{.hero + .rotation-strip{box-shadow:none}}
