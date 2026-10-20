@@ -1210,3 +1210,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .profile-lab small{display:block;margin-top:2px;font:500 10.5px/1.2 var(--font-body);color:var(--muted)}
 .profile-btns{display:flex;gap:4px;flex:0 0 auto}
 .profile-btns button{height:30px;padding:0 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--paper);color:var(--accent-ink);font:800 11.5px/1 var(--font-body);cursor:pointer}
+
+/* Téléphone : pas d'icône « masquer » dans les tableaux, on gagne de la largeur pour les noms et les cases */
+@media (max-width:700px){.pv-hide{display:none!important}:root{--pv-name:100px}}
