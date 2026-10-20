@@ -3536,6 +3536,7 @@ window.addEventListener('resize',()=>{ if(heroFocusReady)updateHeroFocus(true); 
 
 function render(){
   updateHeroFocus();
+  try{ checkMyChanges(); }catch(e){ /* ignoré */ }
   try{ renderRotationWidget(); }catch(e){ /* ignoré */ }
   if(state.statsMode){ renderStatsView(); return; }
   if(state.compareMode){
@@ -4430,3 +4431,58 @@ $('cmpGroups').addEventListener('click',e=>{
   if(i>=0)a[i]=entry;else a.push(entry);
   cmpSavedStore(a); renderCompareView();
 });
+
+// --- « Ton planning a changé » : compare ta dernière version vue avec la nouvelle ---
+// Rien n'est modifié : seules les différences du fichier Excel sont signalées.
+function checkMyChanges(){
+  const card=document.getElementById('changesCard');
+  if(!planning||!planning.employees||!planning.employees.length||!planning.publicationId||state.teamMode||state.compareMode||state.statsMode){
+    if(card)card.classList.add('hidden'); return;
+  }
+  const e=selectedEmployee();
+  if(!e){ if(card)card.classList.add('hidden'); return; }
+  const key='planningSnap:'+cleanEmployeeName(e.name);
+  const pkey='planningChanges:'+cleanEmployeeName(e.name);
+  const todayISO=isoDate(new Date());
+  const lab=c=>{ c=safeCode(c); return c?(compactShiftLabel(c)||c):'Repos'; };
+  let pending=[];
+  try{ pending=JSON.parse(localStorage.getItem(pkey)||'[]'); if(!Array.isArray(pending))pending=[]; }catch(x){ pending=[]; }
+  let prev=null;
+  try{ prev=JSON.parse(localStorage.getItem(key)||'null'); }catch(x){ prev=null; }
+  if(!prev || prev.pub!==planning.publicationId){
+    const days={};
+    const t=new Date(); 
+    for(let i=0;i<120;i++){ const d=new Date(t.getFullYear(),t.getMonth(),t.getDate()+i); const iso=isoDate(d); days[iso]=safeCode(e.schedule[iso]); }
+    if(prev && prev.days){
+      const found=[];
+      for(const iso of Object.keys(days)){
+        if(iso<todayISO||!(iso in prev.days))continue;
+        if(prev.days[iso]!==days[iso])found.push({d:iso,from:prev.days[iso],to:days[iso]});
+      }
+      const map={};
+      for(const p of pending){ if(p.d>=todayISO)map[p.d]=p; }
+      for(const f of found){ map[f.d]=map[f.d]?{d:f.d,from:map[f.d].from,to:f.to}:f; }
+      pending=Object.values(map).filter(p=>p.from!==p.to).sort((a,b)=>a.d.localeCompare(b.d));
+      try{ localStorage.setItem(pkey,JSON.stringify(pending)); }catch(x){ /* ignoré */ }
+    }
+    try{ localStorage.setItem(key,JSON.stringify({pub:planning.publicationId,days})); }catch(x){ /* ignoré */ }
+  }
+  pending=pending.filter(p=>p.d>=todayISO);
+  if(!card){
+    const c=document.createElement('section');
+    c.id='changesCard';c.className='card changes-card hidden';
+    const anchor=document.getElementById('upcomingEventsCard');
+    anchor.parentNode.insertBefore(c,anchor);
+    return checkMyChanges();
+  }
+  if(!pending.length){ card.classList.add('hidden'); return; }
+  const fmt=iso=>{ const [y,m,d]=iso.split('-').map(Number); return formatLongDate(new Date(y,m-1,d)); };
+  const esc=t=>String(t).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const shown=pending.slice(0,5);
+  card.innerHTML=`<span class="upcoming-kicker">Ton planning a changé</span>
+    <ul class="changes-list">${shown.map(p=>`<li><b>${esc(fmt(p.d))}</b> <span class="changes-from">${esc(lab(p.from))}</span> → <span class="changes-to">${esc(lab(p.to))}</span></li>`).join('')}</ul>
+    ${pending.length>shown.length?`<p class="changes-more">et ${pending.length-shown.length} autre${pending.length-shown.length>1?'s':''} jour${pending.length-shown.length>1?'s':''}</p>`:''}
+    <button type="button" class="changes-ok">OK, vu</button>`;
+  card.querySelector('.changes-ok').onclick=()=>{ try{ localStorage.setItem(pkey,'[]'); }catch(x){ /* ignoré */ } card.classList.add('hidden'); };
+  card.classList.remove('hidden');
+}

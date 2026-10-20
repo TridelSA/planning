@@ -1189,4 +1189,12 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media (max-width:700px){
   .pv-panel,.employee-picker.open .employee-picker-panel{bottom:var(--kb,0px)!important;max-height:min(82vh,calc(var(--vvh,100vh) - 16px))!important}
 }
+/* Bandeau « Ton planning a changé » */
+.changes-card{padding:14px 16px;border-left:4px solid var(--accent-solid,#1F5C2C);background:var(--accent-tint)}
+.changes-list{list-style:none;margin:8px 0 4px;padding:0;display:grid;gap:5px;font-size:14px}
+.changes-from{color:var(--muted);text-decoration:line-through}
+.changes-to{font-weight:800;color:var(--accent-ink)}
+.changes-more{margin:2px 0 6px;font-size:12.5px;color:var(--muted)}
+.changes-ok{margin-top:8px;height:34px;padding:0 16px;border:0;border-radius:var(--radius-sm,10px);background:var(--accent-solid,#1F5C2C);color:#fff;font:800 12.5px/1 var(--font-body);cursor:pointer}
+@media print{.changes-card{display:none!important}}
 @media print{.tabbar{display:none!important}}
