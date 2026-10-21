@@ -3888,7 +3888,7 @@ function renderRotationWidget(){
   // (RM/RA/RN), au lieu d'une teinte fixe.
   const TINT_VAR_BY_CODE={RM:'--c-rm-bg',RA:'--c-ra-bg',RN:'--c-rn-bg'};
   const tintVar=TINT_VAR_BY_CODE[nowData.code];
-  const tintOf=code=>TINT_VAR_BY_CODE[code]?`var(${TINT_VAR_BY_CODE[code]})`:'var(--signal-tint)';
+  const tintOf=code=>TINT_VAR_BY_CODE[code]?`color-mix(in srgb, var(${TINT_VAR_BY_CODE[code].replace('-bg','-ink')}) 30%, var(${TINT_VAR_BY_CODE[code]}))`:'var(--signal-tint)';
   card.style.setProperty('--rotation-tint',tintOf(nowData.code));
   card.style.setProperty('--rotation-tint-next',tintOf(nextData.code));
   // Même teintes sur l'en-tête : son bas se fond dans le bandeau (un seul dégradé continu).
