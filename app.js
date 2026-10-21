@@ -2282,7 +2282,7 @@ function updateTeamToggleLabel(){
   const page=currentPage();
   const grp=groupOf(page);
   $('navMenuLabel').textContent=grp.label;
-  $('navMenuPanel').innerHTML='<button type="button" class="navm-close" data-navm-close aria-label="Fermer les réglages">×</button>'+NAV_GROUPS.map(g=>{
+  $('navMenuPanel').innerHTML=NAV_GROUPS.map(g=>{
     const on=g.id===grp.id;
     return `<button type="button" class="navm-item ${on?'is-active':''}" role="menuitem" data-nav-page="${on?g.pages[0]:lastInGroup[g.id]}">
     <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g.icon}</svg></span>
