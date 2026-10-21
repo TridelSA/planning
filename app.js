@@ -3891,6 +3891,9 @@ function renderRotationWidget(){
   const tintOf=code=>TINT_VAR_BY_CODE[code]?`var(${TINT_VAR_BY_CODE[code]})`:'var(--signal-tint)';
   card.style.setProperty('--rotation-tint',tintOf(nowData.code));
   card.style.setProperty('--rotation-tint-next',tintOf(nextData.code));
+  // Même teintes sur l'en-tête : son bas se fond dans le bandeau (un seul dégradé continu).
+  const heroEl=document.querySelector('.hero');
+  if(heroEl){ heroEl.style.setProperty('--rotation-tint',tintOf(nowData.code)); heroEl.style.setProperty('--rotation-tint-next',tintOf(nextData.code)); }
 
   const namesHTML=names=>names.length
     ? escapeHTML(names.join(', '))
@@ -4338,7 +4341,7 @@ function tabBarSync(){
 // --- Sélecteurs de page : « Planning | Statistiques » et « Par poste | Par personne » ---
 (function(){
   const mk=(items,active)=>`<div class="seg" role="tablist">${items.map(([id,l])=>`<button type="button" role="tab" aria-selected="${id===active}" class="seg-btn ${id===active?'is-on':''}" data-go="${id}">${l}</button>`).join('')}</div>`;
-  const ME=[['individual','Planning'],['stats','Statistiques']],TEAM=[['team','Par rotation'],['compare','Par personne']];
+  const ME=[['individual','Planning'],['stats','Statistiques']],TEAM=[['compare','Par personne'],['team','Par rotation']];
   const put=(sel,html)=>{ const el=document.querySelector(sel); if(el)el.innerHTML=html; };
   put('#teamViewSection .team-view-title',mk(TEAM,'team'));
   put('#compareViewSection .team-view-title',mk(TEAM,'compare'));

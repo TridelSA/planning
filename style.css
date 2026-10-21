@@ -366,7 +366,7 @@ select:focus-visible,a:focus-visible,summary:focus-visible,[role="tab"]:focus-vi
 .rotation-strip{
   display:none;align-items:center;flex-wrap:wrap;gap:5px 12px;
   margin-bottom:10px;padding:6px 12px;border-radius:10px;
-  background:linear-gradient(155deg,var(--rotation-tint,var(--signal-tint)),var(--rotation-tint-next,var(--surface)));
+  background:linear-gradient(90deg,var(--rotation-tint,var(--signal-tint)),var(--rotation-tint-next,var(--surface)));
 }
 .rotation-strip:not(.hidden){display:flex}
 .rotation-item{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
@@ -1220,3 +1220,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .rotation-travaux .rt-ico{font-size:11px}
 .rotation-travaux .rt-cal{margin-left:auto;opacity:.7;font-size:11px}
 @media print{.rotation-travaux{display:none}}
+
+/* Jonction en-tête / bandeau : le bas de l'image se fond dans les couleurs du bandeau */
+.hero:has(+ .rotation-strip:not(.hidden)) .hero-art::before{content:'';position:absolute;left:0;right:0;bottom:0;height:46px;z-index:1;
+  background:linear-gradient(90deg,var(--rotation-tint,transparent),var(--rotation-tint-next,transparent));
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000);mask-image:linear-gradient(to bottom,transparent,#000)}
