@@ -1226,3 +1226,9 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   background:var(--rotation-tint,transparent);
   -webkit-mask-image:linear-gradient(to bottom,transparent,#000);mask-image:linear-gradient(to bottom,transparent,#000)}
 
+
+.navm-close{display:none}
+@media (max-width:700px){
+  .navm-close{display:grid;place-items:center;position:absolute;top:6px;right:8px;z-index:2;width:32px;height:32px;border:0;border-radius:50%;background:var(--paper);color:var(--ink-soft);font:400 22px/1 var(--font-body);cursor:pointer}
+  #navMenuPanel{position:fixed}
+}

@@ -2282,7 +2282,7 @@ function updateTeamToggleLabel(){
   const page=currentPage();
   const grp=groupOf(page);
   $('navMenuLabel').textContent=grp.label;
-  $('navMenuPanel').innerHTML=NAV_GROUPS.map(g=>{
+  $('navMenuPanel').innerHTML='<button type="button" class="navm-close" data-navm-close aria-label="Fermer les réglages">×</button>'+NAV_GROUPS.map(g=>{
     const on=g.id===grp.id;
     return `<button type="button" class="navm-item ${on?'is-active':''}" role="menuitem" data-nav-page="${on?g.pages[0]:lastInGroup[g.id]}">
     <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g.icon}</svg></span>
@@ -2323,6 +2323,7 @@ $('navMenuBtn').addEventListener('click',event=>{
   if($('navMenuPanel').classList.contains('hidden'))openNavMenu(); else closeNavMenu();
 });
 $('navMenuPanel').addEventListener('click',async event=>{
+  if(event.target.closest('[data-navm-close]')){ closeNavMenu(); return; }
   if(event.target.closest('[data-share-link]')){ shareCurrentView(); return; }
   if(event.target.closest('[data-profile-export]')){ profileExport(); return; }
   if(event.target.closest('[data-profile-import]')){ profileImport(); return; }
@@ -2351,10 +2352,16 @@ $('navMenuPanel').addEventListener('click',async event=>{
   setPage(item.dataset.navPage);
 });
 document.addEventListener('click',event=>{
+  // Téléphone : la feuille Réglages ne se ferme que par le bouton Réglages ou la croix.
+  if(window.innerWidth<=700)return;
   if(!$('navMenuPanel').contains(event.target))closeNavMenu();
 });
 document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeNavMenu(); });
-window.addEventListener('resize',closeNavMenu);
+window.addEventListener('resize',()=>{
+  // Téléphone : la barre du navigateur qui apparaît/disparaît en défilant déclenche un « resize » ; on garde la feuille ouverte et on la repositionne.
+  if(window.innerWidth<=700){ if(!$('navMenuPanel').classList.contains('hidden'))openNavMenu(); return; }
+  closeNavMenu();
+});
 
 // Page affichée au dernier passage : restaurée une seule fois, au premier
 // affichage des données (fermeture / actualisation de la page).
@@ -4321,6 +4328,7 @@ window.addEventListener('popstate',e=>{
     }
     const b=e.target.closest('[data-tab-group]');
     if(!b)return;
+    closeNavMenu();
     const g=NAV_GROUPS.find(x=>x.id===b.dataset.tabGroup);
     const cur=currentPage();
     setPage(g.pages.includes(cur)?g.pages[0]:lastInGroup[g.id]);
