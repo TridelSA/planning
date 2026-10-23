@@ -2234,18 +2234,18 @@ const NAV_PAGES=[
   {id:'stats',label:'Statistiques',desc:'Mes rotations, piquets, congés, absences',
    icon:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'}
 ];
-// Regroupement de l'interface : « Mon planning » (planning + statistiques) et
-// « Équipe » (rotations par poste + comparer par personne).
+// Regroupement de l'interface : « Planning » (individuel · collègues · rotations)
+// et « Statistiques ».
 const NAV_GROUPS=[
-  {id:'me',label:'Mon planning',desc:'Planning et statistiques',pages:['individual','stats']},
-  {id:'team',label:'Équipe',desc:'Rotations ou comparer des personnes',pages:['team','compare']}
+  {id:'plan',label:'Planning',desc:'Individuel, collègues ou rotations',pages:['individual','compare','team']},
+  {id:'stats',label:'Statistiques',desc:'Congés, absences, rotations, piquets',pages:['stats']}
 ];
 NAV_GROUPS[0].icon=NAV_PAGES[0].icon;
-NAV_GROUPS[1].icon=NAV_PAGES[2].icon;
-var lastInGroup={me:'individual',team:'team'};
+NAV_GROUPS[1].icon=NAV_PAGES[3].icon;
+var lastInGroup={plan:'individual',stats:'stats'};
 try{ const li=JSON.parse(localStorage.getItem('planningLastInGroup')||'{}');
-  if(NAV_GROUPS[0].pages.includes(li.me))lastInGroup.me=li.me;
-  if(NAV_GROUPS[1].pages.includes(li.team))lastInGroup.team=li.team; }catch(e){ /* ignoré */ }
+  if(NAV_GROUPS[0].pages.includes(li.plan))lastInGroup.plan=li.plan;
+  else if(NAV_GROUPS[0].pages.includes(li.team))lastInGroup.plan=li.team; }catch(e){ /* ignoré */ }
 function groupOf(page){ return NAV_GROUPS.find(g=>g.pages.includes(page))||NAV_GROUPS[0]; }
 
 const PAGE_KEY='planningPage';
@@ -2284,7 +2284,7 @@ function updateTeamToggleLabel(){
   $('navMenuLabel').textContent=grp.label;
   $('navMenuPanel').innerHTML=NAV_GROUPS.map(g=>{
     const on=g.id===grp.id;
-    return `<button type="button" class="navm-item ${on?'is-active':''}" role="menuitem" data-nav-page="${on?g.pages[0]:lastInGroup[g.id]}">
+    return `<button type="button" class="navm-item ${on?'is-active':''}" role="menuitem" data-nav-page="${on?page:lastInGroup[g.id]}">
     <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g.icon}</svg></span>
     <span class="navm-txt"><b>${g.label}</b><small>${g.desc}</small></span>
     ${on?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
@@ -4380,7 +4380,7 @@ window.addEventListener('popstate',e=>{
     closeNavMenu();
     const g=NAV_GROUPS.find(x=>x.id===b.dataset.tabGroup);
     const cur=currentPage();
-    setPage(g.pages.includes(cur)?g.pages[0]:lastInGroup[g.id]);
+    setPage(g.pages.includes(cur)?cur:lastInGroup[g.id]);
   });
 })();
 function tabBarSync(){
@@ -4398,13 +4398,13 @@ function tabBarSync(){
 // --- Sélecteurs de page : « Planning | Statistiques » et « Par poste | Par personne » ---
 (function(){
   const mk=(items,active)=>`<div class="seg" role="tablist">${items.map(([id,l])=>`<button type="button" role="tab" aria-selected="${id===active}" class="seg-btn ${id===active?'is-on':''}" data-go="${id}">${l}</button>`).join('')}</div>`;
-  const ME=[['individual','Planning'],['stats','Statistiques']],TEAM=[['compare','Par personne'],['team','Par rotation']];
+  const PLAN=[['individual','Individuel'],['compare','Collègues'],['team','Rotations']];
   const put=(sel,html)=>{ const el=document.querySelector(sel); if(el)el.innerHTML=html; };
-  put('#teamViewSection .team-view-title',mk(TEAM,'team'));
-  put('#compareViewSection .team-view-title',mk(TEAM,'compare'));
-  put('#statsViewSection .team-view-title',mk(ME,'stats'));
+  put('#teamViewSection .team-view-title',mk(PLAN,'team'));
+  put('#compareViewSection .team-view-title',mk(PLAN,'compare'));
+  put('#statsViewSection .team-view-title','');{const t=document.querySelector('#statsViewSection .team-view-title');if(t)t.style.display='none';}
   const ctl=document.querySelector('section.controls');
-  if(ctl){ const w=document.createElement('div'); w.className='seg-wrap'; w.innerHTML=mk(ME,'individual'); ctl.insertBefore(w,ctl.firstChild); }
+  if(ctl){ const w=document.createElement('div'); w.className='seg-wrap'; w.innerHTML=mk(PLAN,'individual'); ctl.insertBefore(w,ctl.firstChild); }
   document.addEventListener('click',e=>{
     const b=e.target.closest('[data-go]');
     if(b&&b.dataset.go!==currentPage())setPage(b.dataset.go);
