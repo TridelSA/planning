@@ -1283,3 +1283,14 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .mini-cell.is-travaux::before{right:6px;top:5px}
   .mini-cell.has-comment::after{right:8px;bottom:6px}
 }
+
+/* Pastilles de code : retour des couleurs d'origine (semaine et mois, téléphone) */
+.code-R{--pill-bg:var(--c-r-bg)}.code-off{--pill-bg:var(--c-off-bg)}.code-RM{--pill-bg:var(--c-rm-bg)}.code-RA{--pill-bg:var(--c-ra-bg)}.code-RN{--pill-bg:var(--c-rn-bg)}
+.code-PIQ{--pill-bg:var(--c-piq-bg)}.code-VA,.code-VJ{--pill-bg:var(--c-va-bg)}.code-HOR,.code-HSR{--pill-bg:var(--c-hor-bg)}
+.code-RF{--pill-bg:var(--c-rf-bg)}.code-CA{--pill-bg:var(--c-ca-bg)}.code-GR{--pill-bg:var(--c-gr-bg)}.code-EN{--pill-bg:var(--c-en-bg)}
+.code-FE,.code-PO,.code-MI,.code-PI,.code-PC,.code-EM,.code-AN,.code-AP,.code-PR,.code-MS,.code-MC,.code-NS,.code-PA,.code-DE,.code-DL,.code-DC,.code-JT{--pill-bg:var(--c-misc-bg)}
+@media (max-width:700px){
+  .week-shift .shift-mainline b{background:var(--pill-bg,color-mix(in srgb,currentColor 14%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 22%,transparent)}
+  .week-shift:not([class*="code-"]) .shift-mainline b{box-shadow:none;background:transparent}
+  .month-cell .month-code-label{background:var(--pill-bg,color-mix(in srgb,currentColor 14%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 22%,transparent)}
+}
