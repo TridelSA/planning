@@ -1228,3 +1228,28 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 
 
 @media (max-width:700px){#navMenuPanel{position:fixed}}
+
+/* ---------- Vue semaine (téléphone) : liste épurée ---------- */
+.week-school-note{display:none}
+@media (max-width:700px){
+  .week-school-note{display:inline-flex;align-items:center;gap:6px;margin:0 0 6px;padding:4px 10px;border-radius:999px;background:var(--school-tint);color:var(--school-dot);font:700 11px/1.2 var(--font-body)}
+  .week-board{border-top:1px solid var(--line)}
+  .week-row{position:relative;border:0;border-bottom:1px solid var(--line);border-radius:0;margin:0;background:transparent;overflow:visible;box-shadow:none;grid-template-columns:54px 1fr}
+  .week-row.is-current-day{box-shadow:none;border-color:var(--line);background:color-mix(in srgb,var(--accent-tint) 70%,transparent)}
+  .week-row.is-current-day::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:3px;background:var(--accent)}
+  .week-day,.week-day.today{background:transparent;border-right:0;padding:9px 6px 9px 12px;gap:0}
+  .week-day strong{font:700 10.5px/1.2 var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .week-day span{font:800 17px/1.15 var(--font-display);color:var(--ink)}
+  .week-day.today strong,.week-day.today span{color:var(--accent-ink)}
+  .week-shift,.week-shift:not([class*="code-"]){background:transparent!important;padding:9px 6px 9px 4px;min-height:52px;row-gap:3px}
+  .shift-mainline{align-items:center;column-gap:9px}
+  .shift-mainline b{display:inline-block;padding:4px 9px;border-radius:8px;background:color-mix(in srgb,currentColor 14%,transparent);font:800 13px/1 var(--font-display);letter-spacing:.02em}
+  .shift-mainline span{font:700 13px/1.25 var(--font-body);color:var(--ink)}
+  .week-shift:not([class*="code-"]) .shift-mainline b{background:transparent;color:var(--muted);padding-left:0}
+  .week-shift:not([class*="code-"]) .shift-mainline span{color:var(--muted)}
+  .shift-time{font:500 11px/1.3 var(--font-body);color:var(--muted);opacity:1}
+  .shift-time.fe-comment{color:var(--ink-soft);opacity:1}
+  .shift-team-inline{font-size:11px;color:var(--muted)}
+  .week-board.has-school-note .week-shift-school-badge{display:none}
+}
+@media (max-width:700px){.shift-team.compact-team{border-top:0!important;padding-top:1px}.shift-team-inline strong{font-weight:600}}

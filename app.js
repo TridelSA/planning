@@ -3987,7 +3987,12 @@ function renderWeek(e){
   const start=mondayOf(state.date);
   $('viewOverline').textContent='';
   populateWeekJump();
-  let h='<div class="week-board">';
+  // Vacances scolaires : un seul libellé pour la semaine (téléphone) au lieu d'une pastille par jour.
+  const schoolCount={};
+  for(let i=0;i<7;i++){ const dd=new Date(start);dd.setDate(start.getDate()+i); const nm=schoolHolidayName(isoDate(dd)); if(nm)schoolCount[nm]=(schoolCount[nm]||0)+1; }
+  const schoolTop=Object.entries(schoolCount).sort((a,b)=>b[1]-a[1])[0];
+  const schoolNote=schoolTop&&schoolTop[1]>=3?schoolTop[0]:'';
+  let h=(schoolNote?`<div class="week-school-note"><span aria-hidden="true">🏫</span> ${escapeHTML(schoolNote)}</div>`:'')+`<div class="week-board${schoolNote?' has-school-note':''}">`;
   for(let i=0;i<7;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
     const isToday=isoDate(d)===todayISO();
