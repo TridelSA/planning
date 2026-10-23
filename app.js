@@ -4050,6 +4050,8 @@ function renderYear(e){
     h+=`<div class="mini-month"><h3>${MONTH_NAMES[m]}</h3><div class="mini-head">${DAY_NAMES.map(d=>`<span>${d[0]}</span>`).join('')}</div><div class="mini-grid">`;
     for(let i=0;i<42;i++){
       const d=new Date(start);d.setDate(start.getDate()+i);
+      // Dernière ligne entièrement hors du mois : on ne l'affiche pas (gain de place).
+      if(i>=28 && i%7===0 && d.getMonth()!==m)break;
       const c=safeCode(e.schedule[isoDate(d)]);
       const isToday=isoDate(d)===todayISO();
       const dISO=isoDate(d);

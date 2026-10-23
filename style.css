@@ -1253,3 +1253,33 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .week-board.has-school-note .week-shift-school-badge{display:none}
 }
 @media (max-width:700px){.shift-team.compact-team{border-top:0!important;padding-top:1px}.shift-team-inline strong{font-weight:600}}
+
+/* ---------- Vues Mois et Année (téléphone) : même style épuré ---------- */
+@media (max-width:700px){
+  .month-calendar{border:0;background:transparent;box-shadow:none}
+  .month-head{background:transparent;border-bottom:1px solid var(--line)}
+  .month-head span{font:700 10px/1 var(--font-body);text-transform:uppercase;letter-spacing:.05em;padding:6px 0}
+  .month-cell,.month-cell.outside{background:transparent!important;border-right:0;min-height:56px;padding:6px 2px;align-items:center;justify-content:center;gap:4px}
+  .month-cell:hover{box-shadow:none}
+  .month-cell .day-num{font:600 13px/1 var(--font-body);color:var(--ink);display:grid;place-items:center;min-width:24px;height:24px;border-radius:50%}
+  .month-cell.outside-month{opacity:.38}
+  .month-code-label{align-self:center;padding:3px 7px;border-radius:7px;background:color-mix(in srgb,currentColor 14%,transparent);font:800 10.5px/1 var(--font-body)}
+  .month-cell.today,.month-cell.is-schoolholiday.today{box-shadow:none}
+  .month-cell.today .day-num{background:var(--accent-solid);color:#fff;font-weight:800}
+  .month-cell.is-schoolholiday,.month-cell.is-schoolholiday.today{box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--school-dot) 30%,transparent)}
+  .month-cell.is-holiday::before{top:5px;right:8px}
+  .month-cell.is-travaux::after{top:5px;left:8px}
+
+  .year-calendar{gap:0}
+  .mini-month{border:0;border-radius:0;background:transparent;border-bottom:1px solid var(--line);padding:0 0 12px}
+  .mini-month h3{background:transparent;text-align:left;padding:14px 4px 6px;font:800 15px/1 var(--font-display)}
+  .mini-head span{font:700 9.5px/1 var(--font-body);text-transform:uppercase}
+  .mini-grid{gap:4px 0;padding:2px 0}
+  .mini-cell{justify-self:center;width:34px;height:34px;aspect-ratio:auto;border-radius:50%;font:600 12px/1 var(--font-body)}
+  .mini-empty{background:transparent!important;color:transparent}
+  .mini-cell.is-schoolholiday,.mini-cell.is-schoolholiday.today{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--school-dot) 50%,transparent)}
+  .mini-cell.today,.mini-cell.is-schoolholiday.today{outline:2px solid var(--accent);outline-offset:1px;font-weight:800}
+  .mini-cell.is-holiday::before{left:6px;top:5px}
+  .mini-cell.is-travaux::before{right:6px;top:5px}
+  .mini-cell.has-comment::after{right:8px;bottom:6px}
+}
