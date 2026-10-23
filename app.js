@@ -3337,6 +3337,35 @@ const ST_MON=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.
 function stShortDate(iso){ const d=parseISODateOnly(iso); return `${d.getDate()} ${ST_MON[d.getMonth()]}`; }
 function stRange(a,b){ return a===b?stShortDate(a):`${stShortDate(a)} → ${stShortDate(b)}`; }
 
+
+// Grille « Mon année » : une colonne par semaine, 7 lignes (lun→dim), colorée par code.
+function stYearGridHTML(emp){
+  const y=stYear();
+  const first=new Date(y,0,1),start=mondayOf(first),end=new Date(y,11,31);
+  const weeks=Math.round((mondayOf(end)-start)/604800000)+1;
+  const today=todayISO();
+  let cells='',labels='',lastM=-1;
+  for(let w=0;w<weeks;w++){
+    for(let i=0;i<7;i++){
+      const d=new Date(start);d.setDate(start.getDate()+w*7+i);
+      if(d.getFullYear()!==y){cells+='<i class="yg-c yg-x"></i>';continue;}
+      const iso=isoDate(d),code=safeCode((emp.schedule||{})[iso]);
+      const hol=swissHolidayName(iso);
+      cells+=`<button type="button" class="yg-c ${classFor(code)} ${iso===today?'is-today':''} ${hol?'is-hol':''} ${schoolHolidayName(iso)?'is-sch':''}" data-iso="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))} ${escapeHTML(code||'repos')}"></button>`;
+    }
+    const m=new Date(start.getFullYear(),0,1+w*7+3).getMonth();
+    const d4=new Date(start);d4.setDate(start.getDate()+w*7+3);
+    if(d4.getFullYear()===y&&d4.getMonth()!==lastM){lastM=d4.getMonth();labels+=`<span style="grid-column:${w+1}/span 4">${ST_MON_SHORT[lastM]}</span>`;}
+  }
+  const leg=[['RM','Matin'],['RA','Après-midi'],['RN','Nuit'],['VA','Congé'],['RF','Férié / repos'],['R','Réserve']]
+    .map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${l}</span>`).join('');
+  return `<div class="st-block yg-block"><h3>Mon année ${y}</h3>
+    <div class="yg-scroll"><div class="yg-months" style="--w:${weeks}">${labels}</div>
+    <div class="yg-grid" style="--w:${weeks}">${cells}</div></div>
+    <div class="yg-info" id="ygInfo">Touchez un jour pour le détail.</div>
+    <div class="yg-legend">${leg}</div></div>`;
+}
+
 function renderStatsView(){
   if(!$('statsViewSection'))return;
   const ys=presenceYears();
@@ -3386,6 +3415,7 @@ function renderStatsView(){
     <div class="st-kpi" style="--st-c:var(--accent)"><small>Prochain congé</small><b style="font-size:${upcoming?'24px':'18px'};line-height:1.2">${nextTxt}</b><span>${nextSub||'—'}</span></div>
   </div>`;
 
+  h+=stYearGridHTML(emp);
   const blocks=[];
   const affYear=stSum(months,ST_AFF,'all');
   if(affYear>0){
@@ -4557,3 +4587,14 @@ function travauxLineHTML(){
   const label=`Travaux · ${f(a,showYear&&a.getFullYear()!==b.getFullYear())} → ${f(b,showYear)}`;
   return `<button type="button" class="rotation-travaux" onclick="addTravauxToCalendar()" title="Ajouter la période de travaux au calendrier" aria-label="${label} — ajouter au calendrier"><span class="rt-ico" aria-hidden="true">⚒️</span><span>${label}</span><span class="rt-cal" aria-hidden="true">📅</span></button>`;
 }
+
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.yg-grid .yg-c[data-iso]'); if(!c)return;
+  const emp=selectedEmployee(); if(!emp)return;
+  const iso=c.dataset.iso,d=parseISODateOnly(iso),code=safeCode((emp.schedule||{})[iso]);
+  const info=CODE_INFO[code]||[code||'Repos',code?'Code du planning':'Aucun service'];
+  const hol=swissHolidayName(iso),sch=schoolHolidayName(iso);
+  const box=$('ygInfo'); if(!box)return;
+  document.querySelectorAll('.yg-c.is-sel').forEach(x=>x.classList.remove('is-sel')); c.classList.add('is-sel');
+  box.innerHTML=`<b>${escapeHTML(formatDateWithYear(d))}</b> · <span class="st-code ${classFor(code)}">${escapeHTML(code||'—')}</span> ${escapeHTML(info[0])}${hol?` · ${escapeHTML(hol)}`:''}${sch?` · ${escapeHTML(sch)}`:''}`;
+});
