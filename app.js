@@ -1995,9 +1995,9 @@ function attachDayClickHandlers(){
 // ==========================================================
 function teamCellStyle(counts){
   const bg=[
-    counts[0]>0?'var(--c-rm-bg)':'var(--c-off-bg)',
-    counts[1]>0?'var(--c-ra-bg)':'var(--c-off-bg)',
-    counts[2]>0?'var(--c-rn-bg)':'var(--c-off-bg)'
+    counts[0]>0?'var(--tm-rm)':'var(--c-off-bg)',
+    counts[1]>0?'var(--tm-ra)':'var(--c-off-bg)',
+    counts[2]>0?'var(--tm-rn)':'var(--c-off-bg)'
   ];
   return `background:linear-gradient(90deg,${bg[0]} 0%,${bg[0]} 30%,${bg[1]} 36%,${bg[1]} 64%,${bg[2]} 70%,${bg[2]} 100%)`;
 }
