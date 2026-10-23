@@ -3632,6 +3632,7 @@ function render(){
 
   if($('employeeName')) $('employeeName').textContent=cleanEmployeeName(e.name);
 
+  if(state.view!=='year')window.__yearScrollKey=null;
   if(state.view==='week'){
     renderWeek(e);
   }else if(state.view==='month'){
@@ -4066,6 +4067,16 @@ function renderYear(e){
     h+='</div></div>';
   }
   h+='</div>';$('viewContainer').innerHTML=h;
+  // Téléphone : à l'ouverture de l'année en cours, on arrive directement sur le mois actuel.
+  if(window.__yearScrollKey!==String(y)){
+    window.__yearScrollKey=String(y);
+    if(y===new Date().getFullYear() && window.innerWidth<=700){
+      requestAnimationFrame(()=>{ try{
+        const el=$('viewContainer').querySelectorAll('.mini-month')[new Date().getMonth()];
+        if(el&&new Date().getMonth()>0)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-72,behavior:'auto'});
+      }catch(err){ /* ignoré */ } });
+    }
+  }
 }
 
 
