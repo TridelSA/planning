@@ -1452,3 +1452,25 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .tw-card ul{padding-bottom:8px;gap:5px}
   .tw-card .tw-name{padding:4px 10px;font-size:12.5px}
 }
+
+/* Sélecteur Planning/Statistiques : même largeur partout */
+.seg{width:100%}
+
+/* Mois individuel (téléphone) : même style compact que Équipe › Par personne */
+@media (max-width:700px){
+  .month-cell{min-height:0;padding:2px 0 4px;gap:1px;justify-content:flex-start;align-items:center}
+  .month-cell .day-num{font:700 8.5px/1 var(--font-body);min-width:0;height:auto;padding:1px 3px;color:var(--muted);border-radius:6px}
+  .month-cell.today .day-num{background:var(--accent-solid);color:#fff}
+  .month-cell .month-code-label{align-self:center;min-width:27px;text-align:center;padding:3px 2px;border-radius:6px;font-size:10.5px}
+  .month-grid{row-gap:0}
+}
+@media (max-width:700px){
+  .month-cell.is-schoolholiday,.month-cell.is-schoolholiday.today{box-shadow:none}
+  .month-cell:not(.outside-month):not(:has(.month-code-label))::after{content:'·';color:var(--muted);opacity:.5;font:600 12px/1 var(--font-body);position:static;margin-top:3px}
+}
+.team-view-title:has(.seg){flex:1 1 100%;min-width:0;width:100%}
+@media (min-width:701px){
+  .month-cell{min-height:78px;padding:9px 11px}
+  .month-cell .day-num{font:700 12px/1 var(--font-body)}
+  .month-cell .month-code-label{font:800 13px/1 var(--font-body);letter-spacing:.02em}
+}

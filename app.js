@@ -17,7 +17,7 @@ const CODE_INFO={
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
-let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),compareMode:false,statsMode:false};
+let state={view:['week','month'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),compareMode:false,statsMode:false};
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -4443,7 +4443,7 @@ function readSharedHash(){
 function applySharedState(q){
   const has=k=>planning.employees.some(x=>x.id===k);
   const e=q.get('e'); if(e&&has(e)){ state.employeeId=e; try{ updateEmployeePicker(); }catch(_){ /* ignoré */ } }
-  const v=q.get('v'); if(['week','month','year'].includes(v))state.view=v;
+  const v=q.get('v'); if(['week','month'].includes(v))state.view=v;
   const d=parseYMD(q.get('d')); if(d)state.date=d;
   const s=q.get('s'); if(['week','month','year'].includes(s))cmp.scale=s;
   const cd=parseYMD(q.get('cd')); if(cd)cmp.date=cd;
