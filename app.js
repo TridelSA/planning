@@ -2842,7 +2842,8 @@ function cmpCardsHTML(view,groups){
   let h='';
   {
     const people=everyone;
-    h+='<div class="cmpm-block">';
+    h+='<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
+    if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''}">${c.name}</span>`).join('')+'</div>';
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<div class="cmpm-card"><div class="cmpm-name">${escapeHTML(name)}</div>`;

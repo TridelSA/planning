@@ -1420,3 +1420,35 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmpm-days.is-week .cmpm-day b{font-size:12.5px;padding:4px 3px}
   .cmpm-card+.cmpm-card{border-top:1px solid var(--line)}
 }
+
+/* Équipe : encore plus compact (téléphone) */
+@media (max-width:700px){
+  /* Par personne – semaine : nom à gauche, 7 jours sur la même ligne */
+  .cmpm-block.is-wk .cmpm-weekhead{display:grid;grid-template-columns:78px repeat(7,1fr);gap:2px;padding:6px 2px 4px;font:700 9px/1 var(--font-body);text-transform:uppercase;color:var(--muted);text-align:center}
+  .cmpm-weekhead .is-today{color:var(--accent-ink);font-weight:900}
+  .cmpm-block.is-wk .cmpm-card{display:grid;grid-template-columns:78px 1fr;align-items:center;padding:4px 2px}
+  .cmpm-block.is-wk .cmpm-name{margin:0;padding-right:4px;font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cmpm-block.is-wk .cmpm-day small{display:none}
+  .cmpm-block.is-wk .cmpm-days.is-week .cmpm-day{min-height:32px}
+  .cmpm-block.is-wk .cmpm-days.is-week .cmpm-day b{min-width:0;width:100%;max-width:34px;padding:5px 1px;font-size:11px}
+  /* Par personne – mois : numéro minuscule, rangées serrées */
+  .cmpm-days.is-month .cmpm-day{min-height:0;padding:1px 0}
+  .cmpm-days.is-month .cmpm-day small{font-size:8px;line-height:1}
+  .cmpm-days.is-month .cmpm-day b{padding:2px 2px;min-width:26px;font-size:10.5px}
+  .cmpm-days.is-month{gap:1px 2px}
+  .cmpm-days.is-month .cmpm-dow{font-size:8px}
+  /* Par rotation – année : 2 mois par ligne */
+  #teamViewContainer .year-calendar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}
+  #teamViewContainer .mini-month{padding-bottom:8px}
+  #teamViewContainer .mini-month h3{padding:10px 2px 4px;font-size:13px}
+  #teamViewContainer .mini-grid{gap:2px 0}
+  #teamViewContainer .mini-cell{width:24px;height:24px;font-size:10px}
+  #teamViewContainer .mini-head span{font-size:8.5px}
+  #teamViewContainer .mini-cell.is-holiday::before{left:3px;top:2px}
+  #teamViewContainer .mini-cell.is-travaux::before{right:3px;top:2px}
+  #teamViewContainer .mini-cell.today{outline-offset:0}
+  /* Par rotation – semaine : un peu plus serré */
+  .tw-card header{padding:7px 2px 5px}
+  .tw-card ul{padding-bottom:8px;gap:5px}
+  .tw-card .tw-name{padding:4px 10px;font-size:12.5px}
+}
