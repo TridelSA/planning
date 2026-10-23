@@ -1498,3 +1498,9 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .yg-months{font-size:8px}
 }
 @media (min-width:701px){ .yg-scroll{max-width:900px} .yg-grid,.yg-months{gap:3px} .yg-c{border-radius:3px} }
+
+/* Mode sombre : grille « Mon année » plus contrastée */
+:root[data-theme="dark"] .yg-c:not(.yg-x){background:color-mix(in srgb,var(--pill-bg,var(--c-off-bg)) 40%,currentColor 60%)}
+:root[data-theme="dark"] .yg-c.code-off,:root[data-theme="dark"] .yg-c:not([class*="code-"]){background:#2A352E;color:#6B7A70}
+/* Export PDF : inutile sur téléphone */
+@media (max-width:700px){#cmpExportBtn{display:none!important}}
