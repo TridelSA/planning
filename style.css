@@ -1861,3 +1861,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .yg-legend .yg-c{display:inline-block;width:11px;height:11px}
 .yg-legend{grid-template-columns:repeat(auto-fill,minmax(78px,1fr))!important;gap:7px 6px!important}
 .ind-legend{display:flex!important;flex-wrap:wrap;gap:7px 14px}
+.mini-cell.ind-cell.is-schoolholiday::after{bottom:5px}
+@media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:4px}}
+@media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:5.5px}}
