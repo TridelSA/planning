@@ -6,7 +6,7 @@ const MONTH_SHORT=['jan','fév','mars','avr','mai','juin','juil','août','sept',
 const CODE_INFO={
   R:['Réserve','Selon besoin'],RM:['Rotation matin','05:00–13:00'],RA:['Rotation après-midi','13:00–21:00'],RN:['Rotation nuit','21:00–05:00'],
   VA:['Vacances','Absence planifiée'],VJ:['Vacances','Absence planifiée'],HOR:['Récupération d\'heure optionnel','Absence planifiée'],
-  HSR:['Récupération d\'heure supplémentaire','Absence planifiée'],PIQ:['Piquet','Service de piquet'],RF:['Repos férié','Jour férié'],
+  HSR:['Récupération d\'heure supplémentaire','Absence planifiée'],PIQ:['Piquet','Service de piquet'],RF:['Reprise férié','Reprise d\'un jour férié'],
   CA:['Camion','Affectation'],GR:['Groupe','Affectation'],EN:['Entretien','Affectation'],FE:['Formation externe','Formation'],
   PO:['Portes','Affectation'],MI:['Militaire','Absence'],PI:['Reprise de piquet','Absence planifiée'],PC:['Protection civile','Absence planifiée'],EM:['Enfant malade','Absence planifiée'],AN:['Ancienneté','Absence'],
   AP:['Accident professionnel','Absence'],PR:['Personnel','Absence'],MS:['Maladie','Absence'],MC:['Maladie / certificat','Absence'],
@@ -1236,7 +1236,7 @@ function buildUpcomingEvents(employee){
     return realStart;
   };
 
-  // Jours qui peuvent relier deux blocs de congé : cellule vide, repos (R) ou repos férié (RF).
+  // Jours qui peuvent relier deux blocs de congé : cellule vide, repos (R) ou reprise férié (RF).
   const isLeaveBridgeCode=code=>{
     const c=safeCode(code);
     return c==='' || c==='R' || c==='RF';
