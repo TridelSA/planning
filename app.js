@@ -3183,7 +3183,7 @@ function cmpDeskTodayFrame(){
   const a=cells[0].getBoundingClientRect(),z=cells[cells.length-1].getBoundingClientRect();
   if(getComputedStyle(grid).position==='static')grid.style.position='relative';
   const d=document.createElement('div');d.className='cmp-todayframe';
-  d.style.cssText=`left:${a.left-g.left+grid.scrollLeft-2}px;top:${a.top-g.top+grid.scrollTop-3}px;width:${a.width+4}px;height:${z.bottom-a.top+6}px`;
+  d.style.cssText=`left:${a.left-g.left+grid.scrollLeft}px;top:${a.top-g.top+grid.scrollTop-2}px;width:${a.width}px;height:${z.bottom-a.top+4}px;box-sizing:border-box`;
   grid.appendChild(d);
 }
 addEventListener('resize',()=>{try{cmpDeskTodayFrame()}catch(e){}});
