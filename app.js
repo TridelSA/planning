@@ -2064,7 +2064,7 @@ function renderTeamWeek(){
   m+=days.map((d,i)=>{const iso=isoDate(d);return `<button type="button" class="tw-sd ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${iso===selISO?'is-sel':''} ${swissHolidayName(iso)?'is-hol':''} ${schoolHolidayName(iso)?'is-sch '+schCls(iso):''}" data-team-pick="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))}"><small>${DAY_NAMES[i]}</small><b${markAttr(iso)}>${d.getDate()}</b></button>`;}).join('');
   m+='</div>';
   const long=sel.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
-  m+=`<div class="tw-daytitle"><strong>${escapeHTML(long.charAt(0).toUpperCase()+long.slice(1))}</strong>${teamBadges(selISO)}</div>`;
+  m+=`<div class="tw-daytitle"><strong>${escapeHTML(long.charAt(0).toUpperCase()+long.slice(1))}</strong></div>`;
   for(const [code,k,label] of TEAM_SHIFTS){
     const team=teamPeople(selISO,code);
     m+=`<section class="tw-card ${k}"><header>${label}<em>${team.length?team.length+' personne'+(team.length>1?'s':''):''}${team.length>3?' · renforcé':''}</em></header>`
@@ -4243,16 +4243,6 @@ function renderYear(e){
     h+='</div></div>';
   }
   h+='</div>'+yearLegendHTML(e,y);$('viewContainer').innerHTML=h;
-  // Téléphone : à l'ouverture de l'année en cours, on arrive directement sur le mois actuel.
-  if(window.__yearScrollKey!==String(y)){
-    window.__yearScrollKey=String(y);
-    if(y===new Date().getFullYear() && window.innerWidth<=700){
-      requestAnimationFrame(()=>{ try{
-        const el=$('viewContainer').querySelectorAll('.mini-month')[new Date().getMonth()];
-        if(el&&new Date().getMonth()>0)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-72,behavior:'auto'});
-      }catch(err){ /* ignoré */ } });
-    }
-  }
 }
 
 
