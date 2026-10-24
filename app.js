@@ -1180,7 +1180,7 @@ function buildUpcomingEvents(employee){
   // lointaine soit-elle.
 
   // « Congé » = vacances (VA, VJ) + récupérations d'heures (HOR, HSR), cumulés en un seul bloc.
-  const isVacationCode=code=>code==='VA' || code==='VJ' || code==='HOR' || code==='HSR';
+  const isVacationCode=code=>code==='VA' || code==='VJ' || code==='HOR' || code==='HSR' || code==='PI';
 
   // Jours qui peuvent relier deux blocs de vacances :
   // cellule vide / repos explicite.
@@ -1299,7 +1299,7 @@ function buildUpcomingEvents(employee){
       let leaveDays=0,recupDays=0;
       for(let d=new Date(vacStart);d<=vacEnd;d.setDate(d.getDate()+1)){
         const c=safeCode(employee.schedule[isoDate(d)]);
-        if(isVacationCode(c)){ leaveDays++; if(c==='HOR'||c==='HSR')recupDays++; }
+        if(isVacationCode(c)){ leaveDays++; if(c==='HOR'||c==='HSR'||c==='PI')recupDays++; }
       }
 
       // Durée affichée : toute la période, week-ends et jours de repos inclus.
