@@ -1891,3 +1891,12 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmptl-code{flex:none;min-width:38px;text-align:center;font:800 11px/1 var(--font-body);padding:5px 6px;border-radius:7px;background:var(--pill-bg,var(--c-off-bg));color:var(--ink)}
 .cmptl-names{font:700 11.5px/1.35 var(--font-body);color:var(--ink);padding-top:2px}
 .cmptl-grp:last-child .cmptl-code.code-off{opacity:.75}
+/* Frise : vacances en un seul bloc continu */
+.cmptl-head b.is-sch{border-radius:0;margin:0 -1px;position:relative}
+.cmptl-head b.is-sch.sc-s{border-radius:7px 0 0 7px;margin-left:0}
+.cmptl-head b.is-sch.sc-e{border-radius:0 7px 7px 0;margin-right:0}
+.cmptl-head b.is-sch.sc-s.sc-e{border-radius:7px}
+.cmptl-head b.is-sch::before{display:none!important}
+.cmptl-head b{height:18px;line-height:18px!important;padding:0!important;min-height:0}
+.cmptl-head b.is-today{border-radius:5px!important;margin:0!important;z-index:1}
+.cmptl-head b{font-size:8px!important;letter-spacing:-.4px;text-indent:0;display:flex;justify-content:center;align-items:center}

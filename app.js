@@ -2972,7 +2972,7 @@ function cmpTimelineHTML(view,groups){
   let h=`<div class="cmptl" style="--n:${n}"><div class="cmptl-head"><span></span>`;
   h+=view.cols.map(c=>{
     const show=c.num===1||c.num%5===0;
-    return `<b class="${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}" data-tl-day="${c.iso}">${show?c.num:''}</b>`;
+    return `<b class="${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch '+schCls(c.iso):''}" data-tl-day="${c.iso}">${show?c.num:''}</b>`;
   }).join('')+'</div>';
   const used=new Set();
   for(const emp of people){
