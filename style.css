@@ -2016,3 +2016,32 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 }
 @media (min-width:701px){.week-shift .shift-team-inline{gap:5px}}
 @media (min-width:701px){body.compare-mode.cmp-week .app{max-width:1120px}}
+
+/* ===== PC : calendriers repensés (même esprit que le téléphone, en plus large) ===== */
+@media (min-width:701px){
+  /* Individuel · année : 3 mois par ligne, pleine largeur, sans cadres */
+  #viewContainer .year-calendar{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 34px;max-width:none;margin:0}
+  #viewContainer .year-calendar .mini-month{border:0;background:transparent;border-radius:0;padding:0}
+  #viewContainer .year-calendar .mini-month h3{background:transparent;text-align:left;padding:4px 2px 8px;font:800 15px/1 var(--font-display);border-bottom:1px solid var(--line);margin-bottom:6px}
+  #viewContainer .year-calendar .mini-head span{font:700 10px/1 var(--font-body);text-transform:uppercase;padding:2px 0 6px}
+  #viewContainer .year-calendar .mini-grid{gap:3px;padding:0}
+  #viewContainer .year-calendar .mini-cell{width:auto;height:34px;aspect-ratio:auto;font:700 12px/1 var(--font-body);border-radius:8px}
+  #viewContainer .year-calendar .mini-cell.mini-empty{background:transparent}
+  #viewContainer .year-calendar .mini-cell.ind-cell.is-schoolholiday::after{bottom:4px;width:4px;height:4px;margin-left:-2px}
+  #viewContainer .year-calendar .mini-cell.ind-cell.today{box-shadow:0 0 0 2px var(--accent-solid)!important}
+
+  /* Individuel · mois : lignes plus basses, code centré */
+  .month-cell{min-height:64px;padding:8px 10px}
+  .month-head span{padding:8px 0}
+
+  /* Rotations · année : 3 mois, cases basses et arrondies */
+  #teamViewContainer .year-calendar{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 34px}
+  #teamViewContainer .year-calendar .mini-month{border:0;background:transparent;border-radius:0;padding:0}
+  #teamViewContainer .year-calendar .mini-month h3{background:transparent;text-align:left;padding:4px 2px 8px;font:800 15px/1 var(--font-display);border-bottom:1px solid var(--line);margin-bottom:6px}
+  #teamViewContainer .year-calendar .mini-head span{font:700 10px/1 var(--font-body);text-transform:uppercase;padding:2px 0 6px}
+  #teamViewContainer .year-calendar .mini-grid{gap:3px;padding:0}
+  #teamViewContainer .year-calendar .mini-cell{width:auto;height:32px;aspect-ratio:auto;font:700 12px/1 var(--font-body);border-radius:8px}
+  #teamViewContainer .year-calendar .team-cell.mini-cell.is-holiday{box-shadow:none!important;background:transparent!important;color:var(--ink)!important}
+  #teamViewContainer .year-calendar .team-cell.mini-cell.is-holiday::after{content:'';position:absolute;left:50%;top:4px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--danger);right:auto}
+}
+@media (min-width:701px){#teamViewContainer .year-calendar .mini-cell.mini-empty,#teamViewContainer .year-calendar .team-cell.mini-empty{background:transparent!important}}
