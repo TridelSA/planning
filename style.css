@@ -1804,3 +1804,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media (max-width:700px){.yg-grid{gap:1.5px}.yg-grid .yg-c{height:11px;border-radius:2px}.yg-grid{grid-template-columns:26px repeat(31,minmax(0,1fr))}.yg-mn{font-size:9px}}
 @media (min-width:701px){.yg-grid .yg-c{height:18px}}
 .yg-c.is-hol{position:relative}
+.yg-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px 8px;font:600 11px/1.2 var(--font-body)}
+.yg-legend span{gap:6px}
+.yg-legend .yg-c{flex:none}
+.yg-dot{display:inline-block;flex:none;width:10px;height:10px;position:relative}
+.yg-dot::after{content:'';position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--danger)}

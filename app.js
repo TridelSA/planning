@@ -3492,7 +3492,7 @@ function stYearGridHTML(emp){
     rows+=`<span class="yg-mn">${ST_MON_SHORT[m]}</span>${cells}`;
   }
   const LEG=[['m','Matin'],['a','Après-midi'],['n','Nuit'],['l','Congé'],['f','Repos férié'],['r','Réserve'],['x','Autre absence'],['o','Repos']];
-  const leg=LEG.filter(([k])=>used.has(k)).map(([k,l])=>`<span><i class="yg-c yg-k-${k}"></i>${l}</span>`).join('')+(usedHol?'<span><i class="yg-c yg-k-o is-hol"></i>Jour férié</span>':'');
+  const leg=LEG.filter(([k])=>used.has(k)).map(([k,l])=>`<span><i class="yg-c yg-k-${k}"></i>${l}</span>`).join('')+(usedHol?'<span><i class="yg-dot"></i>Jour férié</span>':'');
   return `<div class="st-block yg-block"><h3>Mon année ${y}</h3>
     <div class="yg-grid">${head}${rows}</div>
     <div class="yg-info" id="ygInfo">Touchez une case pour voir le détail du jour.</div>
