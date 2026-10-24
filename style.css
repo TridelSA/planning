@@ -1759,3 +1759,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .tw-sd.sc:not(.is-hol):not(.is-sel):not(.is-today) b,
 .cmp-day.sc:not(.is-hol):not(.is-today) b,
 .tw-dayh.sc:not(.is-hol):not(.is-today) b{background:color-mix(in srgb,var(--school-dot) 20%,var(--surface))!important;color:var(--school-dot)!important;box-shadow:none!important;border-radius:50%!important}
+.cmpm-day.is-we,.cmpm-days .cmpm-day.is-we{opacity:1!important}
+.cmpm-day.is-we b{opacity:1!important;filter:none!important}
