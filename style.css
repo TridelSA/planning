@@ -1731,3 +1731,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .month-cell.is-holiday.sc-r::before{right:calc(50% - 9px);border-radius:0 99px 99px 0}
   .month-cell.is-holiday.sc-l.sc-r::before{border-radius:99px}
 }
+/* Vacances : aplat de cellule (aligné sur la grille), plus de capsule */
+.sc::before,.sc-l::before,.sc-r::before,.month-cell.is-holiday.sc::before,.month-cell.is-schoolholiday.sc::before{display:none!important}
+.month-cell.sc,.cmpm-day.sc,.cmpm-weekhead .sc,.tw-sd.sc,.cmp-day.sc,.tw-dayh.sc{background-color:color-mix(in srgb,var(--school-dot) 10%,var(--surface))!important}
+.month-cell.sc.today,.month-cell.sc.is-holiday{background-color:color-mix(in srgb,var(--school-dot) 10%,var(--surface))!important}
+.tw-sd.sc.is-sel{background-color:var(--accent-soft,var(--surface))!important}
