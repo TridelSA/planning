@@ -3003,8 +3003,11 @@ document.addEventListener('click',e=>{
   }else{
     const iso=day.dataset.tlDay;
     const hol=swissHolidayName(iso),sch=schoolHolidayName(iso);
-    const rows=people.map(p=>{const code=safeCode((p.schedule||{})[iso]);return `<span class="cmptl-chip ${code?classFor(code):'code-off'}">${escapeHTML(cleanEmployeeName(p.name))} · ${escapeHTML(code||'—')}</span>`;}).join('');
-    box.innerHTML=`<b>${escapeHTML(fmt(iso))}</b>${hol?' · '+escapeHTML(hol):''}${sch?' · '+escapeHTML(sch):''}<div class="cmptl-chips">${rows}</div>`;
+    const by=new Map();
+    for(const p of people){const code=safeCode((p.schedule||{})[iso])||'';if(!by.has(code))by.set(code,[]);by.get(code).push(cleanEmployeeName(p.name));}
+    const order=[...by.keys()].sort((x,y)=>{if(!x)return 1;if(!y)return -1;const ix=LEGEND_ORDER.indexOf(x),iy=LEGEND_ORDER.indexOf(y);return (ix<0?99:ix)-(iy<0?99:iy);});
+    const rows=order.map(code=>{const info=CODE_INFO[code];return `<div class="cmptl-grp"><span class="cmptl-code ${code?classFor(code):'code-off'}">${escapeHTML(code||'Repos')}</span><span class="cmptl-names">${by.get(code).map(escapeHTML).join(' · ')}</span></div>`;}).join('');
+    box.innerHTML=`<b>${escapeHTML(fmt(iso))}</b>${hol?' · '+escapeHTML(hol):''}${sch?' · '+escapeHTML(sch):''}<div class="cmptl-grps">${rows}</div>`;
   }
 });
 function cmpCardsHTML(view,groups){
