@@ -2072,7 +2072,7 @@ function renderTeamWeek(){
       +'</section>';
   }
   m+='</div>';
-  $('teamViewContainer').innerHTML=g+m;
+  $('teamViewContainer').innerHTML=g+m+periodNotesHTML(days.map(isoDate));
   attachTeamDayClickHandlers();
 }
 
@@ -2082,6 +2082,7 @@ function renderTeamView(){
   const isWeek=state.teamScale==='week';
   document.querySelectorAll('[data-team-scale]').forEach(b=>b.classList.toggle('active',b.dataset.teamScale===state.teamScale));
   $('teamLegend').classList.toggle('hidden',isWeek);
+  $('teamLegend').innerHTML='<span class="team-legend-item"><i class="tl-dot tl-rf"></i>Renforcé (plus de 3)</span><span class="team-legend-item"><i class="tl-dot tl-inc"></i>Équipe incomplète</span><span class="team-legend-item"><i class="tl-circ tl-sch"></i>Vacances scolaires</span><span class="team-legend-item"><i class="tl-circ tl-hol"></i>Jour férié</span>';
   if(isWeek){
     const t=new Date(state.teamDate);
     if(t<min)state.teamDate=new Date(min);
@@ -2110,11 +2111,12 @@ function renderTeamView(){
       const isToday=dISO===todayISO();
       const counts=teamCountsFor(dISO);
       const reinforced=counts.some(n=>n>3);
+      const incomplete=counts.some(n=>n===0);
       const holidayName=swissHolidayName(dISO);
       const inTravaux=isInTravaux(dISO);
       const schoolName=schoolHolidayName(dISO);
       const markClasses=[holidayName?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
-      h+=`<span class="mini-cell team-cell ${isToday?'today':''} ${reinforced?'is-reinforced':''} ${markClasses}" style="${teamCellStyle(counts)}" data-team-date="${dISO}" tabindex="0" role="button" ${holidayName?`title="${escapeHTML(holidayName)}"`:(schoolName?`title="${escapeHTML(schoolName)}"`:'')} aria-label="Équipe du ${escapeHTML(formatDateWithYear(d))}">${d.getDate()}</span>`;
+      h+=`<span class="mini-cell team-cell ${isToday?'today':''} ${reinforced?'is-reinforced':''} ${incomplete?'is-incomplete':''} ${markClasses}" style="" data-team-date="${dISO}" tabindex="0" role="button" ${holidayName?`title="${escapeHTML(holidayName)}"`:(schoolName?`title="${escapeHTML(schoolName)}"`:'')} aria-label="Équipe du ${escapeHTML(formatDateWithYear(d))}">${d.getDate()}</span>`;
     }
     h+='</div></div>';
   }
