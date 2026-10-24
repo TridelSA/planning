@@ -1817,3 +1817,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .hero + .rotation-strip:not(.hidden){background:linear-gradient(180deg,var(--rotation-tint,var(--signal-tint)) 0,var(--rotation-tint-next,var(--surface)) 100%);border-top:0;box-shadow:var(--shadow-card,0 4px 14px rgba(0,0,0,.08))}
 .hero.hero-joined{box-shadow:none!important;border-bottom:0!important}
 .hero + .rotation-strip:not(.hidden){position:relative;box-shadow:0 8px 14px -8px rgba(0,0,0,.12)!important;clip-path:inset(0 -20px -30px -20px)}
+/* Fondu plus court : l'usine reste visible */
+.hero.hero-joined .hero-art::before{height:52px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.1) 25%,rgba(0,0,0,.4) 55%,rgba(0,0,0,.8) 82%,#000 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.1) 25%,rgba(0,0,0,.4) 55%,rgba(0,0,0,.8) 82%,#000 100%)}
