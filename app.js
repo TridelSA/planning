@@ -4209,14 +4209,19 @@ function renderMonth(e){
   h+='</div></div>'+periodNotesHTML(moIsos);$('viewContainer').innerHTML=h;
 }
 
-// Légende compacte : codes seuls, HOR et HSR regroupés.
+// Légende compacte : codes seuls, regroupés par couleur identique et séparés par « / ».
 function legendCodes(list){
-  const out=[];let grouped=false;
+  const probe=document.createElement('i');probe.className='mini-cell';probe.style.cssText='position:absolute;visibility:hidden;left:-99px';
+  document.body.appendChild(probe);
+  const groups=new Map();
   for(const c of list){
-    if(c==='HOR'||c==='HSR'){ if(!grouped){grouped=true;out.push([list.includes('HSR')?'HSR':'HOR',list.includes('HOR')&&list.includes('HSR')?'HOR/HSR':c]);} continue; }
-    out.push([c,c]);
+    probe.className='mini-cell ind-cell '+classFor(c);
+    const key=(getComputedStyle(probe).backgroundColor.match(/\d+(\.\d+)?/g)||[]).slice(0,3).map(n=>Math.round(n/14)).join(',');
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(c);
   }
-  return out;
+  probe.remove();
+  return [...groups.values()].map(cs=>[cs[0],cs.join('/')]);
 }
 function yearLegendHTML(e,y){
   const cnt={};let sch=false,hol=false;
