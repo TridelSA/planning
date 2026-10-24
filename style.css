@@ -1195,7 +1195,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 #sourceStatus.is-offline{color:#FFD58A;font-weight:800}
 
 /* Bandeau En poste / Ensuite : prolonge l'en-tête (un seul grand bloc) */
-.hero:has(+ .rotation-strip:not(.hidden)){margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}
+.hero.hero-joined{margin-bottom:0!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}
 .hero + .rotation-strip:not(.hidden){margin-top:0;margin-bottom:10px;padding:9px 14px 10px;border-radius:0 0 16px 16px;box-shadow:var(--shadow-card,0 4px 14px rgba(0,0,0,.08))}
 @media print{.hero + .rotation-strip{box-shadow:none}}
 
@@ -1222,7 +1222,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media print{.rotation-travaux{display:none}}
 
 /* Jonction en-tête / bandeau : le bas de l'image se fond dans les couleurs du bandeau */
-.hero:has(+ .rotation-strip:not(.hidden)) .hero-art::before{content:'';position:absolute;left:0;right:0;bottom:0;height:44px;z-index:1;
+.hero.hero-joined .hero-art::before{content:'';position:absolute;left:0;right:0;bottom:0;height:44px;z-index:1;
   background:var(--rotation-tint,transparent);
   -webkit-mask-image:linear-gradient(to bottom,transparent,#000);mask-image:linear-gradient(to bottom,transparent,#000)}
 
@@ -1810,10 +1810,10 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .yg-dot{display:inline-block;flex:none;width:10px;height:10px;position:relative}
 .yg-dot::after{content:'';position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--danger)}
 /* Jonction en-tête / bandeau : fondu long et progressif (plus de ligne nette) */
-.hero:has(+ .rotation-strip:not(.hidden)) .hero-art::before{height:96px;
+.hero.hero-joined .hero-art::before{height:96px;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.08) 18%,rgba(0,0,0,.28) 38%,rgba(0,0,0,.6) 62%,rgba(0,0,0,.88) 82%,#000 100%);
   mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.08) 18%,rgba(0,0,0,.28) 38%,rgba(0,0,0,.6) 62%,rgba(0,0,0,.88) 82%,#000 100%)}
 .hero + .rotation-strip:not(.hidden){background:var(--rotation-tint,var(--signal-tint))}
 .hero + .rotation-strip:not(.hidden){background:linear-gradient(180deg,var(--rotation-tint,var(--signal-tint)) 0,var(--rotation-tint-next,var(--surface)) 100%);border-top:0;box-shadow:var(--shadow-card,0 4px 14px rgba(0,0,0,.08))}
-.hero:has(+ .rotation-strip:not(.hidden)){box-shadow:none!important;border-bottom:0!important}
+.hero.hero-joined{box-shadow:none!important;border-bottom:0!important}
 .hero + .rotation-strip:not(.hidden){position:relative;box-shadow:0 8px 14px -8px rgba(0,0,0,.12)!important;clip-path:inset(0 -20px -30px -20px)}

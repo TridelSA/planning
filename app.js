@@ -4755,3 +4755,12 @@ document.addEventListener('click',e=>{
   if(cnt)new MutationObserver(mark).observe(cnt,{childList:true,characterData:true,subtree:true});
   apply(); mark();
 })();
+
+// En-tête + bandeau « En poste » : classe posée en JS (plus fiable que :has() sur iOS pendant les changements de page).
+(function(){
+  const card=document.getElementById('rotationCard'),hero=document.querySelector('.hero');
+  if(!card||!hero)return;
+  const sync=()=>hero.classList.toggle('hero-joined',!card.classList.contains('hidden'));
+  sync();
+  new MutationObserver(sync).observe(card,{attributes:true,attributeFilter:['class']});
+})();
