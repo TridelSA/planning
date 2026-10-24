@@ -1746,3 +1746,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmpm-block.is-wk .cmpm-weekhead{align-items:stretch}
 }
 @media (max-width:700px){.cmpm-block.is-wk .cmpm-weekhead em{margin:0 auto!important}}
+.cmpm-days.is-week .cmpm-day.is-we,.cmpm-block.is-wk .cmpm-day.is-we{opacity:1!important}
+.cmpm-days.is-week .cmpm-day.is-we b{opacity:1!important;filter:none!important}
