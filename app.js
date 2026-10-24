@@ -2972,8 +2972,19 @@ function cmpTimelineHTML(view,groups){
   let h=`<div class="cmptl" style="--n:${n}"><div class="cmptl-head"><span></span>`;
   h+=view.cols.map(c=>{
     const show=c.num===1||c.num%5===0;
-    return `<b class="${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch '+schCls(c.iso):''}" data-tl-day="${c.iso}">${show?c.num:''}</b>`;
+    return `<b class="${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-day="${c.iso}">${show?c.num:''}</b>`;
   }).join('')+'</div>';
+  // Ligne « événements » : vacances en une barre titrée, jours fériés par-dessus.
+  const cols=view.cols;let bars='';
+  for(let i=0;i<cols.length;){
+    if(cols[i].school){
+      let j=i;while(j+1<cols.length&&cols[j+1].school&&cols[j+1].school===cols[i].school)j++;
+      bars+=`<span class="cmptl-vbar" style="grid-column:${i+2}/${j+3}" data-tl-day="${cols[i].iso}">${escapeHTML(cols[i].school.replace(/^Vacances (d'|de |du |des )?/i,'').replace(/^./,m=>m.toUpperCase()))}</span>`;
+      i=j+1;
+    }else i++;
+  }
+  cols.forEach((c,i)=>{if(c.holiday)bars+=`<span class="cmptl-vhol" style="grid-column:${i+2}" data-tl-day="${c.iso}"></span>`;});
+  if(bars)h+=`<div class="cmptl-ev"><span></span>${bars}</div>`;
   const used=new Set();
   for(const emp of people){
     h+=`<div class="cmptl-row"><span class="cmptl-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(cleanEmployeeName(emp.name))}</span>`;
