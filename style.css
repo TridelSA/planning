@@ -1864,3 +1864,4 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .mini-cell.ind-cell.is-schoolholiday::after{bottom:5px}
 @media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:4px}}
 @media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:5.5px}}
+@media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:3.5px}}
