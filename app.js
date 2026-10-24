@@ -2892,7 +2892,7 @@ function cmpCardsHTML(view,groups){
   let h='';
   {
     const people=everyone;
-    h+=cmpNotesHTML(view)+'<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
+    h+='<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
     if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}">${c.name}</span>`).join('')+'</div>';
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
@@ -2981,14 +2981,14 @@ function renderCompareView(){
   if(isYear){ renderCmpYear(view,groups); return; }
 
   if(isPhoneLayout()){
-    grid.innerHTML=`<div class="cmpm">${cmpCardsHTML(view,groups)}</div>`;
+    grid.innerHTML=`<div class="cmpm">${cmpCardsHTML(view,groups)}${cmpNotesHTML(view)}</div>`;
     return;
   }
 
   // La table occupe toute la largeur disponible ; les colonnes de jours se
   // partagent l'espace à parts égales (largeur minimale = défilement horizontal).
   const minW=cmp.scale==='week'?96:34;
-  let h=cmpNotesHTML(view)+`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
+  let h=`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
   h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''} ${c.today?'is-today':''}" ${c.holiday?`title="${escapeHTML(c.holName)}"`:c.school?`title="${escapeHTML(c.school)}"`:''}><span>${c.name}</span><b>${c.num}</b></th>`).join('');
   h+='</tr></thead><tbody>';
   for(const group of groups){
@@ -3006,7 +3006,7 @@ function renderCompareView(){
     }
   }
   h+='</tbody></table>';
-  grid.innerHTML=h;
+  grid.innerHTML=h+cmpNotesHTML(view);
 }
 
 // Vue « Année » : une case par personne et par semaine ISO (vert = présent
