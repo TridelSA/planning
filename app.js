@@ -3047,9 +3047,9 @@ function cmpCardsHTML(view,groups){
     const people=everyone;
     h+='<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
     if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch '+schCls(c.iso):''}">${c.name}<em${markAttr(c.iso)}>${c.num}</em></span>`).join('')+'</div>';
-    for(const emp of people){
+    for(const [pi,emp] of people.entries()){
       const name=cleanEmployeeName(emp.name);
-      h+=`<div class="cmpm-card"><div class="cmpm-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</div>`;
+      h+=`<div class="cmpm-card${pi===0?' is-first':''}${pi===people.length-1?' is-last':''}"><div class="cmpm-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</div>`;
       if(view.kind==='year'){
         h+='<div class="cmpm-year">'+view.cols.map(c=>{
           const y=cmpYearInfo(emp,c);
@@ -3157,14 +3157,14 @@ function renderCompareView(){
   h+='</tr></thead><tbody>';
   for(const group of groups){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
-    for(const emp of people){
+    for(const [pi,emp] of people.entries()){
       const name=cleanEmployeeName(emp.name);
       h+=`<tr class="cmp-person"><th class="cmp-name"><div class="cmp-name-inner"><span title="${escapeHTML(name)}" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</span></div></th>`;
       const wide=cmp.scale==='week';
       h+=view.cols.map(c=>{
         const d=cmpDayInfo(emp,c);
         const tap=wide?` data-cmp-key="${escapeHTML(presencePersonKey(emp))}" data-cmp-iso="${c.iso}" role="button" tabindex="0"`:'';
-        return `<td class="cmp-cell ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"${tap}><b>${escapeHTML(d.code)}</b>${wide&&d.code&&d.info?`<small>${escapeHTML(d.info[0])}</small>`:''}</td>`;
+        return `<td class="cmp-cell ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today'+(pi===0?' tl-f':'')+(pi===people.length-1?' tl-l':''):''}" title="${escapeHTML(d.title)}"${tap}><b>${escapeHTML(d.code)}</b>${wide&&d.code&&d.info?`<small>${escapeHTML(d.info[0])}</small>`:''}</td>`;
       }).join('');
       h+='</tr>';
     }

@@ -1950,3 +1950,16 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmptl-vbar{box-sizing:border-box}
 .cmptl-rows{position:relative}
 .cmptl-today{top:-2px;bottom:-2px}
+/* Semaine collègues : cadre autour du jour actuel, sur les lignes des collègues seulement */
+.cmpm-block.is-wk .cmpm-day.is-today{position:relative;box-shadow:none!important;background:transparent!important}
+.cmpm-block.is-wk .cmpm-day.is-today b{box-shadow:none!important}
+.cmpm-block.is-wk .cmpm-day.is-today::after{content:"";position:absolute;left:-1px;right:-1px;top:-5px;bottom:-5px;border:1.8px solid var(--accent-solid);border-top:0;border-bottom:0;background:color-mix(in srgb,var(--accent-solid) 7%,transparent);pointer-events:none;z-index:2}
+.cmpm-block.is-wk .cmpm-card.is-first .cmpm-day.is-today::after{top:-3px;border-top:1.8px solid var(--accent-solid);border-radius:7px 7px 0 0}
+.cmpm-block.is-wk .cmpm-card.is-last .cmpm-day.is-today::after{bottom:-3px;border-bottom:1.8px solid var(--accent-solid);border-radius:0 0 7px 7px}
+.cmpm-block.is-wk .cmpm-card.is-first.is-last .cmpm-day.is-today::after{border-radius:7px}
+.cmp-cell.is-today{box-shadow:none!important;position:relative;opacity:1!important}
+.cmp-cell.is-today::after{content:"";position:absolute;left:-2px;right:-2px;top:-4px;bottom:-4px;border:1.8px solid var(--accent-solid);border-top:0;border-bottom:0;background:color-mix(in srgb,var(--accent-solid) 7%,transparent);pointer-events:none}
+.cmp-cell.is-today.tl-f::after{top:-3px;border-top:1.8px solid var(--accent-solid);border-radius:7px 7px 0 0}
+.cmp-cell.is-today.tl-l::after{bottom:-3px;border-bottom:1.8px solid var(--accent-solid);border-radius:0 0 7px 7px}
+.cmp-cell.is-today.tl-f.tl-l::after{border-radius:7px}
+.cmp-cell.is-today::after{background:none!important}
