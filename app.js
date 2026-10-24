@@ -4703,3 +4703,19 @@ document.addEventListener('click',e=>{
   document.querySelectorAll('.yg-c.is-sel').forEach(x=>x.classList.remove('is-sel')); c.classList.add('is-sel');
   box.innerHTML=`<b>${escapeHTML(formatDateWithYear(d))}</b> · <span class="st-code ${classFor(code)}">${escapeHTML(code||'—')}</span> ${escapeHTML(info[0])}${hol?` · ${escapeHTML(hol)}`:''}${sch?` · ${escapeHTML(sch)}`:''}`;
 });
+
+// Filtres par groupe (Collègues) : repliés par défaut, mémorisés.
+(function(){
+  const btn=document.getElementById('cmpGroupsToggle'),box=document.getElementById('cmpGroups');
+  if(!btn||!box)return;
+  let open=false; try{ open=localStorage.getItem('cmpGroupsOpen')==='1'; }catch(e){}
+  const apply=()=>{
+    box.classList.toggle('is-collapsed',!open);
+    btn.setAttribute('aria-expanded',String(open));
+    btn.classList.toggle('is-open',open);
+  };
+  const mark=()=>btn.classList.toggle('has-active',!!box.querySelector('.pv-chip.is-on,.pv-chip.is-partial'));
+  btn.addEventListener('click',()=>{ open=!open; try{ localStorage.setItem('cmpGroupsOpen',open?'1':'0'); }catch(e){} apply(); });
+  new MutationObserver(mark).observe(box,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  apply(); mark();
+})();

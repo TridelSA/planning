@@ -1600,3 +1600,14 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 }
 .mark-pop{position:fixed;z-index:200;max-width:min(280px,calc(100vw - 16px));padding:8px 12px;border-radius:10px;background:var(--ink);color:var(--surface);font:600 12.5px/1.4 var(--font-body);box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none}
 [data-mark]{cursor:help}
+
+/* Filtres Collègues repliables */
+.cmp-groups.is-collapsed{display:none}
+.cmp-gtoggle{gap:6px;position:relative}
+.cmp-gtoggle.is-open{background:var(--accent-tint);border-color:var(--accent)}
+.cmp-gtoggle.has-active::after{content:'';position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--accent-solid);box-shadow:0 0 0 2px var(--surface)}
+@media (max-width:700px){
+  .cmp-actions>.cmp-gtoggle{flex:0 0 44px;width:44px;padding:0}
+  .cmp-gtoggle-txt{display:none}
+  .cmp-actions>#cmpTodayBtn,.cmp-actions>#cmpFilter{flex:1 1 calc(50% - 30px)}
+}
