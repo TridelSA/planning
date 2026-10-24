@@ -2968,21 +2968,22 @@ function cmpNotesHTML(view){
 // Collègues › Mois (téléphone) : une ligne par personne, une colonne par jour, tout sur un seul écran.
 function cmpTimelineHTML(view,groups,desk){
   const people=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
-  const n=view.cols.length;
+  const n=31,pad=Math.max(0,31-view.cols.length);
+  const padH='<span></span>'.repeat(pad),padC='<i class="cmptl-x"></i>'.repeat(pad);
   let lgOpen=false;try{lgOpen=localStorage.getItem('cmpTlLegend')==='1';}catch(e){}
   const ti=view.cols.findIndex(c=>c.today);
   let h=`<div class="cmptl ${lgOpen?'lg-open':''}" style="--n:${n}"><div class="cmptl-grid"><div class="cmptl-head"><span></span>`;
   h+=view.cols.map(c=>{
     const show=desk||c.num===1||c.num%5===0;
     return `<b class="${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-day="${c.iso}">${show?c.num:''}</b>`;
-  }).join('')+'</div>';
+  }).join('')+padH+'</div>';
   // Ligne « événements » : vacances en une barre titrée, jours fériés par-dessus.
   const cols=view.cols;let bars='';
   for(let i=0;i<cols.length;){
     if(cols[i].school){
       let j=i;while(j+1<cols.length&&cols[j+1].school&&cols[j+1].school===cols[i].school)j++;
       let hl=0;for(let k=i;k<=j&&cols[k].holiday;k++)hl++;let hr=0;for(let k=j;k>=i&&cols[k].holiday;k--)hr++;const free=(j-i+1)-hl-hr;
-      bars+=`<span class="cmptl-vbar ${cols[i].holiday?'tr':cols[j].holiday?'tl':''}" style="grid-column:${i+2}/${j+3}" data-tl-day="${cols[i].iso}">${free<3?'':escapeHTML(cols[i].school.replace(/^Vacances (d'|de |du |des )?/i,'').replace(/^./,m=>m.toUpperCase()))}</span>`;
+      const m=j-i+1;bars+=`<span class="cmptl-vbar" style="grid-column:${i+2}/${j+3};padding-left:${(hl/m*100).toFixed(1)}%;padding-right:${(hr/m*100).toFixed(1)}%" data-tl-day="${cols[i].iso}">${free<3?'':escapeHTML(cols[i].school.replace(/^Vacances (d'|de |du |des )?/i,'').replace(/^./,m=>m.toUpperCase()))}</span>`;
       i=j+1;
     }else i++;
   }
@@ -3001,7 +3002,7 @@ function cmpTimelineHTML(view,groups,desk){
       const d=cmpDayInfo(emp,c);
       if(d.code)used.add(d.code);
       return `<i class="yg-c cmptl-c ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-key="${escapeHTML(presencePersonKey(emp))}" data-tl-iso="${c.iso}">${desk?escapeHTML(d.code||''):''}</i>`;
-    }).join('')+'</div>';
+    }).join('')+padC+'</div>';
   }
   if(ti>=0)h+=`<div class="cmptl-today" style="--ti:${ti}"></div>`;
   h+='</div>';

@@ -1945,3 +1945,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmptl-lg-toggle .pm{display:inline-grid;place-items:center;width:14px;height:14px;border-radius:50%;background:var(--paper);font-size:12px;line-height:1}
 .cmptl-legend{display:none;margin-top:6px}
 .cmptl.lg-open .cmptl-legend{display:block}
+.cmptl-vbar.tr,.cmptl-vbar.tl{text-align:center;padding-left:0;padding-right:0}
+.cmptl-x{display:block}
+.cmptl-vbar{box-sizing:border-box}
