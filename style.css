@@ -1915,3 +1915,20 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmptl-ev{height:12px;margin:0 0 4px}
 .cmptl-vbar,.cmptl-vhol{height:11px!important}
 .cmptl-vbar{font-size:7.5px!important;line-height:11px!important}
+/* Collègues › Mois sur ordinateur : frise large, cases identiques avec le code */
+@media (min-width:701px){
+  .cmptl-desk .cmptl{--nm:150px}
+  .cmptl-desk .cmptl-head,.cmptl-desk .cmptl-row,.cmptl-desk .cmptl-ev{gap:0 3px}
+  .cmptl-desk .cmptl-head b{font-size:11px!important;height:22px;line-height:22px!important;letter-spacing:0}
+  .cmptl-desk .cmptl-name{font-size:12.5px;padding-right:10px}
+  .cmptl-desk .cmptl-row{margin-bottom:4px}
+  .cmptl-desk .cmptl-c.yg-c{height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font:800 11.5px/1 var(--font-body);color:var(--ink);letter-spacing:.2px}
+  .cmptl-desk .cmptl-ev{height:20px;margin:2px 0 8px}
+  .cmptl-desk .cmptl-vbar,.cmptl-desk .cmptl-vhol{height:18px!important}
+  .cmptl-desk .cmptl-vbar{font-size:11px!important;line-height:18px!important}
+  .cmptl-desk .cmptl-info{font-size:14px}
+  .cmptl-desk .yg-legend{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))!important;font-size:12.5px;max-width:760px}
+  .cmptl-desk .yg-legend .yg-c{width:14px;height:14px}
+  .cmptl-desk .cmptl-code{font-size:13px;padding:6px 9px}
+  .cmptl-desk .cmptl-names{font-size:13.5px}
+}

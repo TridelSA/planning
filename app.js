@@ -2966,12 +2966,12 @@ function cmpNotesHTML(view){
     +'</div>';
 }
 // Collègues › Mois (téléphone) : une ligne par personne, une colonne par jour, tout sur un seul écran.
-function cmpTimelineHTML(view,groups){
+function cmpTimelineHTML(view,groups,desk){
   const people=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   const n=view.cols.length;
   let h=`<div class="cmptl" style="--n:${n}"><div class="cmptl-head"><span></span>`;
   h+=view.cols.map(c=>{
-    const show=c.num===1||c.num%5===0;
+    const show=desk||c.num===1||c.num%5===0;
     return `<b class="${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-day="${c.iso}">${show?c.num:''}</b>`;
   }).join('')+'</div>';
   // Ligne « événements » : vacances en une barre titrée, jours fériés par-dessus.
@@ -2998,7 +2998,7 @@ function cmpTimelineHTML(view,groups){
     h+=view.cols.map(c=>{
       const d=cmpDayInfo(emp,c);
       if(d.code)used.add(d.code);
-      return `<i class="yg-c cmptl-c ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-key="${escapeHTML(presencePersonKey(emp))}" data-tl-iso="${c.iso}"></i>`;
+      return `<i class="yg-c cmptl-c ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-key="${escapeHTML(presencePersonKey(emp))}" data-tl-iso="${c.iso}">${desk?escapeHTML(d.code||''):''}</i>`;
     }).join('')+'</div>';
   }
   const leg=legendCodes([...used]).map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('');
@@ -3130,6 +3130,11 @@ function renderCompareView(){
       return;
     }
     grid.innerHTML=`<div class="cmpm">${periodStripHTML(view.cols.map(c=>c.iso))}${cmpCardsHTML(view,groups)}${cmpNotesHTML(view)}</div>`;
+    return;
+  }
+
+  if(cmp.scale==='month'){
+    grid.innerHTML=`<div class="cmpm cmptl-desk">${cmpTimelineHTML(view,groups,true)}${cmpNotesHTML(view)}</div>`;
     return;
   }
 
