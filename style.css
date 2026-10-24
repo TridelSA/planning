@@ -1865,3 +1865,22 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:4px}}
 @media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:5.5px}}
 @media (max-width:700px){.mini-cell.ind-cell.is-schoolholiday::after{bottom:3.5px}}
+/* Collègues › Mois (téléphone) : frise une ligne par personne */
+.cmptl{--nm:72px}
+.cmptl-head,.cmptl-row{display:grid;grid-template-columns:var(--nm) repeat(var(--n),minmax(0,1fr));gap:2px;align-items:center}
+.cmptl-head{margin-bottom:4px}
+.cmptl-head b{font:700 7.5px/1 var(--font-body);text-align:center;color:var(--muted);padding:4px 0;border-radius:3px;cursor:pointer;min-width:0;overflow:visible;white-space:nowrap}
+.cmptl-head b.is-we{opacity:.55}
+.cmptl-head b.is-sch{background:color-mix(in srgb,var(--school-dot) 22%,var(--surface));color:var(--school-dot);opacity:1}
+.cmptl-head b.is-hol{background:color-mix(in srgb,var(--danger) 20%,var(--surface));color:var(--danger);opacity:1}
+.cmptl-head b.is-today{background:var(--accent-solid);color:#fff;opacity:1}
+.cmptl-row{margin-bottom:3px}
+.cmptl-name{font:800 10px/1.1 var(--font-body);text-transform:uppercase;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px;cursor:pointer}
+.cmptl-c.yg-c{display:block;height:17px;aspect-ratio:auto;border-radius:2px;padding:0;cursor:pointer;min-width:0}
+.cmptl-c.is-sel{box-shadow:0 0 0 1.5px var(--ink)!important;position:relative;z-index:1}
+.cmptl-info{margin-top:12px;min-height:34px}
+.cmptl-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.cmptl-chip{font:700 10.5px/1 var(--font-body);padding:4px 7px;border-radius:99px;background:var(--pill-bg,var(--c-off-bg))}
+.cmptl-chip{color:var(--ink)}
+.cmptl-c.is-today:not(.is-sel){box-shadow:none!important;outline:0!important}
+.cmptl-c.yg-c{position:relative}
