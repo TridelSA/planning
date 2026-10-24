@@ -4216,7 +4216,7 @@ function legendCodes(list){
   const groups=new Map();
   for(const c of list){
     probe.className='mini-cell ind-cell '+classFor(c);
-    const key=(getComputedStyle(probe).backgroundColor.match(/\d+(\.\d+)?/g)||[]).slice(0,3).map(n=>Math.round(n/14)).join(',');
+    const key=(getComputedStyle(probe).backgroundColor.match(/\d+(\.\d+)?/g)||[]).slice(0,3).map(n=>Math.round(n/5)).join(',');
     if(!groups.has(key))groups.set(key,[]);
     groups.get(key).push(c);
   }
@@ -4282,7 +4282,7 @@ function updateLegendVisibility(codes){
 
   if(!details || !summary)return;
 
-  if(codes.length===0){
+  if(codes.length===0 || state.view==='week' || state.view==='year'){
     details.classList.add('hidden');
     details.removeAttribute('open');
     return;
