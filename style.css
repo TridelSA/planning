@@ -6,7 +6,7 @@
   --accent:#1F7A4D;--accent-ink:#155C39;--accent-tint:#E7F4EC;
   --accent-solid:#1F7A4D;--accent-solid-hover:#155C39;
   --signal:#E8770F;--signal-tint:#FFEEDD;--signal-ink:#9E4C0A;
-  --school-dot:#6C63B5;--school-tint:#EFEDFA;
+  --school-dot:#17807F;--school-tint:#E3F3F2;
   --danger:#C62838;--danger-bg:#FDECEE;--danger-line:#F3CBD1;
   --warn-bg:#FFF3D6;--warn-ink:#8A5A00;
   --ok-bg:#E7F6EC;--ok-ink:#1C6E3E;
@@ -51,7 +51,7 @@
   --accent:#4CC184;--accent-ink:#7FD8A8;--accent-tint:#16322550;
   --accent-solid:#1E7E4F;--accent-solid-hover:#2AA468;
   --signal:#F09A47;--signal-tint:#3A2A18;--signal-ink:#F2B176;
-  --school-dot:#9A92E0;--school-tint:#25233F;
+  --school-dot:#5CC9C6;--school-tint:#15302F;
   --danger:#F0707C;--danger-bg:#3A1A1F;--danger-line:#5A2A31;
   --warn-bg:#3A3015;--warn-ink:#F0C860;
   --ok-bg:#16301F;--ok-ink:#7FD8A8;
@@ -1611,3 +1611,20 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmp-gtoggle-txt{display:none}
   .cmp-actions>#cmpTodayBtn,.cmp-actions>#cmpFilter{flex:1 1 calc(50% - 30px)}
 }
+
+/* Filtres Collègues : bouton unique (collègues + groupes) */
+.cmp-fbox.is-collapsed{display:none}
+.cmp-fbox{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+.cmp-fbox #cmpFilter .pv-filter-btn{width:100%}
+.cmp-gtoggle-n{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent-solid);color:#fff;display:grid;place-items:center;font:800 11px/1 var(--font-body)}
+.cmp-gtoggle-n:empty{display:none}
+.cmp-gtoggle.has-active::after{display:none}
+@media (max-width:700px){
+  .cmp-actions>.cmp-gtoggle{flex:1 1 calc(50% - 4px);width:auto;padding:0 12px}
+  .cmp-gtoggle-txt{display:inline}
+  .cmp-actions>#cmpTodayBtn{flex:1 1 calc(50% - 4px)}
+}
+
+/* Vacances scolaires : anneau pointillé sans remplissage (distinct des pastilles de codes) */
+.month-cell.is-schoolholiday .day-num,.cmpm-day.is-sch small,.cmpm-weekhead .is-sch em,.tw-sd.is-sch:not(.is-sel) b,.cmp-day.is-sch b,.tw-dayh.is-sch b{background:transparent!important;box-shadow:none!important;color:var(--school-dot)!important;outline:1.6px dashed var(--school-dot);outline-offset:-1.6px}
+@media (min-width:701px){.cmp-fbox #cmpFilter{max-width:260px}}

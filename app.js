@@ -4704,9 +4704,9 @@ document.addEventListener('click',e=>{
   box.innerHTML=`<b>${escapeHTML(formatDateWithYear(d))}</b> · <span class="st-code ${classFor(code)}">${escapeHTML(code||'—')}</span> ${escapeHTML(info[0])}${hol?` · ${escapeHTML(hol)}`:''}${sch?` · ${escapeHTML(sch)}`:''}`;
 });
 
-// Filtres par groupe (Collègues) : repliés par défaut, mémorisés.
+// Filtres (Collègues) : repliés par défaut, mémorisés ; le bouton affiche le nombre de personnes.
 (function(){
-  const btn=document.getElementById('cmpGroupsToggle'),box=document.getElementById('cmpGroups');
+  const btn=document.getElementById('cmpGroupsToggle'),box=document.getElementById('cmpFiltersBox'),groups=document.getElementById('cmpGroups'),cnt=document.getElementById('cmpCount');
   if(!btn||!box)return;
   let open=false; try{ open=localStorage.getItem('cmpGroupsOpen')==='1'; }catch(e){}
   const apply=()=>{
@@ -4714,8 +4714,12 @@ document.addEventListener('click',e=>{
     btn.setAttribute('aria-expanded',String(open));
     btn.classList.toggle('is-open',open);
   };
-  const mark=()=>btn.classList.toggle('has-active',!!box.querySelector('.pv-chip.is-on,.pv-chip.is-partial'));
+  const mark=()=>{
+    const n=cnt?cnt.textContent.trim():'';
+    let b=btn.querySelector('.cmp-gtoggle-n'); if(!b){ b=document.createElement('span'); b.className='cmp-gtoggle-n'; btn.appendChild(b); }
+    b.textContent=n&&n!=='0'?n:'';
+  };
   btn.addEventListener('click',()=>{ open=!open; try{ localStorage.setItem('cmpGroupsOpen',open?'1':'0'); }catch(e){} apply(); });
-  new MutationObserver(mark).observe(box,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  if(cnt)new MutationObserver(mark).observe(cnt,{childList:true,characterData:true,subtree:true});
   apply(); mark();
 })();
