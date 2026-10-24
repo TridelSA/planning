@@ -1598,3 +1598,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmp-day.is-hol b{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
   .cmp-day.is-hol::after{display:none}
 }
+.mark-pop{position:fixed;z-index:200;max-width:min(280px,calc(100vw - 16px));padding:8px 12px;border-radius:10px;background:var(--ink);color:var(--surface);font:600 12.5px/1.4 var(--font-body);box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none}
+[data-mark]{cursor:help}

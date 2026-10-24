@@ -2045,7 +2045,7 @@ function renderTeamWeek(){
 
   // --- Ordinateur : jours en colonnes, Matin / Après-midi / Nuit en lignes
   let g='<div class="tw-grid"><div class="tw-corner"></div>';
-  g+=days.map((d,i)=>{const iso=isoDate(d);return `<div class="tw-dayh ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${schoolHolidayName(iso)?'is-sch':''}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b>${teamBadges(iso)}</div>`;}).join('');
+  g+=days.map((d,i)=>{const iso=isoDate(d);return `<div class="tw-dayh ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${schoolHolidayName(iso)?'is-sch':''}"><small>${DAY_NAMES[i]}</small><b${markAttr(iso)}>${d.getDate()}</b>${teamBadges(iso)}</div>`;}).join('');
   for(const [code,k,label] of TEAM_SHIFTS){
     g+=`<div class="tw-rowh ${k}">${label}</div>`;
     g+=days.map((d,i)=>{
@@ -2061,7 +2061,7 @@ function renderTeamWeek(){
   const sel=new Date(state.teamDate);sel.setHours(0,0,0,0);
   const selISO=isoDate(sel);
   let m='<div class="tw-mobile"><div class="tw-strip">';
-  m+=days.map((d,i)=>{const iso=isoDate(d);return `<button type="button" class="tw-sd ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${iso===selISO?'is-sel':''} ${swissHolidayName(iso)?'is-hol':''} ${schoolHolidayName(iso)?'is-sch':''}" data-team-pick="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b></button>`;}).join('');
+  m+=days.map((d,i)=>{const iso=isoDate(d);return `<button type="button" class="tw-sd ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${iso===selISO?'is-sel':''} ${swissHolidayName(iso)?'is-hol':''} ${schoolHolidayName(iso)?'is-sch':''}" data-team-pick="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))}"><small>${DAY_NAMES[i]}</small><b${markAttr(iso)}>${d.getDate()}</b></button>`;}).join('');
   m+='</div>';
   const long=sel.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
   m+=`<div class="tw-daytitle"><strong>${escapeHTML(long.charAt(0).toUpperCase()+long.slice(1))}</strong>${teamBadges(selISO)}</div>`;
@@ -2875,6 +2875,34 @@ function cmpYearInfo(emp,c){
 
 // Affichage téléphone : une carte par personne (pas de tableau à faire défiler).
 
+
+// Infobulle au toucher sur les ronds « vacances scolaires » / « jour férié ».
+function markText(iso){
+  const h=swissHolidayName(iso),sc=schoolHolidayName(iso);
+  const t=[]; if(h)t.push('Jour férié : '+h); if(sc)t.push('Vacances scolaires : '+sc);
+  return t.join('\n');
+}
+function markAttr(iso){ const t=markText(iso); return t?` data-mark="${escapeHTML(t)}"`:''; }
+(function(){
+  let pop=null,timer=null;
+  const close=()=>{ if(pop){pop.remove();pop=null;} clearTimeout(timer); };
+  document.addEventListener('click',e=>{
+    const t=e.target.closest('[data-mark]');
+    if(!t){ close(); return; }
+    e.stopPropagation(); e.preventDefault();
+    close();
+    pop=document.createElement('div'); pop.className='mark-pop'; pop.setAttribute('role','status');
+    pop.innerHTML=t.dataset.mark.split('\n').map(x=>`<div>${escapeHTML(x)}</div>`).join('');
+    document.body.appendChild(pop);
+    const r=t.getBoundingClientRect(),pw=pop.offsetWidth;
+    pop.style.left=Math.max(8,Math.min(window.innerWidth-pw-8,r.left+r.width/2-pw/2))+'px';
+    const below=r.top<80;
+    pop.style.top=(below?r.bottom+8:r.top-pop.offsetHeight-8)+'px';
+    timer=setTimeout(close,3500);
+  },true);
+  window.addEventListener('scroll',close,{passive:true});
+})();
+
 // Ruban « période » : vacances scolaires (bande violette) et jours fériés (points rouges)
 // sur toute la période affichée. Hauteur fixe, même quand il est vide.
 function periodStripHTML(isos){
@@ -2900,7 +2928,7 @@ function periodNotesHTML(isos){
 }
 
 function cmpNotesHTML(view){
-  if(view.kind!=='year')return cmp.scale==='week'?'':periodNotesHTML(view.cols.map(c=>c.iso));
+  if(view.kind!=='year')return periodNotesHTML(view.cols.map(c=>c.iso));
   if(view.kind==='year')return '';
   const sch=[...new Set(view.cols.map(c=>c.school).filter(Boolean))];
   const hol=view.cols.filter(c=>c.holiday);
@@ -2918,7 +2946,7 @@ function cmpCardsHTML(view,groups){
   {
     const people=everyone;
     h+='<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
-    if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}">${c.name}<em>${c.num}</em></span>`).join('')+'</div>';
+    if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}">${c.name}<em${markAttr(c.iso)}>${c.num}</em></span>`).join('')+'</div>';
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<div class="cmpm-card"><div class="cmpm-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</div>`;
@@ -2935,7 +2963,7 @@ function cmpCardsHTML(view,groups){
         h+=view.cols.map(c=>{
           const d=cmpDayInfo(emp,c);
           const tap=cmp.scale==='week'?` data-cmp-key="${escapeHTML(presencePersonKey(emp))}" data-cmp-iso="${c.iso}" role="button" tabindex="0"`:'';
-          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}" title="${escapeHTML(d.title)}"${tap}><small>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
+          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}" title="${escapeHTML(d.title)}"${tap}><small${markAttr(c.iso)}>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
         }).join('');
         h+='</div>';
       }
@@ -3014,7 +3042,7 @@ function renderCompareView(){
   // partagent l'espace à parts égales (largeur minimale = défilement horizontal).
   const minW=cmp.scale==='week'?96:34;
   let h=periodStripHTML(view.cols.map(c=>c.iso))+`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
-  h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''} ${c.today?'is-today':''}" ${c.holiday?`title="${escapeHTML(c.holName)}"`:c.school?`title="${escapeHTML(c.school)}"`:''}><span>${c.name}</span><b>${c.num}</b></th>`).join('');
+  h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''} ${c.today?'is-today':''}" ${c.holiday?`title="${escapeHTML(c.holName)}"`:c.school?`title="${escapeHTML(c.school)}"`:''}><span>${c.name}</span><b${markAttr(c.iso)}>${c.num}</b></th>`).join('');
   h+='</tr></thead><tbody>';
   for(const group of groups){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
@@ -4143,7 +4171,7 @@ function renderMonth(e){
     const showLabel=visible&&c;
     const outsideClass=inMonth?'':'outside-month';
     const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
-    h+=`<div class="month-cell ${colorClass} ${outsideClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num">${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
+    h+=`<div class="month-cell ${colorClass} ${outsideClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num"${markAttr(dISO)}>${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
   }
   h+='</div></div>'+periodNotesHTML(moIsos);$('viewContainer').innerHTML=h;
 }
