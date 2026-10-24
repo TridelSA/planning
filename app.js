@@ -2072,7 +2072,7 @@ function renderTeamWeek(){
       +'</section>';
   }
   m+='</div>';
-  $('teamViewContainer').innerHTML=periodStripHTML(days.map(isoDate))+g+m+periodNotesHTML(days.map(isoDate));
+  $('teamViewContainer').innerHTML=g+m;
   attachTeamDayClickHandlers();
 }
 
@@ -2900,7 +2900,7 @@ function periodNotesHTML(isos){
 }
 
 function cmpNotesHTML(view){
-  if(view.kind!=='year')return periodNotesHTML(view.cols.map(c=>c.iso));
+  if(view.kind!=='year')return cmp.scale==='week'?'':periodNotesHTML(view.cols.map(c=>c.iso));
   if(view.kind==='year')return '';
   const sch=[...new Set(view.cols.map(c=>c.school).filter(Boolean))];
   const hol=view.cols.filter(c=>c.holiday);
@@ -2918,7 +2918,7 @@ function cmpCardsHTML(view,groups){
   {
     const people=everyone;
     h+='<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
-    if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}">${c.name}</span>`).join('')+'</div>';
+    if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}">${c.name}<em>${c.num}</em></span>`).join('')+'</div>';
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<div class="cmpm-card"><div class="cmpm-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</div>`;
@@ -4115,7 +4115,7 @@ function renderWeek(e){
       (inTravaux?'<span class="week-travaux-dot" aria-hidden="true"></span>':'');
     h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${dots}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
   }
-  h+='</div>'+periodNotesHTML(wkIsos);
+  h+='</div>';
   $('viewContainer').innerHTML=h;
 }
 
