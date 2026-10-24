@@ -2979,11 +2979,18 @@ function cmpTimelineHTML(view,groups){
   for(let i=0;i<cols.length;){
     if(cols[i].school){
       let j=i;while(j+1<cols.length&&cols[j+1].school&&cols[j+1].school===cols[i].school)j++;
-      bars+=`<span class="cmptl-vbar" style="grid-column:${i+2}/${j+3}" data-tl-day="${cols[i].iso}">${escapeHTML(cols[i].school.replace(/^Vacances (d'|de |du |des )?/i,'').replace(/^./,m=>m.toUpperCase()))}</span>`;
+      let hl=0;for(let k=i;k<=j&&cols[k].holiday;k++)hl++;let hr=0;for(let k=j;k>=i&&cols[k].holiday;k--)hr++;const free=(j-i+1)-hl-hr;
+      bars+=`<span class="cmptl-vbar ${cols[i].holiday?'tr':cols[j].holiday?'tl':''}" style="grid-column:${i+2}/${j+3}" data-tl-day="${cols[i].iso}">${free<3?'':escapeHTML(cols[i].school.replace(/^Vacances (d'|de |du |des )?/i,'').replace(/^./,m=>m.toUpperCase()))}</span>`;
       i=j+1;
     }else i++;
   }
-  cols.forEach((c,i)=>{if(c.holiday)bars+=`<span class="cmptl-vhol" style="grid-column:${i+2}" data-tl-day="${c.iso}"></span>`;});
+  for(let i=0;i<cols.length;){
+    if(cols[i].holiday){
+      let j=i;while(j+1<cols.length&&cols[j+1].holiday)j++;
+      bars+=`<span class="cmptl-vhol" style="grid-column:${i+2}/${j+3}" data-tl-day="${cols[i].iso}"></span>`;
+      i=j+1;
+    }else i++;
+  }
   if(bars)h+=`<div class="cmptl-ev"><span></span>${bars}</div>`;
   const used=new Set();
   for(const emp of people){
