@@ -2969,7 +2969,9 @@ function cmpNotesHTML(view){
 function cmpTimelineHTML(view,groups,desk){
   const people=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   const n=view.cols.length;
-  let h=`<div class="cmptl" style="--n:${n}"><div class="cmptl-head"><span></span>`;
+  let lgOpen=false;try{lgOpen=localStorage.getItem('cmpTlLegend')==='1';}catch(e){}
+  const ti=view.cols.findIndex(c=>c.today);
+  let h=`<div class="cmptl ${lgOpen?'lg-open':''}" style="--n:${n}"><div class="cmptl-grid"><div class="cmptl-head"><span></span>`;
   h+=view.cols.map(c=>{
     const show=desk||c.num===1||c.num%5===0;
     return `<b class="${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-day="${c.iso}">${show?c.num:''}</b>`;
@@ -3001,11 +3003,17 @@ function cmpTimelineHTML(view,groups,desk){
       return `<i class="yg-c cmptl-c ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" data-tl-key="${escapeHTML(presencePersonKey(emp))}" data-tl-iso="${c.iso}">${desk?escapeHTML(d.code||''):''}</i>`;
     }).join('')+'</div>';
   }
+  if(ti>=0)h+=`<div class="cmptl-today" style="--ti:${ti}"></div>`;
+  h+='</div>';
   const leg=legendCodes([...used]).map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('');
-  h+=`<div class="yg-info cmptl-info" id="cmpTlInfo">Touchez une case ou un jour pour le détail.</div><div class="yg-legend">${leg}</div></div>`;
+  h+=`<div class="yg-info cmptl-info" id="cmpTlInfo">Touchez une case ou un jour pour le détail.</div>
+    <button type="button" class="cmptl-lg-toggle" data-tl-legend aria-expanded="${lgOpen}"><span class="pm">${lgOpen?'−':'+'}</span> Légende</button>
+    <div class="cmptl-legend"><div class="yg-legend">${leg}</div>${periodNotesHTML(view.cols.map(c=>c.iso))}</div></div>`;
   return h;
 }
 document.addEventListener('click',e=>{
+  const tg=e.target.closest('[data-tl-legend]');
+  if(tg){const w=tg.closest('.cmptl');const o=!w.classList.contains('lg-open');w.classList.toggle('lg-open',o);tg.setAttribute('aria-expanded',String(o));tg.querySelector('.pm').textContent=o?'−':'+';try{localStorage.setItem('cmpTlLegend',o?'1':'0');}catch(err){}return;}
   const box=document.getElementById('cmpTlInfo'); if(!box)return;
   const cell=e.target.closest('.cmptl-c[data-tl-iso]'),day=e.target.closest('.cmptl-head [data-tl-day]');
   if(!cell&&!day)return;
@@ -3126,7 +3134,7 @@ function renderCompareView(){
 
   if(isPhoneLayout()){
     if(cmp.scale==='month'){
-      grid.innerHTML=`<div class="cmpm">${cmpTimelineHTML(view,groups)}${cmpNotesHTML(view)}</div>`;
+      grid.innerHTML=`<div class="cmpm">${cmpTimelineHTML(view,groups)}</div>`;
       return;
     }
     grid.innerHTML=`<div class="cmpm">${periodStripHTML(view.cols.map(c=>c.iso))}${cmpCardsHTML(view,groups)}${cmpNotesHTML(view)}</div>`;
@@ -3134,7 +3142,7 @@ function renderCompareView(){
   }
 
   if(cmp.scale==='month'){
-    grid.innerHTML=`<div class="cmpm cmptl-desk">${cmpTimelineHTML(view,groups,true)}${cmpNotesHTML(view)}</div>`;
+    grid.innerHTML=`<div class="cmpm cmptl-desk">${cmpTimelineHTML(view,groups,true)}</div>`;
     return;
   }
 
