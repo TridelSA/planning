@@ -1736,3 +1736,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .month-cell.sc,.cmpm-day.sc,.cmpm-weekhead .sc,.tw-sd.sc,.cmp-day.sc,.tw-dayh.sc{background-color:color-mix(in srgb,var(--school-dot) 10%,var(--surface))!important}
 .month-cell.sc.today,.month-cell.sc.is-holiday{background-color:color-mix(in srgb,var(--school-dot) 10%,var(--surface))!important}
 .tw-sd.sc.is-sel{background-color:var(--accent-soft,var(--surface))!important}
+/* Collègues mois : cases vacances jointes, sans coins, sans contour autour des codes */
+.cmpm-day.sc{border-radius:0!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--school-dot) 10%,var(--surface))!important}
+.cmpm-day b{box-shadow:none!important;border:0!important;outline:0!important}
