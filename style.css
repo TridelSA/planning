@@ -2045,3 +2045,4 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   #teamViewContainer .year-calendar .team-cell.mini-cell.is-holiday::after{content:'';position:absolute;left:50%;top:4px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--danger);right:auto}
 }
 @media (min-width:701px){#teamViewContainer .year-calendar .mini-cell.mini-empty,#teamViewContainer .year-calendar .team-cell.mini-empty{background:transparent!important}}
+@media (min-width:701px){.cmptl-desk{padding:14px 22px 12px!important;box-sizing:border-box}.cmptl-desk .cmptl-name{padding-left:2px}}
