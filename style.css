@@ -1948,3 +1948,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmptl-vbar.tr,.cmptl-vbar.tl{text-align:center;padding-left:0;padding-right:0}
 .cmptl-x{display:block}
 .cmptl-vbar{box-sizing:border-box}
+.cmptl-rows{position:relative}
+.cmptl-today{top:-2px;bottom:-2px}

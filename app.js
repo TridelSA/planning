@@ -2996,6 +2996,7 @@ function cmpTimelineHTML(view,groups,desk){
   }
   h+=`<div class="cmptl-ev"><span></span>${bars}</div>`;
   const used=new Set();
+  h+='<div class="cmptl-rows">';
   for(const emp of people){
     h+=`<div class="cmptl-row"><span class="cmptl-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(cleanEmployeeName(emp.name))}</span>`;
     h+=view.cols.map(c=>{
@@ -3005,7 +3006,7 @@ function cmpTimelineHTML(view,groups,desk){
     }).join('')+padC+'</div>';
   }
   if(ti>=0)h+=`<div class="cmptl-today" style="--ti:${ti}"></div>`;
-  h+='</div>';
+  h+='</div></div>';
   const leg=legendCodes([...used]).map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('');
   h+=`<div class="yg-info cmptl-info" id="cmpTlInfo">Touchez une case ou un jour pour le détail.</div>
     <button type="button" class="cmptl-lg-toggle" data-tl-legend aria-expanded="${lgOpen}"><span class="pm">${lgOpen?'−':'+'}</span> Légende</button>
