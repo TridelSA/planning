@@ -2046,3 +2046,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 }
 @media (min-width:701px){#teamViewContainer .year-calendar .mini-cell.mini-empty,#teamViewContainer .year-calendar .team-cell.mini-empty{background:transparent!important}}
 @media (min-width:701px){.cmptl-desk{padding:14px 22px 12px!important;box-sizing:border-box}.cmptl-desk .cmptl-name{padding-left:2px}}
+/* Rotations · semaine : férié = même pastille rouge que dans Individuel */
+.tw-badge.hol{display:inline-block;width:auto;padding:3px 9px;border-radius:99px;font:700 11px/1.3 var(--font-body);background:var(--danger-bg);color:var(--danger);max-width:100%}
