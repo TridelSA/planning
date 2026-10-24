@@ -4099,7 +4099,7 @@ function renderWeek(e){
   const schoolTop=Object.entries(schoolCount).sort((a,b)=>b[1]-a[1])[0];
   const schoolNote=schoolTop&&schoolTop[1]>=3?schoolTop[0]:'';
   const wkIsos=Array.from({length:7},(_,i)=>{const dd=new Date(start);dd.setDate(start.getDate()+i);return isoDate(dd);});
-  let h=periodStripHTML(wkIsos)+`<div class="week-board${schoolNote?' has-school-note':''}">`;
+  let h=`<div class="week-board">`;
   for(let i=0;i<7;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
     const isToday=isoDate(d)===todayISO();
