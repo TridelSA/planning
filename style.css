@@ -1803,3 +1803,4 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .yg-legend .yg-c{width:10px;height:10px}
 @media (max-width:700px){.yg-grid{gap:1.5px}.yg-grid .yg-c{height:11px;border-radius:2px}.yg-grid{grid-template-columns:26px repeat(31,minmax(0,1fr))}.yg-mn{font-size:9px}}
 @media (min-width:701px){.yg-grid .yg-c{height:18px}}
+.yg-c.is-hol{position:relative}

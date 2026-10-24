@@ -3315,10 +3315,10 @@ document.addEventListener('keydown',event=>{ if(event.key==='Escape')closeCmpPan
 // si la personne en a dans son année.
 // ==========================================================
 const ST_KEY='statsState';
-const ST_VAC=['VA','VJ','HSR','HOR']; // « congés » = vacances + récupérations (HSR, HOR)
+const ST_VAC=['VA','VJ','PI','HSR','HOR']; // « congés » = vacances + récupérations (HSR, HOR)
 const ST_REC=[];
 const ST_AFF=['CA','PO','EN','GR']; // affectations : Camion, Portes, Entretien, Groupe
-const ST_OTHER=['MS','MC','AP','MI','EM','PC','PI','FE','PR','AN','NS','PA','DE','DL','DC','JT'];
+const ST_OTHER=['MS','MC','AP','MI','EM','PC','FE','PR','AN','NS','PA','DE','DL','DC','JT'];
 const ST_COLORS={vac:'#E0566A',oth:'#6B7A90',rot:'#4545AA',piq:'#63428E',aff:'#3E8E6B'};
 const st={month:'all',year:0,metric:'',search:'',mode:'month',more:false};
 // Année affichée : par défaut l'année en cours ; les autres années ne sont
@@ -3530,7 +3530,7 @@ function renderStatsView(){
   const today=todayISO();
   const periods=stLeavePeriods(emp,sub);
   const vacYear=stSum(months,ST_VAC,'all');
-  const vacBreak=[['VA','VJ'],['HSR','HOR']].map(g=>stSum(months,g,sub));
+  const vacBreak=[['VA','VJ','PI'],['HSR','HOR']].map(g=>stSum(months,g,sub));
   const takenYear=Object.keys(emp.schedule||{}).filter(iso=>iso.startsWith(String(stYear())+'-') && ST_VAC.includes(safeCode(emp.schedule[iso])) && (sub==='all'||Number(iso.slice(5,7))-1===sub));
   const past=takenYear.filter(i=>i<=today).length, next=takenYear.length-past;
   const upcoming=stLeavePeriods(emp,'all').find(x=>x.end>=today);
