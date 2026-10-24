@@ -2015,3 +2015,4 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .week-shift .shift-team.compact-team,.week-shift .shift-team-inline{text-align:left;margin:0;justify-content:flex-start;display:flex}
 }
 @media (min-width:701px){.week-shift .shift-team-inline{gap:5px}}
+@media (min-width:701px){body.compare-mode.cmp-week .app{max-width:1120px}}

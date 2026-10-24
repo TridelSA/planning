@@ -3187,6 +3187,7 @@ function cmpDeskTodayFrame(){
   grid.appendChild(d);
 }
 addEventListener('resize',()=>{try{cmpDeskTodayFrame()}catch(e){}});
+try{const _ro=new ResizeObserver(()=>{try{cmpDeskTodayFrame()}catch(e){}});const _g=document.getElementById('cmpGrid');if(_g)_ro.observe(_g);const _a=document.querySelector('.app');if(_a){_ro.observe(_a);_a.addEventListener('transitionend',()=>cmpDeskTodayFrame())}}catch(e){}
 try{document.fonts&&document.fonts.ready.then(()=>cmpDeskTodayFrame())}catch(e){}
 
 // Vue « Année » : une case par personne et par semaine ISO (vert = présent
