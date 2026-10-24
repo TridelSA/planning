@@ -1525,3 +1525,20 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmpm-weekhead .is-sch:not(.is-hol){color:var(--school-dot)}
   .cmp-notes{padding:0 2px}
 }
+
+/* Ruban période : vacances scolaires + jours fériés (toutes les vues calendrier) */
+.ps{display:grid;grid-template-columns:repeat(var(--ps-n),1fr);grid-template-rows:18px;height:18px;margin:0 0 8px;border-radius:9px;background:color-mix(in srgb,var(--line) 55%,transparent);position:relative;overflow:hidden}
+.ps-sch{grid-row:1;display:flex;align-items:center;min-width:0;padding:0 8px;background:var(--school-tint);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--school-dot) 28%,transparent);border-radius:9px}
+.ps-sch b{font:800 10px/1 var(--font-body);color:var(--school-dot);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps-hol{grid-row:1;display:grid;place-items:center;z-index:1}
+.ps-hol i{width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--surface)}
+.week-school-note{display:none!important}
+.cmp-day.is-sch{background:transparent}
+.month-cell.is-schoolholiday,.month-cell.is-schoolholiday.today{box-shadow:none}
+@media (max-width:700px){
+  .cmpm-day.is-sch:not(.is-hol) small{color:var(--muted);font-weight:700}
+  .cmpm-weekhead .is-sch:not(.is-hol){color:var(--muted);box-shadow:none}
+  .cmpm>.ps,#viewContainer>.ps,#teamViewContainer>.ps{margin:4px 2px 8px}
+}
+.ps-hol{place-items:end center;padding-bottom:1px}
+.ps-hol i{width:14px;height:4px;border-radius:2px;box-shadow:none;background:var(--danger)}

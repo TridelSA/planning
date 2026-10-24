@@ -2072,7 +2072,7 @@ function renderTeamWeek(){
       +'</section>';
   }
   m+='</div>';
-  $('teamViewContainer').innerHTML=g+m;
+  $('teamViewContainer').innerHTML=periodStripHTML(days.map(isoDate))+g+m+periodNotesHTML(days.map(isoDate));
   attachTeamDayClickHandlers();
 }
 
@@ -2874,8 +2874,32 @@ function cmpYearInfo(emp,c){
 }
 
 // Affichage téléphone : une carte par personne (pas de tableau à faire défiler).
-// Pastilles « Vacances scolaires » et jours fériés de la période affichée.
+
+// Ruban « période » : vacances scolaires (bande violette) et jours fériés (points rouges)
+// sur toute la période affichée. Hauteur fixe, même quand il est vide.
+function periodStripHTML(isos){
+  const n=isos.length; if(!n)return '';
+  let segs='',i=0,any=false;
+  while(i<n){
+    const nm=schoolHolidayName(isos[i])||'';
+    let j=i; while(j+1<n&&(schoolHolidayName(isos[j+1])||'')===nm)j++;
+    if(nm){ any=true; segs+=`<span class="ps-sch" style="grid-column:${i+1}/span ${j-i+1}" title="${escapeHTML(nm)}"><b>${escapeHTML(nm)}</b></span>`; }
+    i=j+1;
+  }
+  isos.forEach((iso,k)=>{ const h=swissHolidayName(iso); if(h){ any=true; segs+=`<span class="ps-hol" style="grid-column:${k+1}" title="${escapeHTML(h)}"><i></i></span>`; } });
+  return `<div class="ps${any?' has-ev':''}" style="--ps-n:${n}" aria-label="Vacances scolaires et jours fériés">${segs}</div>`;
+}
+// Légende sous le calendrier : noms des vacances et fériés de la période.
+function periodNotesHTML(isos){
+  const sch=[...new Set(isos.map(i=>schoolHolidayName(i)).filter(Boolean))];
+  const hol=isos.map(i=>({i,n:swissHolidayName(i)})).filter(x=>x.n);
+  if(!sch.length&&!hol.length)return '';
+  const fmt=iso=>{const d=parseISODateOnly(iso);return `${DAY_NAMES[(d.getDay()+6)%7].slice(0,3).toLowerCase()}. ${d.getDate()}`;};
+  return '<div class="cmp-notes">'+sch.map(n=>`<span class="cmp-note sch">🏫 ${escapeHTML(n)}</span>`).join('')+hol.map(x=>`<span class="cmp-note hol"><i></i>${fmt(x.i)} · ${escapeHTML(x.n)}</span>`).join('')+'</div>';
+}
+
 function cmpNotesHTML(view){
+  if(view.kind!=='year')return periodNotesHTML(view.cols.map(c=>c.iso));
   if(view.kind==='year')return '';
   const sch=[...new Set(view.cols.map(c=>c.school).filter(Boolean))];
   const hol=view.cols.filter(c=>c.holiday);
@@ -2981,14 +3005,14 @@ function renderCompareView(){
   if(isYear){ renderCmpYear(view,groups); return; }
 
   if(isPhoneLayout()){
-    grid.innerHTML=`<div class="cmpm">${cmpCardsHTML(view,groups)}${cmpNotesHTML(view)}</div>`;
+    grid.innerHTML=`<div class="cmpm">${periodStripHTML(view.cols.map(c=>c.iso))}${cmpCardsHTML(view,groups)}${cmpNotesHTML(view)}</div>`;
     return;
   }
 
   // La table occupe toute la largeur disponible ; les colonnes de jours se
   // partagent l'espace à parts égales (largeur minimale = défilement horizontal).
   const minW=cmp.scale==='week'?96:34;
-  let h=`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
+  let h=periodStripHTML(view.cols.map(c=>c.iso))+`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
   h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''} ${c.today?'is-today':''}" ${c.holiday?`title="${escapeHTML(c.holName)}"`:c.school?`title="${escapeHTML(c.school)}"`:''}><span>${c.name}</span><b>${c.num}</b></th>`).join('');
   h+='</tr></thead><tbody>';
   for(const group of groups){
@@ -4074,7 +4098,8 @@ function renderWeek(e){
   for(let i=0;i<7;i++){ const dd=new Date(start);dd.setDate(start.getDate()+i); const nm=schoolHolidayName(isoDate(dd)); if(nm)schoolCount[nm]=(schoolCount[nm]||0)+1; }
   const schoolTop=Object.entries(schoolCount).sort((a,b)=>b[1]-a[1])[0];
   const schoolNote=schoolTop&&schoolTop[1]>=3?schoolTop[0]:'';
-  let h=(schoolNote?`<div class="week-school-note"><span aria-hidden="true">🏫</span> ${escapeHTML(schoolNote)}</div>`:'')+`<div class="week-board${schoolNote?' has-school-note':''}">`;
+  const wkIsos=Array.from({length:7},(_,i)=>{const dd=new Date(start);dd.setDate(start.getDate()+i);return isoDate(dd);});
+  let h=periodStripHTML(wkIsos)+`<div class="week-board${schoolNote?' has-school-note':''}">`;
   for(let i=0;i<7;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
     const isToday=isoDate(d)===todayISO();
@@ -4089,7 +4114,7 @@ function renderWeek(e){
       (inTravaux?'<span class="week-travaux-dot" aria-hidden="true"></span>':'');
     h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${dots}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
   }
-  h+='</div>';
+  h+='</div>'+periodNotesHTML(wkIsos);
   $('viewContainer').innerHTML=h;
 }
 
@@ -4098,7 +4123,8 @@ function renderMonth(e){
   $('viewOverline').textContent='';
   populateMonthJump();
   const first=new Date(y,m,1),start=mondayOf(first);
-  let h='<div class="month-calendar"><div class="month-head">'+DAY_NAMES.map(d=>`<span>${d}</span>`).join('')+'</div><div class="month-grid">';
+  const moIsos=Array.from({length:new Date(y,m+1,0).getDate()},(_,i)=>isoDate(new Date(y,m,i+1)));
+  let h=periodStripHTML(moIsos)+'<div class="month-calendar"><div class="month-head">'+DAY_NAMES.map(d=>`<span>${d}</span>`).join('')+'</div><div class="month-grid">';
   for(let i=0;i<42;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
     const dISO=isoDate(d);
@@ -4118,7 +4144,7 @@ function renderMonth(e){
     const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
     h+=`<div class="month-cell ${colorClass} ${outsideClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num">${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
   }
-  h+='</div></div>';$('viewContainer').innerHTML=h;
+  h+='</div></div>'+periodNotesHTML(moIsos);$('viewContainer').innerHTML=h;
 }
 
 function renderYear(e){
