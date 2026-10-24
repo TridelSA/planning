@@ -2814,7 +2814,7 @@ function cmpColumns(){
     const cols=[];
     for(let i=1;i<=n;i++){
       const d=new Date(y,m,i);const iso=isoDate(d);const dow=(d.getDay()+6)%7;
-      cols.push({iso,d,dow,num:i,name:DAY_NAMES[dow][0],weekend:dow>=5,holiday:!!swissHolidayName(iso),today:iso===today});
+      cols.push({iso,d,dow,num:i,name:DAY_NAMES[dow][0],weekend:dow>=5,holiday:!!swissHolidayName(iso),holName:swissHolidayName(iso)||'',school:schoolHolidayName(iso)||'',today:iso===today});
     }
     return {kind:'day',title:`${MONTH_NAMES[m]} ${y}`,cols};
   }
@@ -2822,7 +2822,7 @@ function cmpColumns(){
   const cols=[];
   for(let i=0;i<7;i++){
     const d=new Date(monday);d.setDate(monday.getDate()+i);const iso=isoDate(d);
-    cols.push({iso,d,dow:i,num:d.getDate(),name:DAY_NAMES[i],weekend:i>=5,holiday:!!swissHolidayName(iso),today:iso===today});
+    cols.push({iso,d,dow:i,num:d.getDate(),name:DAY_NAMES[i],weekend:i>=5,holiday:!!swissHolidayName(iso),holName:swissHolidayName(iso)||'',school:schoolHolidayName(iso)||'',today:iso===today});
   }
   const sunday=cols[6].d;
   let title=`Semaine ${isoWeek(monday)} · ${formatShortDate(monday)} – ${formatDateWithYear(sunday)}`;
@@ -2874,14 +2874,26 @@ function cmpYearInfo(emp,c){
 }
 
 // Affichage téléphone : une carte par personne (pas de tableau à faire défiler).
+// Pastilles « Vacances scolaires » et jours fériés de la période affichée.
+function cmpNotesHTML(view){
+  if(view.kind==='year')return '';
+  const sch=[...new Set(view.cols.map(c=>c.school).filter(Boolean))];
+  const hol=view.cols.filter(c=>c.holiday);
+  if(!sch.length&&!hol.length)return '';
+  const fmt=c=>`${c.name.slice(0,3).toLowerCase()}. ${c.num}`;
+  return '<div class="cmp-notes">'
+    +sch.map(n=>`<span class="cmp-note sch">🏫 ${escapeHTML(n)}</span>`).join('')
+    +hol.map(c=>`<span class="cmp-note hol"><i></i>${fmt(c)} · ${escapeHTML(c.holName)}</span>`).join('')
+    +'</div>';
+}
 function cmpCardsHTML(view,groups){
   // Tout le monde dans un seul bloc, sans séparation par groupe.
   const everyone=groups.flatMap(g=>g.people).filter(e=>cmp.people.has(presencePersonKey(e)));
   let h='';
   {
     const people=everyone;
-    h+='<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
-    if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''}">${c.name}</span>`).join('')+'</div>';
+    h+=cmpNotesHTML(view)+'<div class="cmpm-block'+(view.kind!=='year'&&cmp.scale==='week'?' is-wk':'')+'">';
+    if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}">${c.name}</span>`).join('')+'</div>';
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
       h+=`<div class="cmpm-card"><div class="cmpm-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</div>`;
@@ -2898,7 +2910,7 @@ function cmpCardsHTML(view,groups){
         h+=view.cols.map(c=>{
           const d=cmpDayInfo(emp,c);
           const tap=cmp.scale==='week'?` data-cmp-key="${escapeHTML(presencePersonKey(emp))}" data-cmp-iso="${c.iso}" role="button" tabindex="0"`:'';
-          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''}" title="${escapeHTML(d.title)}"${tap}><small>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
+          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''}" title="${escapeHTML(d.title)}"${tap}><small>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
         }).join('');
         h+='</div>';
       }
@@ -2976,8 +2988,8 @@ function renderCompareView(){
   // La table occupe toute la largeur disponible ; les colonnes de jours se
   // partagent l'espace à parts égales (largeur minimale = défilement horizontal).
   const minW=cmp.scale==='week'?96:34;
-  let h=`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
-  h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.today?'is-today':''}"><span>${c.name}</span><b>${c.num}</b></th>`).join('');
+  let h=cmpNotesHTML(view)+`<table class="cmp-table" style="width:100%;min-width:${190+view.cols.length*(minW+2)+2}px"><colgroup><col style="width:190px">${view.cols.map(()=>'<col>').join('')}</colgroup><thead><tr><th class="cmp-name"><div class="cmp-name-inner"></div></th>`;
+  h+=view.cols.map(c=>`<th class="cmp-day ${c.weekend?'is-we':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch':''} ${c.today?'is-today':''}" ${c.holiday?`title="${escapeHTML(c.holName)}"`:c.school?`title="${escapeHTML(c.school)}"`:''}><span>${c.name}</span><b>${c.num}</b></th>`).join('');
   h+='</tr></thead><tbody>';
   for(const group of groups){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
