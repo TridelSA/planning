@@ -3468,30 +3468,33 @@ function stRange(a,b){ return a===b?stShortDate(a):`${stShortDate(a)} → ${stSh
 
 
 // Grille « Mon année » : une colonne par semaine, 7 lignes (lun→dim), colorée par code.
+function ygCat(code){
+  if(!code)return 'o';
+  if(code==='RM')return 'm'; if(code==='RA')return 'a'; if(code==='RN')return 'n';
+  if(ST_VAC.includes(code))return 'l'; if(code==='RF')return 'f'; if(code==='R')return 'r';
+  return 'x';
+}
 function stYearGridHTML(emp){
-  const y=stYear();
-  const first=new Date(y,0,1),start=mondayOf(first),end=new Date(y,11,31);
-  const weeks=Math.round((mondayOf(end)-start)/604800000)+1;
-  const today=todayISO();
-  let cells='',labels='',lastM=-1;
-  for(let w=0;w<weeks;w++){
-    for(let i=0;i<7;i++){
-      const d=new Date(start);d.setDate(start.getDate()+w*7+i);
-      if(d.getFullYear()!==y){cells+='<i class="yg-c yg-x"></i>';continue;}
-      const iso=isoDate(d),code=safeCode((emp.schedule||{})[iso]);
-      const hol=swissHolidayName(iso);
-      cells+=`<button type="button" class="yg-c ${classFor(code)} ${iso===today?'is-today':''} ${hol?'is-hol':''} ${schoolHolidayName(iso)?'is-sch':''}" data-iso="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))} ${escapeHTML(code||'repos')}"></button>`;
+  const y=stYear(),today=todayISO();
+  let head='<span class="yg-corner"></span>';
+  for(let d=1;d<=31;d++)head+=`<span class="yg-dn">${(d===1||d%5===0)?d:''}</span>`;
+  let rows='';
+  for(let m=0;m<12;m++){
+    const n=new Date(y,m+1,0).getDate();
+    let cells='';
+    for(let d=1;d<=31;d++){
+      if(d>n){cells+='<i class="yg-c yg-x"></i>';continue;}
+      const dt=new Date(y,m,d),iso=isoDate(dt),code=safeCode((emp.schedule||{})[iso]);
+      const we=dt.getDay()===0||dt.getDay()===6;
+      cells+=`<button type="button" class="yg-c yg-k-${ygCat(code)} ${we?'is-we':''} ${iso===today?'is-today':''} ${swissHolidayName(iso)?'is-hol':''}" data-iso="${iso}" aria-label="${escapeHTML(formatDateWithYear(dt))} ${escapeHTML(code||'repos')}"></button>`;
     }
-    const m=new Date(start.getFullYear(),0,1+w*7+3).getMonth();
-    const d4=new Date(start);d4.setDate(start.getDate()+w*7+3);
-    if(d4.getFullYear()===y&&d4.getMonth()!==lastM){lastM=d4.getMonth();labels+=`<span style="grid-column:${w+1}/span 4">${ST_MON_SHORT[lastM]}</span>`;}
+    rows+=`<span class="yg-mn">${ST_MON_SHORT[m]}</span>${cells}`;
   }
-  const leg=[['RM','Matin'],['RA','Après-midi'],['RN','Nuit'],['VA','Congé'],['RF','Férié / repos'],['R','Réserve']]
-    .map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${l}</span>`).join('');
+  const leg=[['m','Matin'],['a','Après-midi'],['n','Nuit'],['l','Congé'],['f','Férié'],['r','Réserve'],['o','Repos']]
+    .map(([k,l])=>`<span><i class="yg-c yg-k-${k}"></i>${l}</span>`).join('')+'<span><i class="yg-c yg-k-o is-hol"></i>Jour férié</span>';
   return `<div class="st-block yg-block"><h3>Mon année ${y}</h3>
-    <div class="yg-scroll"><div class="yg-months" style="--w:${weeks}">${labels}</div>
-    <div class="yg-grid" style="--w:${weeks}">${cells}</div></div>
-    <div class="yg-info" id="ygInfo">Touchez un jour pour le détail.</div>
+    <div class="yg-grid">${head}${rows}</div>
+    <div class="yg-info" id="ygInfo">Touchez une case pour voir le détail du jour.</div>
     <div class="yg-legend">${leg}</div></div>`;
 }
 

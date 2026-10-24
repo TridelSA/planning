@@ -1768,3 +1768,23 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .month-cell.sc:not(.is-holiday):not(.today) .day-num,.cmpm-day.sc:not(.is-hol) small,.cmpm-weekhead .sc:not(.is-hol):not(.is-today) em,.tw-sd.sc:not(.is-hol):not(.is-sel):not(.is-today) b,.cmp-day.sc:not(.is-hol):not(.is-today) b,.tw-dayh.sc:not(.is-hol):not(.is-today) b{background:var(--school-tint)!important}
   .month-cell.is-holiday .day-num,.cmpm-day.is-hol small,.cmpm-weekhead .is-hol em,.tw-sd.is-hol:not(.is-sel) b,.cmp-day.is-hol b,.tw-dayh.is-hol b{background:var(--danger-bg)!important}
 }
+/* Mon année v2 : un mois par ligne, un jour par colonne */
+.yg-grid{display:grid;grid-template-columns:30px repeat(31,minmax(0,1fr));grid-template-rows:none;grid-auto-flow:row;gap:2px;align-items:center}
+.yg-corner{display:block}
+.yg-dn{font:700 8px/1 var(--font-body);color:var(--muted);text-align:center;min-width:0;overflow:visible;white-space:nowrap}
+.yg-mn{font:800 10px/1 var(--font-body);color:var(--ink-soft);text-transform:uppercase;letter-spacing:.02em}
+.yg-grid .yg-c{aspect-ratio:auto;height:17px;border-radius:3px;border:0;box-shadow:none}
+.yg-grid .yg-x{background:transparent!important}
+.yg-k-m{background:#8B7CF6!important}.yg-k-a{background:#4B9CF0!important}.yg-k-n{background:#F2A83B!important}
+.yg-k-l{background:#EF5E73!important}.yg-k-f{background:#F2D65C!important}.yg-k-r{background:#43B97F!important}
+.yg-k-x{background:#9AA7B5!important}.yg-k-o{background:#E3E8E5!important}
+:root[data-theme="dark"] .yg-k-o{background:#2C3731!important}
+:root[data-theme="dark"] .yg-k-x{background:#6F7C8A!important}
+.yg-grid .yg-c.is-we{opacity:.62}
+.yg-grid .yg-c.is-hol{box-shadow:inset 0 0 0 2px var(--danger)!important;opacity:1}
+.yg-grid .yg-c.is-today,.yg-grid .yg-c.is-sel{box-shadow:0 0 0 2px var(--ink)!important;opacity:1;position:relative;z-index:1}
+.yg-legend .yg-c{width:11px;height:11px;border-radius:3px;display:inline-block}
+.yg-legend .yg-c.is-we{opacity:1}
+@media (max-width:700px){.yg-grid{gap:1.5px}.yg-grid .yg-c{height:15px;border-radius:2px}.yg-dn{font-size:7px}}
+@media (min-width:701px){.yg-grid{gap:3px}.yg-grid .yg-c{height:24px;border-radius:4px}.yg-dn{font-size:10px}.yg-mn{font-size:12px}.yg-grid{grid-template-columns:44px repeat(31,minmax(0,1fr))}}
+.yg-grid .yg-c.is-we{opacity:1}
