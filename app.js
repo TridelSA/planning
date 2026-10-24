@@ -17,7 +17,7 @@ const CODE_INFO={
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
-let state={view:['week','month'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),compareMode:false,statsMode:false};
+let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),compareMode:false,statsMode:false};
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -2483,7 +2483,7 @@ function syncScopes(from,to){
   ref=new Date(ref);
   if(from==='team'&&scale==='year'){ const t=new Date(); ref=t.getFullYear()===state.teamYear?t:ref; }
   if(to!=='individual'||true){ state.date=new Date(ref); cmp.date=new Date(ref); state.teamDate=new Date(ref); }
-  if(to==='individual'){ if(scale==='week'||scale==='month')state.view=scale; }
+  if(to==='individual'){ if(scale==='week'||scale==='month'||scale==='year')state.view=scale; }
   else if(to==='compare'){ cmp.scale=scale; saveCmp(); }
   else if(to==='team'){ state.teamScale=scale==='year'?'year':'week'; state.teamYear=ref.getFullYear(); }
 }
@@ -4210,6 +4210,12 @@ function renderMonth(e){
   h+='</div></div>'+periodNotesHTML(moIsos);$('viewContainer').innerHTML=h;
 }
 
+function yearLegendHTML(e,y){
+  const used=new Set();let sch=false,hol=false;
+  for(let m=0;m<12;m++)for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const iso=isoDate(new Date(y,m,d));used.add(ygCat(safeCode((e.schedule||{})[iso])));if(schoolHolidayName(iso))sch=true;if(swissHolidayName(iso))hol=true;}
+  const LEG=[['m','Matin'],['a','Après-midi'],['n','Nuit'],['l','Congé'],['f','Repos férié'],['r','Réserve'],['x','Autre absence'],['o','Repos']];
+  return '<div class="team-legend ind-legend">'+LEG.filter(([k])=>used.has(k)).map(([k,l])=>`<span class="team-legend-item"><i class="tl-circ yg-k-${k}"></i>${l}</span>`).join('')+(sch?'<span class="team-legend-item"><i class="tl-dot tl-sch2"></i>Vacances scolaires</span>':'')+(hol?'<span class="team-legend-item"><i class="tl-circ tl-hol"></i>Jour férié</span>':'')+'</div>';
+}
 function renderYear(e){
   const y=state.date.getFullYear();
   $('viewOverline').textContent='';
@@ -4232,11 +4238,11 @@ function renderYear(e){
       const inTravaux=d.getMonth()===m && isInTravaux(dISO);
       const schoolName=d.getMonth()===m ? schoolHolidayName(dISO) : null;
       const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
-      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?classFor(c):'mini-empty')} ${isToday?'today':''} ${hasComment?'has-comment':''} ${markClasses}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''} ${schoolName?`title="${escapeHTML(schoolName)}"`:''}>${d.getMonth()===m?d.getDate():''}</span>`;
+      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?'ind-cell yg-k-'+ygCat(c):'mini-empty')} ${isToday?'today':''} ${hasComment?'has-comment':''} ${markClasses}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''} ${schoolName?`title="${escapeHTML(schoolName)}"`:''}>${d.getMonth()===m?d.getDate():''}</span>`;
     }
     h+='</div></div>';
   }
-  h+='</div>';$('viewContainer').innerHTML=h;
+  h+='</div>'+yearLegendHTML(e,y);$('viewContainer').innerHTML=h;
   // Téléphone : à l'ouverture de l'année en cours, on arrive directement sur le mois actuel.
   if(window.__yearScrollKey!==String(y)){
     window.__yearScrollKey=String(y);
@@ -4612,7 +4618,7 @@ function readSharedHash(){
 function applySharedState(q){
   const has=k=>planning.employees.some(x=>x.id===k);
   const e=q.get('e'); if(e&&has(e)){ state.employeeId=e; try{ updateEmployeePicker(); }catch(_){ /* ignoré */ } }
-  const v=q.get('v'); if(['week','month'].includes(v))state.view=v;
+  const v=q.get('v'); if(['week','month','year'].includes(v))state.view=v;
   const d=parseYMD(q.get('d')); if(d)state.date=d;
   const s=q.get('s'); if(['week','month','year'].includes(s))cmp.scale=s;
   const cd=parseYMD(q.get('cd')); if(cd)cmp.date=cd;

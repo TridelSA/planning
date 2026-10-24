@@ -1838,3 +1838,13 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .team-cell.mini-cell:not(.is-incomplete)::before{content:none!important}
 .tw-sd.sc.is-sel,.tw-sd.is-sel{background:var(--accent-solid)!important}
 .tw-sd.sc.is-sel small,.tw-sd.sc.is-sel b{color:#fff!important;background:transparent!important}
+/* Individuel › Année : mini-mois pastel, comme Rotations › Année */
+.mini-cell.ind-cell{color:var(--ink)!important;font-weight:700;position:relative;box-shadow:none}
+.mini-cell.ind-cell.is-holiday{box-shadow:inset 0 0 0 1.8px var(--danger)!important}
+.mini-cell.ind-cell.is-schoolholiday::after{content:'';position:absolute;left:50%;bottom:1px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--school-dot)}
+.mini-cell.ind-cell.today{box-shadow:0 0 0 2px var(--ink)!important;color:var(--ink)!important}
+.mini-cell.ind-cell::before{content:none!important}
+.mini-cell.ind-cell.has-comment{outline:0}
+.tl-sch2{background:var(--school-dot)}
+.ind-legend{margin:12px 0 4px;gap:6px 14px}
+.ind-legend .tl-circ{width:11px;height:11px}
