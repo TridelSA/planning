@@ -1682,3 +1682,40 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .month-cell.is-schoolholiday.sc-s .day-num,.month-cell.is-schoolholiday.sc-e .day-num{background:transparent!important;color:var(--school-dot)!important}
   .month-cell.is-schoolholiday{padding-top:12px}
 }
+
+/* Pastilles de codes reliées + dégradé quand le code change (téléphone) */
+@media (max-width:700px){
+  .month-code-label.lk-l,.month-code-label.lk-r,.cmpm-day b.lk-l,.cmpm-day b.lk-r{
+    background:linear-gradient(90deg,var(--pl,var(--pb)) 0%,var(--pb) 40%,var(--pb) 60%,var(--pr,var(--pb)) 100%)!important;
+    box-shadow:none!important;
+  }
+  .month-cell .month-code-label.lk-l,.month-cell .month-code-label.lk-r{align-self:stretch;margin:0;min-width:0;padding:4px 0;border-radius:0}
+  .month-cell .month-code-label.lk-l:not(.lk-r){margin-right:3px;border-radius:0 6px 6px 0;margin-left:0}
+  .month-cell .month-code-label.lk-r:not(.lk-l){margin-left:3px;border-radius:6px 0 0 6px}
+  .month-cell .month-code-label:not(.lk-l):not(.lk-r){}
+  .cmpm-day b.lk-l,.cmpm-day b.lk-r{align-self:stretch;width:auto!important;max-width:none!important;min-width:0!important;border-radius:0;margin:0 -1px;padding-top:4px;padding-bottom:4px}
+  .cmpm-day b.lk-l:not(.lk-r){margin-right:3px;border-radius:0 6px 6px 0}
+  .cmpm-day b.lk-r:not(.lk-l){margin-left:3px;border-radius:6px 0 0 6px}
+  .cmpm-day b:not(.lk-l):not(.lk-r){align-self:center}
+}
+
+/* Capsule vacances plus fine */
+@media (max-width:700px){
+  .sc::before,.sc-l::before,.sc-r::before{background:color-mix(in srgb,var(--school-dot) 11%,var(--surface))}
+  .month-cell.sc{--sc-top:5px;--sc-h:14px;--sc-r:9px}
+  .month-cell .day-num{width:18px;height:18px;font-size:10px}
+  .month-cell.sc-l::before{left:calc(50% - 9px)}
+  .month-cell.sc-r::before{right:calc(50% - 9px)}
+  .cmpm-day.sc{--sc-top:3px;--sc-h:11px;--sc-r:7.5px}
+  .cmpm-day small{width:15px;height:15px;font-size:8.5px}
+  .cmpm-day.sc-l::before{left:calc(50% - 7.5px)}
+  .cmpm-day.sc-r::before{right:calc(50% - 7.5px)}
+  .cmpm-weekhead em{width:18px;height:18px;font-size:10.5px}
+  .cmpm-weekhead .sc{--sc-top:13px;--sc-h:14px;--sc-r:9px}
+  .cmpm-weekhead .sc-l::before{left:calc(50% - 9px)}
+  .cmpm-weekhead .sc-r::before{right:calc(50% - 9px)}
+  .tw-sd b{width:28px;height:28px}
+  .tw-sd.sc{--sc-top:23px;--sc-h:20px;--sc-r:14px}
+  .tw-sd.sc-l::before{left:calc(50% - 14px)}
+  .tw-sd.sc-r::before{right:calc(50% - 14px)}
+}

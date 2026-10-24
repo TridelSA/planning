@@ -2877,6 +2877,19 @@ function cmpYearInfo(emp,c){
 
 
 
+
+// Pastilles de codes reliées entre jours voisins (dégradé quand le code change).
+const PILL_VARS={R:'--c-r-bg',RM:'--c-rm-bg',RA:'--c-ra-bg',RN:'--c-rn-bg',PIQ:'--c-piq-bg',VA:'--c-va-bg',VJ:'--c-va-bg',HOR:'--c-hor-bg',HSR:'--c-hor-bg',RF:'--c-rf-bg',CA:'--c-ca-bg',GR:'--c-gr-bg',EN:'--c-en-bg'};
+function pillVar(code){ if(!code)return ''; return PILL_VARS[code]||'--c-misc-bg'; }
+function linkAttrs(prev,code,next){
+  const own=pillVar(code); if(!own)return {cls:'',style:''};
+  const p=pillVar(prev),n=pillVar(next);
+  let cls='',st=`--pb:var(${own});`;
+  if(p){ cls+=' lk-l'; if(p!==own)st+=`--pl:color-mix(in srgb,var(${own}) 50%,var(${p}) 50%);`; }
+  if(n){ cls+=' lk-r'; if(n!==own)st+=`--pr:color-mix(in srgb,var(${own}) 50%,var(${n}) 50%);`; }
+  return {cls,style:st};
+}
+
 // Position d'un jour dans une plage de vacances scolaires (pour tracer une capsule continue).
 function schCls(iso){
   if(!schoolHolidayName(iso))return '';
@@ -2971,10 +2984,12 @@ function cmpCardsHTML(view,groups){
         h+=`<div class="cmpm-days ${cmp.scale==='week'?'is-week':'is-month'}">`;
         if(cmp.scale==='month')h+=DAY_NAMES.map(n=>`<span class="cmpm-dow">${n[0]}</span>`).join('');
         for(let i=0;i<lead;i++)h+='<span></span>';
-        h+=view.cols.map(c=>{
-          const d=cmpDayInfo(emp,c);
+        const infos=view.cols.map(c=>cmpDayInfo(emp,c));
+        h+=view.cols.map((c,ci)=>{
+          const d=infos[ci];
+          const lkc=linkAttrs(c.dow>0&&infos[ci-1]?infos[ci-1].code:'',d.code,c.dow<6&&infos[ci+1]?infos[ci+1].code:'');
           const tap=cmp.scale==='week'?` data-cmp-key="${escapeHTML(presencePersonKey(emp))}" data-cmp-iso="${c.iso}" role="button" tabindex="0"`:'';
-          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch '+schCls(c.iso):''}" title="${escapeHTML(d.title)}"${tap}><small${markAttr(c.iso)}>${cmp.scale==='week'?c.name:c.num}</small><b>${escapeHTML(d.code)}</b></div>`;
+          return `<div class="cmpm-day ${d.cls} ${c.weekend?'is-we':''} ${c.today?'is-today':''} ${c.holiday?'is-hol':''} ${c.school?'is-sch '+schCls(c.iso):''}" title="${escapeHTML(d.title)}"${tap}><small${markAttr(c.iso)}>${cmp.scale==='week'?c.name:c.num}</small><b class="${lkc.cls.trim()}" style="${lkc.style}">${escapeHTML(d.code)}</b></div>`;
         }).join('');
         h+='</div>';
       }
@@ -4180,9 +4195,11 @@ function renderMonth(e){
     // plus besoin de changer de mois pour voir ce qu'il y a juste après/avant.
     const colorClass=visible?classFor(c):'outside';
     const showLabel=visible&&c;
+    const dowM=(d.getDay()+6)%7,pd=new Date(d),nd=new Date(d);pd.setDate(pd.getDate()-1);nd.setDate(nd.getDate()+1);
+    const lk=showLabel?linkAttrs(dowM>0&&codeMatchesFilter(safeCode(e.schedule[isoDate(pd)]))?safeCode(e.schedule[isoDate(pd)]):'',c,dowM<6&&codeMatchesFilter(safeCode(e.schedule[isoDate(nd)]))?safeCode(e.schedule[isoDate(nd)]):''):{cls:'',style:''};
     const outsideClass=inMonth?'':'outside-month';
     const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday '+schCls(dISO):''].filter(Boolean).join(' ');
-    h+=`<div class="month-cell ${colorClass} ${outsideClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num"${markAttr(dISO)}>${d.getDate()}</span>${showLabel?`<span class="month-code-label">${escapeHTML(c)}</span>`:''}</div>`;
+    h+=`<div class="month-cell ${colorClass} ${outsideClass} ${isToday?'today':''} ${markClasses}" data-date="${dISO}" tabindex="0" role="button" ${schoolName?`title="${escapeHTML(schoolName)}"`:''}><span class="day-num"${markAttr(dISO)}>${d.getDate()}</span>${showLabel?`<span class="month-code-label${lk.cls}" style="${lk.style}">${escapeHTML(c)}</span>`:''}</div>`;
   }
   h+='</div></div>'+periodNotesHTML(moIsos);$('viewContainer').innerHTML=h;
 }
