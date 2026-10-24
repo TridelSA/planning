@@ -3493,8 +3493,7 @@ function stYearGridHTML(emp){
     }
     rows+=`<span class="yg-mn">${ST_MON_SHORT[m]}</span>${cells}`;
   }
-  const lab=c=>{const i=CODE_INFO[c];return `${c}${i?' · '+i[0]:''}`;};
-  const leg=[...usedCodes].map(c=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(lab(c))}</span>`).join('')+(usedHol?'<span><i class="yg-dot"></i>Jour férié</span>':'');
+  const leg=legendCodes([...usedCodes]).map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('')+(usedHol?'<span><i class="yg-dot"></i>Férié</span>':'');
   return `<div class="st-block yg-block"><h3>Mon année ${y}</h3>
     <div class="yg-grid">${head}${rows}</div>
     <div class="yg-info" id="ygInfo">Touchez une case pour voir le détail du jour.</div>
@@ -4210,12 +4209,20 @@ function renderMonth(e){
   h+='</div></div>'+periodNotesHTML(moIsos);$('viewContainer').innerHTML=h;
 }
 
+// Légende compacte : codes seuls, HOR et HSR regroupés.
+function legendCodes(list){
+  const out=[];let grouped=false;
+  for(const c of list){
+    if(c==='HOR'||c==='HSR'){ if(!grouped){grouped=true;out.push([list.includes('HSR')?'HSR':'HOR',list.includes('HOR')&&list.includes('HSR')?'HOR/HSR':c]);} continue; }
+    out.push([c,c]);
+  }
+  return out;
+}
 function yearLegendHTML(e,y){
   const cnt={};let sch=false,hol=false;
   for(let m=0;m<12;m++)for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const iso=isoDate(new Date(y,m,d));const c=safeCode((e.schedule||{})[iso]);if(c)cnt[c]=(cnt[c]||0)+1;if(schoolHolidayName(iso))sch=true;if(swissHolidayName(iso))hol=true;}
-  const codes=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
-  const lab=c=>{const i=CODE_INFO[c];return `${c}${i?' · '+i[0]:''}`;};
-  return '<div class="team-legend ind-legend">'+codes.map(c=>`<span class="team-legend-item"><i class="mini-cell ind-sw ${classFor(c)}"></i>${escapeHTML(lab(c))}</span>`).join('')+(sch?'<span class="team-legend-item"><i class="tl-dot tl-sch2"></i>Vacances scolaires</span>':'')+(hol?'<span class="team-legend-item"><i class="tl-circ tl-hol"></i>Jour férié</span>':'')+'</div>';
+  const codes=legendCodes(Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]));
+  return '<div class="team-legend ind-legend">'+codes.map(([c,l])=>`<span class="team-legend-item"><i class="mini-cell ind-sw ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('')+(sch?'<span class="team-legend-item"><i class="tl-dot tl-sch2"></i>Vacances</span>':'')+(hol?'<span class="team-legend-item"><i class="tl-circ tl-hol"></i>Férié</span>':'')+'</div>';
 }
 function renderYear(e){
   const y=state.date.getFullYear();

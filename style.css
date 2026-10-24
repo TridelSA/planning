@@ -1859,3 +1859,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .ind-legend .ind-sw{display:inline-block;width:13px;height:13px;aspect-ratio:auto;border-radius:50%;flex:none;font-size:0;padding:0}
 .ind-legend{gap:6px 12px}
 .yg-legend .yg-c{display:inline-block;width:11px;height:11px}
+.yg-legend{grid-template-columns:repeat(auto-fill,minmax(78px,1fr))!important;gap:7px 6px!important}
+.ind-legend{display:flex!important;flex-wrap:wrap;gap:7px 14px}
