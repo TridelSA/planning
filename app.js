@@ -2991,7 +2991,7 @@ function cmpTimelineHTML(view,groups){
       i=j+1;
     }else i++;
   }
-  if(bars)h+=`<div class="cmptl-ev"><span></span>${bars}</div>`;
+  h+=`<div class="cmptl-ev"><span></span>${bars}</div>`;
   const used=new Set();
   for(const emp of people){
     h+=`<div class="cmptl-row"><span class="cmptl-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(cleanEmployeeName(emp.name))}</span>`;
