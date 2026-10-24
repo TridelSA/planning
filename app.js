@@ -3009,8 +3009,9 @@ function cmpTimelineHTML(view,groups,desk){
   h+='</div></div>';
   const leg=legendCodes([...used]).map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('');
   h+=`<div class="yg-info cmptl-info" id="cmpTlInfo">Touchez une case ou un jour pour le détail.</div>
+    ${periodNotesHTML(view.cols.map(c=>c.iso))}
     <button type="button" class="cmptl-lg-toggle" data-tl-legend aria-expanded="${lgOpen}"><span class="pm">${lgOpen?'−':'+'}</span> Légende</button>
-    <div class="cmptl-legend"><div class="yg-legend">${leg}</div>${periodNotesHTML(view.cols.map(c=>c.iso))}</div></div>`;
+    <div class="cmptl-legend"><div class="yg-legend">${leg}</div></div></div>`;
   return h;
 }
 document.addEventListener('click',e=>{
