@@ -1068,6 +1068,7 @@ function inferGenericEventTitle(rawText,fallbackTitle){
 // « du 12 au 20 octobre », « du 30 octobre au 11 novembre », « du 28 décembre 2026 au 4 janvier 2027 »
 function longDateRange(a,b){
   const mo=d=>MONTH_NAMES[d.getMonth()].toLowerCase();
+  if(a.getTime()===b.getTime()){ const dn=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'][a.getDay()]; return `${dn} ${a.getDate()} ${mo(a)}`; }
   if(a.getFullYear()!==b.getFullYear())return `du ${a.getDate()} ${mo(a)} ${a.getFullYear()} au ${b.getDate()} ${mo(b)} ${b.getFullYear()}`;
   if(a.getMonth()===b.getMonth())return `du ${a.getDate()} au ${b.getDate()} ${mo(b)}`;
   return `du ${a.getDate()} ${mo(a)} au ${b.getDate()} ${mo(b)}`;
@@ -1309,7 +1310,14 @@ function buildUpcomingEvents(employee){
       const vacOnly=recupDays===0;
       const range=longDateRange(vacStart,vacEnd);
 
-      if(leaveDays>=5){
+      // Un ou plusieurs jours posés collés à un week-end (vendredi ou lundi) :
+      // annoncés aussi, car ils rallongent le week-end.
+      const dowStart=vacStart.getDay(),dowEnd=vacEnd.getDay();
+      let touchesWeekend=dowEnd===5||dowStart===1;
+      for(let d=new Date(vacStart);d<=vacEnd&&!touchesWeekend;d.setDate(d.getDate()+1)){ if(d.getDay()===6||d.getDay()===0)touchesWeekend=true; }
+      const hasWeekdayLeave=(()=>{for(let d=new Date(vacStart);d<=vacEnd;d.setDate(d.getDate()+1)){const c=safeCode(employee.schedule[isoDate(d)]);if(isVacationCode(c)&&d.getDay()!==0&&d.getDay()!==6)return true;}return false;})();
+      const longWeekend=leaveDays<5&&touchesWeekend&&hasWeekdayLeave;
+      if(leaveDays>=5||longWeekend){
         pushUnique({
           type:'vacation',
           date:new Date(vacStart),
@@ -1317,7 +1325,9 @@ function buildUpcomingEvents(employee){
           allDay:true,
           title:vacOnly?`Vacances ${range}`:`Congé ${range}`,
           calendarTitle:vacOnly?`🏖️ Vacances ${range}`:`🌴 Congé ${range}`,
-          detail:vacOnly
+          detail:longWeekend
+            ? `${leaveDays} jour${leaveDays>1?'s':''} ${vacOnly?'de congé':'de congé / récupération'} · week-end prolongé : ${totalDays+(dowEnd===5?2:0)+(dowStart===1?2:0)} jours de repos d'affilée`
+            : vacOnly
             ? `${totalDays} jours de vacances, week-ends compris · Profitez-en bien !`
             : `${totalDays} jours de congé, week-ends compris${(recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
         },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
@@ -2058,7 +2068,7 @@ function renderTeamWeek(){
   for(const [code,k,label] of TEAM_SHIFTS){
     const team=teamPeople(selISO,code);
     m+=`<section class="tw-card ${k}"><header>${label}<em>${team.length?team.length+' personne'+(team.length>1?'s':''):''}${team.length>3?' · renforcé':''}</em></header>`
-      +(team.length?'<ul>'+team.map(e=>`<li class="tw-name ${k} ${e.id===me?'is-me':''}">${escapeHTML(cleanEmployeeName(e.name))}</li>`).join('')+'</ul>':'<div class="tw-none">Personne en rotation</div>')
+      +(team.length?'<ul>'+team.map(e=>`<li class="tw-name ${k} ${e.id===me?'is-me':''}" data-open-emp="${escapeHTML(e.id)}">${escapeHTML(cleanEmployeeName(e.name))}</li>`).join('')+'</ul>':'<div class="tw-none">Personne en rotation</div>')
       +'</section>';
   }
   m+='</div>';
@@ -2461,8 +2471,36 @@ function pageTransitionRun(t){
     requestAnimationFrame(tick);
   })();
 }
+// Garde la même période (semaine / mois, date) en passant d'une vue à l'autre.
+function syncScopes(from,to){
+  if(from===to||from==='stats'||to==='stats')return;
+  let ref,scale;
+  if(from==='individual'){ ref=state.date; scale=state.view; }
+  else if(from==='compare'){ ref=cmp.date; scale=cmp.scale; }
+  else { ref=state.teamScale==='year'?new Date(state.teamYear,0,1):state.teamDate; scale=state.teamScale==='year'?'year':'week'; }
+  ref=new Date(ref);
+  if(from==='team'&&scale==='year'){ const t=new Date(); ref=t.getFullYear()===state.teamYear?t:ref; }
+  if(to!=='individual'||true){ state.date=new Date(ref); cmp.date=new Date(ref); state.teamDate=new Date(ref); }
+  if(to==='individual'){ if(scale==='week'||scale==='month')state.view=scale; }
+  else if(to==='compare'){ cmp.scale=scale; saveCmp(); }
+  else if(to==='team'){ state.teamScale=scale==='year'?'year':'week'; state.teamYear=ref.getFullYear(); }
+}
+
+// Ouvre le planning individuel d'une personne (depuis Collègues ou Rotations).
+function openPersonIndividual(id){
+  const emp=planning.employees.find(e=>e.id===id); if(!emp)return;
+  state.employeeId=emp.id; persistSelectedEmployee(emp);
+  setPage('individual');
+  window.scrollTo({top:0});
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-open-emp]'); if(!t||e.target.closest('.pv-hide'))return;
+  openPersonIndividual(t.dataset.openEmp);
+});
+
 function setPage(page){
   if(page!=='individual' && (!planning.employees || !planning.employees.length))return;
+  syncScopes(currentPage(),page);
   const pageTrans=pageTransitionStart(currentPage(),page);
   state.teamMode=page==='team';
   state.compareMode=page==='compare';
@@ -2846,7 +2884,7 @@ function cmpCardsHTML(view,groups){
     if(view.kind!=='year'&&cmp.scale==='week')h+='<div class="cmpm-weekhead"><span></span>'+view.cols.map(c=>`<span class="${c.today?'is-today':''}">${c.name}</span>`).join('')+'</div>';
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
-      h+=`<div class="cmpm-card"><div class="cmpm-name">${escapeHTML(name)}</div>`;
+      h+=`<div class="cmpm-card"><div class="cmpm-name" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</div>`;
       if(view.kind==='year'){
         h+='<div class="cmpm-year">'+view.cols.map(c=>{
           const y=cmpYearInfo(emp,c);
@@ -2945,7 +2983,7 @@ function renderCompareView(){
     const people=group.people.filter(e=>cmp.people.has(presencePersonKey(e)));
     for(const emp of people){
       const name=cleanEmployeeName(emp.name);
-      h+=`<tr class="cmp-person"><th class="cmp-name"><div class="cmp-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span></div></th>`;
+      h+=`<tr class="cmp-person"><th class="cmp-name"><div class="cmp-name-inner"><span title="${escapeHTML(name)}" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</span></div></th>`;
       const wide=cmp.scale==='week';
       h+=view.cols.map(c=>{
         const d=cmpDayInfo(emp,c);
@@ -2995,7 +3033,7 @@ function renderCmpYear(view,groups){
       const rowIndex=rows.length;
       rows.push(emp);
       const name=cleanEmployeeName(emp.name);
-      h+=`<tr class="pv-person"><th class="pv-name"><div class="pv-name-inner"><span title="${escapeHTML(name)}">${escapeHTML(name)}</span><button type="button" class="pv-hide" data-pv-hide="${escapeHTML(presencePersonKey(emp))}" title="Retirer ${escapeHTML(name)}" aria-label="Retirer ${escapeHTML(name)}">${EYE_OFF_ICON}</button></div></th>`;
+      h+=`<tr class="pv-person"><th class="pv-name"><div class="pv-name-inner"><span title="${escapeHTML(name)}" data-open-emp="${escapeHTML(emp.id)}">${escapeHTML(name)}</span><button type="button" class="pv-hide" data-pv-hide="${escapeHTML(presencePersonKey(emp))}" title="Retirer ${escapeHTML(name)}" aria-label="Retirer ${escapeHTML(name)}">${EYE_OFF_ICON}</button></div></th>`;
       weeks.forEach((w,i)=>{
         const p=weekPresence(emp,w);
         if(p.level==='full'||p.level==='reserve')fullCounts[i]++; // = cases vertes

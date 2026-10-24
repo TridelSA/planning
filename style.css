@@ -1504,3 +1504,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 :root[data-theme="dark"] .yg-c.code-off,:root[data-theme="dark"] .yg-c:not([class*="code-"]){background:#2A352E;color:#6B7A70}
 /* Export PDF : inutile sur téléphone */
 @media (max-width:700px){#cmpExportBtn{display:none!important}}
+[data-open-emp]{cursor:pointer}
+@media (hover:hover){.cmpm-name[data-open-emp]:hover,.pv-name-inner span[data-open-emp]:hover,.cmp-name-inner span[data-open-emp]:hover{text-decoration:underline;color:var(--accent-ink)}}
