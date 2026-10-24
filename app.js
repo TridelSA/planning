@@ -4238,7 +4238,7 @@ function renderYear(e){
       const inTravaux=d.getMonth()===m && isInTravaux(dISO);
       const schoolName=d.getMonth()===m ? schoolHolidayName(dISO) : null;
       const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
-      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?'ind-cell yg-k-'+ygCat(c):'mini-empty')} ${isToday?'today':''} ${hasComment?'has-comment':''} ${markClasses}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''} ${schoolName?`title="${escapeHTML(schoolName)}"`:''}>${d.getMonth()===m?d.getDate():''}</span>`;
+      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?'ind-cell yg-k-'+ygCat(c):'mini-empty')} ${isToday?'today':''}  ${markClasses}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''} ${schoolName?`title="${escapeHTML(schoolName)}"`:''}>${d.getMonth()===m?d.getDate():''}</span>`;
     }
     h+='</div></div>';
   }
