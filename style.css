@@ -1762,3 +1762,9 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmpm-day.is-we,.cmpm-days .cmpm-day.is-we{opacity:1!important}
 .cmpm-day.is-we b{opacity:1!important;filter:none!important}
 .week-shift .shift-mainline b{border:0!important;box-shadow:none!important;outline:0!important}
+/* Compat anciens navigateurs (sans color-mix) */
+.day-modal-backdrop{-webkit-backdrop-filter:blur(3px)}
+@supports not (color:color-mix(in srgb,red,blue)){
+  .month-cell.sc:not(.is-holiday):not(.today) .day-num,.cmpm-day.sc:not(.is-hol) small,.cmpm-weekhead .sc:not(.is-hol):not(.is-today) em,.tw-sd.sc:not(.is-hol):not(.is-sel):not(.is-today) b,.cmp-day.sc:not(.is-hol):not(.is-today) b,.tw-dayh.sc:not(.is-hol):not(.is-today) b{background:var(--school-tint)!important}
+  .month-cell.is-holiday .day-num,.cmpm-day.is-hol small,.cmpm-weekhead .is-hol em,.tw-sd.is-hol:not(.is-sel) b,.cmp-day.is-hol b,.tw-dayh.is-hol b{background:var(--danger-bg)!important}
+}
