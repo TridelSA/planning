@@ -1788,3 +1788,18 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media (max-width:700px){.yg-grid{gap:1.5px}.yg-grid .yg-c{height:15px;border-radius:2px}.yg-dn{font-size:7px}}
 @media (min-width:701px){.yg-grid{gap:3px}.yg-grid .yg-c{height:24px;border-radius:4px}.yg-dn{font-size:10px}.yg-mn{font-size:12px}.yg-grid{grid-template-columns:44px repeat(31,minmax(0,1fr))}}
 .yg-grid .yg-c.is-we{opacity:1}
+/* Mon année : plus compact, couleurs pâles, jour férié = petit point */
+.yg-k-m{background:#B3A8F7!important}.yg-k-a{background:#8FBFF6!important}.yg-k-n{background:#F6C987!important}
+.yg-k-l{background:#F4A0AD!important}.yg-k-f{background:#F3E39F!important}.yg-k-r{background:#98D6B3!important}
+.yg-k-x{background:#C3CCD6!important}.yg-k-o{background:#EDF0EE!important}
+:root[data-theme="dark"] .yg-k-m{background:#6E64B8!important}:root[data-theme="dark"] .yg-k-a{background:#456FA6!important}
+:root[data-theme="dark"] .yg-k-n{background:#A8793A!important}:root[data-theme="dark"] .yg-k-l{background:#A94E5E!important}
+:root[data-theme="dark"] .yg-k-f{background:#9C8B45!important}:root[data-theme="dark"] .yg-k-r{background:#3F8764!important}
+:root[data-theme="dark"] .yg-k-x{background:#586471!important}:root[data-theme="dark"] .yg-k-o{background:#26312B!important}
+.yg-grid .yg-c.is-hol{box-shadow:none!important;position:relative}
+.yg-c.is-hol::after{content:'';position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--danger)}
+.yg-grid .yg-c.is-today,.yg-grid .yg-c.is-sel{box-shadow:0 0 0 1.5px var(--ink)!important}
+.yg-legend{gap:5px 12px;font-size:10.5px}
+.yg-legend .yg-c{width:10px;height:10px}
+@media (max-width:700px){.yg-grid{gap:1.5px}.yg-grid .yg-c{height:11px;border-radius:2px}.yg-grid{grid-template-columns:26px repeat(31,minmax(0,1fr))}.yg-mn{font-size:9px}}
+@media (min-width:701px){.yg-grid .yg-c{height:18px}}

@@ -3478,7 +3478,7 @@ function stYearGridHTML(emp){
   const y=stYear(),today=todayISO();
   let head='<span class="yg-corner"></span>';
   for(let d=1;d<=31;d++)head+=`<span class="yg-dn">${(d===1||d%5===0)?d:''}</span>`;
-  let rows='';
+  let rows='';const used=new Set();let usedHol=false;
   for(let m=0;m<12;m++){
     const n=new Date(y,m+1,0).getDate();
     let cells='';
@@ -3486,12 +3486,13 @@ function stYearGridHTML(emp){
       if(d>n){cells+='<i class="yg-c yg-x"></i>';continue;}
       const dt=new Date(y,m,d),iso=isoDate(dt),code=safeCode((emp.schedule||{})[iso]);
       const we=dt.getDay()===0||dt.getDay()===6;
+      used.add(ygCat(code));if(swissHolidayName(iso))usedHol=true;
       cells+=`<button type="button" class="yg-c yg-k-${ygCat(code)} ${we?'is-we':''} ${iso===today?'is-today':''} ${swissHolidayName(iso)?'is-hol':''}" data-iso="${iso}" aria-label="${escapeHTML(formatDateWithYear(dt))} ${escapeHTML(code||'repos')}"></button>`;
     }
     rows+=`<span class="yg-mn">${ST_MON_SHORT[m]}</span>${cells}`;
   }
-  const leg=[['m','Matin'],['a','Après-midi'],['n','Nuit'],['l','Congé'],['f','Férié'],['r','Réserve'],['o','Repos']]
-    .map(([k,l])=>`<span><i class="yg-c yg-k-${k}"></i>${l}</span>`).join('')+'<span><i class="yg-c yg-k-o is-hol"></i>Jour férié</span>';
+  const LEG=[['m','Matin'],['a','Après-midi'],['n','Nuit'],['l','Congé'],['f','Repos férié'],['r','Réserve'],['x','Autre absence'],['o','Repos']];
+  const leg=LEG.filter(([k])=>used.has(k)).map(([k,l])=>`<span><i class="yg-c yg-k-${k}"></i>${l}</span>`).join('')+(usedHol?'<span><i class="yg-c yg-k-o is-hol"></i>Jour férié</span>':'');
   return `<div class="st-block yg-block"><h3>Mon année ${y}</h3>
     <div class="yg-grid">${head}${rows}</div>
     <div class="yg-info" id="ygInfo">Touchez une case pour voir le détail du jour.</div>
