@@ -3480,7 +3480,7 @@ function stYearGridHTML(emp){
   const y=stYear(),today=todayISO();
   let head='<span class="yg-corner"></span>';
   for(let d=1;d<=31;d++)head+=`<span class="yg-dn">${(d===1||d%5===0)?d:''}</span>`;
-  let rows='';const used=new Set();let usedHol=false;
+  let rows='';const used=new Set();const usedCodes=new Set();let usedHol=false;
   for(let m=0;m<12;m++){
     const n=new Date(y,m+1,0).getDate();
     let cells='';
@@ -3488,13 +3488,13 @@ function stYearGridHTML(emp){
       if(d>n){cells+='<i class="yg-c yg-x"></i>';continue;}
       const dt=new Date(y,m,d),iso=isoDate(dt),code=safeCode((emp.schedule||{})[iso]);
       const we=dt.getDay()===0||dt.getDay()===6;
-      used.add(ygCat(code));if(swissHolidayName(iso))usedHol=true;
-      cells+=`<button type="button" class="yg-c yg-k-${ygCat(code)} ${we?'is-we':''} ${iso===today?'is-today':''} ${swissHolidayName(iso)?'is-hol':''}" data-iso="${iso}" aria-label="${escapeHTML(formatDateWithYear(dt))} ${escapeHTML(code||'repos')}"></button>`;
+      used.add(ygCat(code));if(code)usedCodes.add(code);if(swissHolidayName(iso))usedHol=true;
+      cells+=`<button type="button" class="yg-c ${classFor(code)} ${we?'is-we':''} ${iso===today?'is-today':''} ${swissHolidayName(iso)?'is-hol':''}" data-iso="${iso}" aria-label="${escapeHTML(formatDateWithYear(dt))} ${escapeHTML(code||'repos')}"></button>`;
     }
     rows+=`<span class="yg-mn">${ST_MON_SHORT[m]}</span>${cells}`;
   }
-  const LEG=[['m','Matin'],['a','Après-midi'],['n','Nuit'],['l','Congé'],['f','Repos férié'],['r','Réserve'],['x','Autre absence'],['o','Repos']];
-  const leg=LEG.filter(([k])=>used.has(k)).map(([k,l])=>`<span><i class="yg-c yg-k-${k}"></i>${l}</span>`).join('')+(usedHol?'<span><i class="yg-dot"></i>Jour férié</span>':'');
+  const lab=c=>{const i=CODE_INFO[c];return `${c}${i?' · '+i[0]:''}`;};
+  const leg=[...usedCodes].map(c=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(lab(c))}</span>`).join('')+(usedHol?'<span><i class="yg-dot"></i>Jour férié</span>':'');
   return `<div class="st-block yg-block"><h3>Mon année ${y}</h3>
     <div class="yg-grid">${head}${rows}</div>
     <div class="yg-info" id="ygInfo">Touchez une case pour voir le détail du jour.</div>
@@ -4211,10 +4211,11 @@ function renderMonth(e){
 }
 
 function yearLegendHTML(e,y){
-  const used=new Set();let sch=false,hol=false;
-  for(let m=0;m<12;m++)for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const iso=isoDate(new Date(y,m,d));used.add(ygCat(safeCode((e.schedule||{})[iso])));if(schoolHolidayName(iso))sch=true;if(swissHolidayName(iso))hol=true;}
-  const LEG=[['m','Matin'],['a','Après-midi'],['n','Nuit'],['l','Congé'],['f','Repos férié'],['r','Réserve'],['x','Autre absence'],['o','Repos']];
-  return '<div class="team-legend ind-legend">'+LEG.filter(([k])=>used.has(k)).map(([k,l])=>`<span class="team-legend-item"><i class="tl-circ yg-k-${k}"></i>${l}</span>`).join('')+(sch?'<span class="team-legend-item"><i class="tl-dot tl-sch2"></i>Vacances scolaires</span>':'')+(hol?'<span class="team-legend-item"><i class="tl-circ tl-hol"></i>Jour férié</span>':'')+'</div>';
+  const cnt={};let sch=false,hol=false;
+  for(let m=0;m<12;m++)for(let d=1;d<=new Date(y,m+1,0).getDate();d++){const iso=isoDate(new Date(y,m,d));const c=safeCode((e.schedule||{})[iso]);if(c)cnt[c]=(cnt[c]||0)+1;if(schoolHolidayName(iso))sch=true;if(swissHolidayName(iso))hol=true;}
+  const codes=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
+  const lab=c=>{const i=CODE_INFO[c];return `${c}${i?' · '+i[0]:''}`;};
+  return '<div class="team-legend ind-legend">'+codes.map(c=>`<span class="team-legend-item"><i class="mini-cell ind-sw ${classFor(c)}"></i>${escapeHTML(lab(c))}</span>`).join('')+(sch?'<span class="team-legend-item"><i class="tl-dot tl-sch2"></i>Vacances scolaires</span>':'')+(hol?'<span class="team-legend-item"><i class="tl-circ tl-hol"></i>Jour férié</span>':'')+'</div>';
 }
 function renderYear(e){
   const y=state.date.getFullYear();
@@ -4238,7 +4239,7 @@ function renderYear(e){
       const inTravaux=d.getMonth()===m && isInTravaux(dISO);
       const schoolName=d.getMonth()===m ? schoolHolidayName(dISO) : null;
       const markClasses=[isHoliday?'is-holiday':'',inTravaux?'is-travaux':'',schoolName?'is-schoolholiday':''].filter(Boolean).join(' ');
-      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?'ind-cell yg-k-'+ygCat(c):'mini-empty')} ${isToday?'today':''}  ${markClasses}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''} ${schoolName?`title="${escapeHTML(schoolName)}"`:''}>${d.getMonth()===m?d.getDate():''}</span>`;
+      h+=`<span class="mini-cell ${d.getMonth()!==m?'mini-empty':(visible?'ind-cell '+classFor(c):'mini-empty')} ${isToday?'today':''}  ${markClasses}" data-date="${d.getMonth()===m?dISO:''}" ${d.getMonth()===m?'tabindex="0" role="button"':''} ${schoolName?`title="${escapeHTML(schoolName)}"`:''}>${d.getMonth()===m?d.getDate():''}</span>`;
     }
     h+='</div></div>';
   }

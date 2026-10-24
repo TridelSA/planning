@@ -1856,3 +1856,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   #viewContainer .year-calendar .mini-cell{width:24px;height:24px;font-size:10px}
 }
 .mini-cell.ind-cell.is-schoolholiday::after{width:3px;height:3px;margin-left:-1.5px;bottom:2px}
+.ind-legend .ind-sw{display:inline-block;width:13px;height:13px;aspect-ratio:auto;border-radius:50%;flex:none;font-size:0;padding:0}
+.ind-legend{gap:6px 12px}
+.yg-legend .yg-c{display:inline-block;width:11px;height:11px}
