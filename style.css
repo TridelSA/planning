@@ -1719,3 +1719,15 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .tw-sd.sc-l::before{left:calc(50% - 14px)}
   .tw-sd.sc-r::before{right:calc(50% - 14px)}
 }
+
+/* Vacances + fériés + aujourd'hui : un seul langage — la bande reste continue, les ronds se posent dessus */
+.month-cell.sc-s .day-num,.month-cell.sc-e .day-num,.cmpm-day.sc-s small,.cmpm-day.sc-e small,.cmpm-weekhead .sc-s em,.cmpm-weekhead .sc-e em,.tw-sd.sc-s:not(.is-sel) b,.tw-sd.sc-e:not(.is-sel) b,.cmp-day.sc-s b,.cmp-day.sc-e b,.tw-dayh.sc-s b,.tw-dayh.sc-e b{background:transparent!important;color:var(--school-dot)!important}
+.month-cell.is-holiday .day-num,.cmpm-day.is-hol small,.cmpm-weekhead .is-hol em,.tw-sd.is-hol:not(.is-sel) b,.cmp-day.is-hol b,.tw-dayh.is-hol b{background:color-mix(in srgb,var(--danger) 18%,var(--surface))!important;color:var(--danger)!important;box-shadow:inset 0 0 0 1.5px var(--danger)!important;position:relative;z-index:1}
+.month-cell.today .day-num,.cmpm-weekhead .is-today em{background:var(--accent-solid)!important;color:#fff!important;box-shadow:none!important;position:relative;z-index:1}
+.month-cell.is-holiday:not(.sc)::before{display:none}
+@media (max-width:700px){
+  .month-cell.is-holiday.sc::before{display:block;top:var(--sc-top);height:var(--sc-h);width:auto;left:0;right:0;border-radius:0;background:color-mix(in srgb,var(--school-dot) 11%,var(--surface))}
+  .month-cell.is-holiday.sc-l::before{left:calc(50% - 9px);border-radius:99px 0 0 99px}
+  .month-cell.is-holiday.sc-r::before{right:calc(50% - 9px);border-radius:0 99px 99px 0}
+  .month-cell.is-holiday.sc-l.sc-r::before{border-radius:99px}
+}
