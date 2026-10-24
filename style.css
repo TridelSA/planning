@@ -1966,3 +1966,21 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmp-cell.is-today::after{display:none!important}
 .cmp-todayframe{position:absolute;pointer-events:none;z-index:1;border:1.8px solid var(--accent-solid);border-radius:7px}
 @media (min-width:701px){#cmpFilter .pv-panel{left:0;right:auto}}
+/* PC sombre : frise du mois = mêmes couleurs que la vue semaine */
+@media (min-width:701px){
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.yg-c:not(.yg-x){background:var(--pill-bg,var(--c-off-bg))!important}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-R{color:var(--c-r-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-off{color:var(--c-off-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-RM{color:var(--c-rm-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-RA{color:var(--c-ra-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-RN{color:var(--c-rn-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-PIQ{color:var(--c-piq-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-VA,:root[data-theme="dark"] .cmptl-desk .cmptl-c.code-VJ{color:var(--c-va-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-HOR,:root[data-theme="dark"] .cmptl-desk .cmptl-c.code-HSR{color:var(--c-hor-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-RF{color:var(--c-rf-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-CA{color:var(--c-ca-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-GR{color:var(--c-gr-ink)}
+  :root[data-theme="dark"] .cmptl-desk .cmptl-c.code-EN{color:var(--c-en-ink)}
+}
+/* Semaine PC : pas de « Vacances scol. » sous chaque jour (déjà dans la légende) */
+.tw-badge.sch{display:none!important}
