@@ -1542,3 +1542,24 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 }
 .ps-hol{place-items:end center;padding-bottom:1px}
 .ps-hol i{width:14px;height:4px;border-radius:2px;box-shadow:none;background:var(--danger)}
+
+/* Vacances scolaires : fond violet clair continu sur les jours concernés ; fériés : numéro entouré de rouge */
+:root{--sch-bg:var(--school-tint)}
+@media (max-width:700px){
+  .month-cell.is-schoolholiday,.month-cell.is-schoolholiday.outside{background:var(--sch-bg)!important}
+  .month-cell.is-holiday .day-num{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger);border-radius:6px;font-weight:900}
+  .month-cell.is-holiday::before{display:none}
+  .cmpm-day.is-sch{background:var(--sch-bg)!important}
+  .cmpm-day.is-hol small{background:color-mix(in srgb,var(--danger) 16%,transparent);border-radius:5px;padding:1px 3px}
+  .cmpm-day.is-hol small::after{content:none}
+  .cmpm-weekhead .is-sch{background:var(--sch-bg);border-radius:6px}
+  .tw-sd.is-sch:not(.is-sel){background:var(--sch-bg)}
+  .tw-sd.is-hol::before{display:none}
+  .tw-sd.is-hol:not(.is-sel) b{color:var(--danger)}
+  .week-row .week-day span .week-holiday-dot{background:var(--danger)}
+}
+@media (min-width:701px){
+  .month-cell.is-schoolholiday{box-shadow:inset 0 4px 0 var(--school-dot)!important}
+  .month-cell.is-holiday .day-num{color:var(--danger)}
+  .cmp-day.is-sch,.tw-dayh.is-sch{background:var(--sch-bg);box-shadow:inset 0 -3px 0 var(--school-dot)}
+}

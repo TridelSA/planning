@@ -2045,7 +2045,7 @@ function renderTeamWeek(){
 
   // --- Ordinateur : jours en colonnes, Matin / Après-midi / Nuit en lignes
   let g='<div class="tw-grid"><div class="tw-corner"></div>';
-  g+=days.map((d,i)=>{const iso=isoDate(d);return `<div class="tw-dayh ${i>=5?'is-we':''} ${iso===today?'is-today':''}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b>${teamBadges(iso)}</div>`;}).join('');
+  g+=days.map((d,i)=>{const iso=isoDate(d);return `<div class="tw-dayh ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${schoolHolidayName(iso)?'is-sch':''}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b>${teamBadges(iso)}</div>`;}).join('');
   for(const [code,k,label] of TEAM_SHIFTS){
     g+=`<div class="tw-rowh ${k}">${label}</div>`;
     g+=days.map((d,i)=>{
@@ -2061,7 +2061,7 @@ function renderTeamWeek(){
   const sel=new Date(state.teamDate);sel.setHours(0,0,0,0);
   const selISO=isoDate(sel);
   let m='<div class="tw-mobile"><div class="tw-strip">';
-  m+=days.map((d,i)=>{const iso=isoDate(d);return `<button type="button" class="tw-sd ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${iso===selISO?'is-sel':''} ${swissHolidayName(iso)?'is-hol':''}" data-team-pick="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b></button>`;}).join('');
+  m+=days.map((d,i)=>{const iso=isoDate(d);return `<button type="button" class="tw-sd ${i>=5?'is-we':''} ${iso===today?'is-today':''} ${iso===selISO?'is-sel':''} ${swissHolidayName(iso)?'is-hol':''} ${schoolHolidayName(iso)?'is-sch':''}" data-team-pick="${iso}" aria-label="${escapeHTML(formatDateWithYear(d))}"><small>${DAY_NAMES[i]}</small><b>${d.getDate()}</b></button>`;}).join('');
   m+='</div>';
   const long=sel.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
   m+=`<div class="tw-daytitle"><strong>${escapeHTML(long.charAt(0).toUpperCase()+long.slice(1))}</strong>${teamBadges(selISO)}</div>`;
@@ -2878,6 +2878,7 @@ function cmpYearInfo(emp,c){
 // Ruban « période » : vacances scolaires (bande violette) et jours fériés (points rouges)
 // sur toute la période affichée. Hauteur fixe, même quand il est vide.
 function periodStripHTML(isos){
+  return '';
   const n=isos.length; if(!n)return '';
   let segs='',i=0,any=false;
   while(i<n){
