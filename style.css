@@ -1984,3 +1984,34 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 }
 /* Semaine PC : pas de « Vacances scol. » sous chaque jour (déjà dans la légende) */
 .tw-badge.sch{display:none!important}
+/* ===== Individuel · semaine sur PC : liste en lignes, claire et aérée ===== */
+@media (min-width:701px){
+  .week-board{display:flex;flex-direction:column;gap:6px}
+  .week-row{display:grid;grid-template-columns:96px 1fr;align-items:stretch;position:relative;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;box-shadow:none}
+  .week-row.is-current-day{box-shadow:none;border-color:var(--accent-solid);background:color-mix(in srgb,var(--accent-tint) 55%,var(--surface))}
+  .week-row.is-current-day::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent-solid)}
+  .week-day,.week-day.today{flex-direction:column;justify-content:center;align-items:flex-start;gap:2px;padding:10px 12px 10px 18px;background:transparent;border:0}
+  .week-day strong{font:800 11px/1.2 var(--font-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  .week-day span{font:800 22px/1.1 var(--font-display);color:var(--ink)}
+  .week-day.today strong,.week-day.today span{color:var(--accent-ink)}
+  .week-shift,.week-shift:not([class*="code-"]){height:auto;min-height:62px;padding:10px 18px 10px 4px;background:transparent!important;display:grid;grid-template-columns:minmax(210px,300px) minmax(160px,1fr) minmax(0,1.3fr) auto;grid-template-areas:'main time team badge';align-items:center;column-gap:20px;text-align:left;overflow:visible}
+  .week-shift .shift-mainline{grid-area:main;justify-content:flex-start;margin:0;gap:12px}
+  .week-shift .shift-mainline b{display:inline-grid;place-items:center;min-width:54px;padding:8px 10px;border-radius:9px;background:var(--pill-bg,var(--paper))!important;font:800 15px/1 var(--font-display);letter-spacing:.02em}
+  .week-shift:not([class*="code-"]) .shift-mainline b{background:transparent!important;color:var(--muted)}
+  .week-shift .shift-mainline span{font:700 14px/1.25 var(--font-body);color:var(--ink)}
+  .week-shift:not([class*="code-"]) .shift-mainline span{color:var(--muted)}
+  .week-shift .shift-time{grid-area:time;margin:0;font:500 12.5px/1.3 var(--font-body);color:var(--muted);opacity:1}
+  .week-shift .shift-time.fe-comment{color:var(--ink-soft)}
+  .week-shift .shift-team.compact-team{grid-area:team;margin:0;padding:0;border:0;min-height:0;width:auto;justify-content:flex-start}
+  .week-shift .shift-team-inline{font-size:12.5px;color:var(--ink-soft)}
+  .week-shift .shift-team-inline strong{font-weight:600;color:var(--muted)}
+  .week-shift .shift-team-inline.placeholder{display:none}
+  .week-shift-badge-stack{grid-area:badge;position:static;max-width:none;flex-direction:row;align-items:center;gap:6px;pointer-events:auto}
+  .week-shift-holiday-badge,.week-shift-travaux-badge{font-size:11px;padding:3px 8px;border-radius:99px;max-width:220px}
+  .week-shift-school-badge{display:none}
+}
+@media (min-width:701px){
+  .week-shift,.week-shift:not([class*="code-"]){grid-template-columns:300px 200px minmax(0,1fr) auto}
+  .week-shift .shift-team.compact-team,.week-shift .shift-team-inline{text-align:left;margin:0;justify-content:flex-start;display:flex}
+}
+@media (min-width:701px){.week-shift .shift-team-inline{gap:5px}}
