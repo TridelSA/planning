@@ -1628,3 +1628,57 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 /* Vacances scolaires : anneau pointillé sans remplissage (distinct des pastilles de codes) */
 .month-cell.is-schoolholiday .day-num,.cmpm-day.is-sch small,.cmpm-weekhead .is-sch em,.tw-sd.is-sch:not(.is-sel) b,.cmp-day.is-sch b,.tw-dayh.is-sch b{background:transparent!important;box-shadow:none!important;color:var(--school-dot)!important;outline:1.6px dashed var(--school-dot);outline-offset:-1.6px}
 @media (min-width:701px){.cmp-fbox #cmpFilter{max-width:260px}}
+
+/* ===== Vacances scolaires : capsule continue (style sélecteur de période) ===== */
+.sc{position:relative}
+.sc::before{content:'';position:absolute;left:-3px;right:-3px;top:var(--sc-top,2px);height:var(--sc-h,20px);background:var(--school-tint);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--school-dot) 30%,transparent);pointer-events:none;z-index:0}
+.sc-l::before{left:calc(50% - var(--sc-r,10px));border-top-left-radius:99px;border-bottom-left-radius:99px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--school-dot) 30%,transparent)}
+.sc-r::before{right:calc(50% - var(--sc-r,10px));border-top-right-radius:99px;border-bottom-right-radius:99px}
+.sc-l:not(.sc-r)::before{margin-left:0}
+/* le numéro passe au-dessus de la capsule ; début et fin = ronds pleins */
+.month-cell.is-schoolholiday .day-num,.cmpm-day.is-sch small,.cmpm-weekhead .is-sch em,.tw-sd.is-sch b,.cmp-day.is-sch b,.tw-dayh.is-sch b{position:relative;z-index:1;outline:none!important;background:transparent!important;box-shadow:none!important;color:var(--school-dot)!important}
+.month-cell.sc-s .day-num,.month-cell.sc-e .day-num,.cmpm-day.sc-s small,.cmpm-day.sc-e small,.cmpm-weekhead .sc-s em,.cmpm-weekhead .sc-e em,.tw-sd.sc-s:not(.is-sel) b,.tw-sd.sc-e:not(.is-sel) b,.cmp-day.sc-s b,.cmp-day.sc-e b,.tw-dayh.sc-s b,.tw-dayh.sc-e b{background:var(--school-dot)!important;color:#fff!important}
+:root[data-theme="dark"] .month-cell.sc-s .day-num,:root[data-theme="dark"] .month-cell.sc-e .day-num,:root[data-theme="dark"] .cmpm-day.sc-s small,:root[data-theme="dark"] .cmpm-day.sc-e small,:root[data-theme="dark"] .cmpm-weekhead .sc-s em,:root[data-theme="dark"] .cmpm-weekhead .sc-e em,:root[data-theme="dark"] .tw-sd.sc-s b,:root[data-theme="dark"] .tw-sd.sc-e b,:root[data-theme="dark"] .cmp-day.sc-s b,:root[data-theme="dark"] .cmp-day.sc-e b{color:#0F1A18!important}
+.cmpm-day.is-sch{background:transparent!important}
+@media (max-width:700px){
+  .month-cell.sc{--sc-top:2px;--sc-h:20px;--sc-r:10px}
+  .month-cell.sc::before{left:0;right:0}
+  .month-cell.sc-l::before{left:calc(50% - 10px)}
+  .month-cell.sc-r::before{right:calc(50% - 10px)}
+  .cmpm-day.sc{--sc-top:1px;--sc-h:17px;--sc-r:8.5px}
+  .cmpm-day.sc::before{left:-1px;right:-1px}
+  .cmpm-day.sc-l::before{left:calc(50% - 8.5px)}
+  .cmpm-day.sc-r::before{right:calc(50% - 8.5px)}
+  .cmpm-weekhead .sc{--sc-top:12px;--sc-h:20px;--sc-r:10px}
+  .cmpm-weekhead .sc::before{left:-1px;right:-1px}
+  .cmpm-weekhead .sc-l::before{left:calc(50% - 10px)}
+  .cmpm-weekhead .sc-r::before{right:calc(50% - 10px)}
+  .tw-sd.sc{--sc-top:19px;--sc-h:30px;--sc-r:15px}
+  .tw-sd.sc::before{left:-3px;right:-3px}
+  .tw-sd.sc-l::before{left:calc(50% - 15px)}
+  .tw-sd.sc-r::before{right:calc(50% - 15px)}
+  .tw-sd.is-sel.sc::before{display:none}
+}
+@media (min-width:701px){
+  .cmp-day.sc,.tw-dayh.sc{--sc-top:auto;--sc-h:24px;--sc-r:12px}
+  .cmp-day.sc::before,.tw-dayh.sc::before{top:auto;bottom:4px;left:0;right:0}
+  .cmp-day.sc-l::before,.tw-dayh.sc-l::before{left:calc(50% - 12px)}
+  .cmp-day.sc-r::before,.tw-dayh.sc-r::before{right:calc(50% - 12px)}
+  .month-cell.is-schoolholiday.sc::before{top:0;height:5px;left:0;right:0;border-radius:0;box-shadow:none;background:var(--school-dot)}
+  .month-cell.is-schoolholiday.sc-l::before{left:6px;border-top-left-radius:99px;border-bottom-left-radius:99px}
+  .month-cell.is-schoolholiday.sc-r::before{right:6px;border-top-right-radius:99px;border-bottom-right-radius:99px}
+  .month-cell.is-schoolholiday .day-num{background:transparent!important}
+}
+.sc::before,.sc-l::before,.sc-r::before{box-shadow:none!important;background:color-mix(in srgb,var(--school-dot) 16%,var(--surface))}
+.cmpm-block.is-wk .cmpm-day.sc::before{display:none}
+.tw-sd.is-sel b{color:#fff!important;background:transparent!important}
+@media (min-width:701px){
+  .month-cell.is-schoolholiday.sc::before{top:4px;height:4px;left:6px;right:6px;border-radius:99px;background:var(--school-dot)}
+  .month-cell.is-schoolholiday.sc-l::before{left:6px}
+  .month-cell.is-schoolholiday.sc:not(.sc-l)::before{left:-1px}
+  .month-cell.is-schoolholiday.sc:not(.sc-r)::before{right:-1px}
+  .month-cell.is-schoolholiday.sc:not(.sc-l)::before{border-top-left-radius:0;border-bottom-left-radius:0}
+  .month-cell.is-schoolholiday.sc:not(.sc-r)::before{border-top-right-radius:0;border-bottom-right-radius:0}
+  .month-cell.is-schoolholiday.sc-s .day-num,.month-cell.is-schoolholiday.sc-e .day-num{background:transparent!important;color:var(--school-dot)!important}
+  .month-cell.is-schoolholiday{padding-top:12px}
+}
