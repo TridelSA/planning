@@ -1963,3 +1963,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmp-cell.is-today.tl-l::after{bottom:-3px;border-bottom:1.8px solid var(--accent-solid);border-radius:0 0 7px 7px}
 .cmp-cell.is-today.tl-f.tl-l::after{border-radius:7px}
 .cmp-cell.is-today::after{background:none!important}
+.cmp-cell.is-today::after{display:none!important}
+.cmp-todayframe{position:absolute;pointer-events:none;z-index:1;border:1.8px solid var(--accent-solid);border-radius:7px}
+@media (min-width:701px){#cmpFilter .pv-panel{left:0;right:auto}}

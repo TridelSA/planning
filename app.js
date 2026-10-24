@@ -3171,7 +3171,23 @@ function renderCompareView(){
   }
   h+='</tbody></table>';
   grid.innerHTML=h+cmpNotesHTML(view);
+  cmpDeskTodayFrame();requestAnimationFrame(cmpDeskTodayFrame);setTimeout(cmpDeskTodayFrame,250);
 }
+function cmpDeskTodayFrame(){
+  const grid=$('cmpGrid')||document.querySelector('.cmp-table')?.parentElement;
+  if(!grid)return;
+  grid.querySelectorAll('.cmp-todayframe').forEach(n=>n.remove());
+  const cells=[...grid.querySelectorAll('.cmp-table td.cmp-cell.is-today')];
+  if(!cells.length)return;
+  const g=grid.getBoundingClientRect();
+  const a=cells[0].getBoundingClientRect(),z=cells[cells.length-1].getBoundingClientRect();
+  if(getComputedStyle(grid).position==='static')grid.style.position='relative';
+  const d=document.createElement('div');d.className='cmp-todayframe';
+  d.style.cssText=`left:${a.left-g.left+grid.scrollLeft-2}px;top:${a.top-g.top+grid.scrollTop-3}px;width:${a.width+4}px;height:${z.bottom-a.top+6}px`;
+  grid.appendChild(d);
+}
+addEventListener('resize',()=>{try{cmpDeskTodayFrame()}catch(e){}});
+try{document.fonts&&document.fonts.ready.then(()=>cmpDeskTodayFrame())}catch(e){}
 
 // Vue « Année » : une case par personne et par semaine ISO (vert = présent
 // 4 jours ou plus / piquet, orange = 1 à 3 jours, rouge = aucun), avec le
