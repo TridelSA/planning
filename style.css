@@ -1750,3 +1750,12 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmpm-days.is-week .cmpm-day.is-we b{opacity:1!important;filter:none!important}
 /* Vacances : lavis très doux qui s'estompe vers le bas (plus de dalle grise) */
 .month-cell.sc,.month-cell.sc.today,.month-cell.sc.is-holiday{background-color:transparent!important;background-image:linear-gradient(180deg,color-mix(in srgb,#17A6A3 14%,var(--surface)) 0,color-mix(in srgb,#17A6A3 3%,var(--surface)) 100%)!important}
+/* Vacances : rond turquoise doux, même taille que les ronds des jours (plus de remplissage de case) */
+.month-cell.sc,.month-cell.sc.today,.month-cell.sc.is-holiday,.cmpm-day.sc,.cmpm-weekhead .sc,.tw-sd.sc,.cmp-day.sc,.tw-dayh.sc{background:transparent!important;background-image:none!important;box-shadow:none!important}
+.tw-sd.sc.is-sel{background:var(--accent-soft,var(--surface))!important}
+.month-cell.sc:not(.is-holiday):not(.today) .day-num,
+.cmpm-day.sc:not(.is-hol) small,
+.cmpm-weekhead .sc:not(.is-hol):not(.is-today) em,
+.tw-sd.sc:not(.is-hol):not(.is-sel):not(.is-today) b,
+.cmp-day.sc:not(.is-hol):not(.is-today) b,
+.tw-dayh.sc:not(.is-hol):not(.is-today) b{background:color-mix(in srgb,var(--school-dot) 20%,var(--surface))!important;color:var(--school-dot)!important;box-shadow:none!important;border-radius:50%!important}
