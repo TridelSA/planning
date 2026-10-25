@@ -2062,3 +2062,6 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .mini-cell.ind-cell.is-holiday,#viewContainer .year-calendar .mini-cell.ind-cell.is-holiday{box-shadow:inset 0 0 0 1.4px color-mix(in srgb,var(--danger) 55%,transparent)!important}
 .tl-hol{background:color-mix(in srgb,var(--danger) 8%,var(--surface));box-shadow:inset 0 0 0 1.2px color-mix(in srgb,var(--danger) 55%,transparent)}
 .mini-cell.ind-cell.today.is-holiday{box-shadow:0 0 0 2px var(--ink)!important}
+/* Rotations · semaine (téléphone) : prénoms sans contour */
+.tw-card .tw-name{box-shadow:none!important;border:0!important}
+.tw-card .tw-name.is-me{box-shadow:inset 0 0 0 1.6px var(--accent-solid)!important}
