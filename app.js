@@ -3274,6 +3274,7 @@ function renderCmpYear(view,groups){
   }catch(e){ /* ignoré : largeur par défaut */ }
   wrap.innerHTML=h;
   wrap.dataset.year=String(year);
+  cmpYearTodayFrame();requestAnimationFrame(cmpYearTodayFrame);setTimeout(cmpYearTodayFrame,250);
   if(firstRender && currentWeekIndex>=0){
     // Centre la semaine en cours à l'ouverture.
     const cell=wrap.querySelector('.pv-week.is-current');
@@ -3287,6 +3288,19 @@ function renderCmpYear(view,groups){
   }
 }
 
+function cmpYearTodayFrame(){
+  const wrap=$('cmpGrid');
+  if(!wrap||!wrap.classList.contains('pv-wrap'))return;
+  wrap.querySelectorAll('.cmp-yframe').forEach(n=>n.remove());
+  const cells=[...wrap.querySelectorAll('td.pv-cell.is-current')];
+  if(!cells.length)return;
+  if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';
+  const w=wrap.getBoundingClientRect(),a=cells[0].getBoundingClientRect(),z=cells[cells.length-1].getBoundingClientRect();
+  const d=document.createElement('div');d.className='cmp-yframe';
+  d.style.cssText=`left:${a.left-w.left+wrap.scrollLeft-2}px;top:${a.top-w.top+wrap.scrollTop-3}px;width:${a.width+4}px;height:${z.bottom-a.top+6}px;box-sizing:border-box`;
+  wrap.appendChild(d);
+}
+addEventListener('resize',()=>{try{cmpYearTodayFrame()}catch(e){}});
 function renderCmpPanelList(){
   const list=$('cmpPanelList');
   const query=normalizeSearchText(cmp.search);

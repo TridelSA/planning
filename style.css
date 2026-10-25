@@ -2065,3 +2065,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 /* Rotations · semaine (téléphone) : prénoms sans contour */
 .tw-card .tw-name{box-shadow:none!important;border:0!important}
 .tw-card .tw-name.is-me{box-shadow:inset 0 0 0 1.6px var(--accent-solid)!important}
+/* Collègues · année : semaine actuelle = un trait autour de la colonne, numéro entouré */
+.pv-cell.is-current,.pv-cell.is-current:hover{box-shadow:none!important;transform:none}
+.pv-week.is-current{background:transparent!important;color:var(--accent-ink)!important;font-weight:900;border-radius:999px;box-shadow:inset 0 0 0 1.8px var(--accent-solid)!important}
+.cmp-yframe{position:absolute;pointer-events:none;z-index:1;border:1.8px solid var(--accent-solid);border-radius:7px}
