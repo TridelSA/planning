@@ -2058,3 +2058,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 :root{--pv-full-bg:#CFEBDB;--pv-full-ink:#1E6B44;--pv-partial-bg:#FCE6C2;--pv-partial-ink:#8A5A12;--pv-reserve-bg:#CFEBDB;--pv-reserve-ink:#1E6B44;--pv-absent-bg:#FBD3D7;--pv-absent-ink:#A63A45}
 :root[data-theme="dark"]{--pv-full-bg:#1F4A36;--pv-full-ink:#8FDDB0;--pv-partial-bg:#4A3A18;--pv-partial-ink:#F0C070;--pv-reserve-bg:#1F4A36;--pv-reserve-ink:#8FDDB0;--pv-absent-bg:#4F1F27;--pv-absent-ink:#FFA9B3}
 .pv-cell.is-current{box-shadow:inset 0 0 0 1.8px var(--accent-solid)!important}
+/* Férié : même contour clair que dans Rotations · année */
+.mini-cell.ind-cell.is-holiday,#viewContainer .year-calendar .mini-cell.ind-cell.is-holiday{box-shadow:inset 0 0 0 1.4px color-mix(in srgb,var(--danger) 55%,transparent)!important}
+.tl-hol{background:color-mix(in srgb,var(--danger) 8%,var(--surface));box-shadow:inset 0 0 0 1.2px color-mix(in srgb,var(--danger) 55%,transparent)}
+.mini-cell.ind-cell.today.is-holiday{box-shadow:0 0 0 2px var(--ink)!important}
