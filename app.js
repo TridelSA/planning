@@ -17,7 +17,19 @@ const CODE_INFO={
 let planning={year:new Date().getFullYear(),employees:[],updatedAt:'',publicationId:'',schemaVersion:0,dateCount:0,travaux:null};
 let lastLoadedRawText='';
 let lastJournal=[];
-let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:new Date(),teamMode:false,teamYear:new Date().getFullYear(),compareMode:false,statsMode:false};
+function smartAnchor(kind){
+  // Vendredi, samedi, dimanche : on affiche déjà la semaine suivante ; et le mois suivant
+  // quand on est dans la dernière semaine du mois.
+  const d=new Date();d.setHours(0,0,0,0);
+  const dow=(d.getDay()+6)%7;
+  if(dow<4||kind==='year')return d;
+  const nextMon=new Date(d);nextMon.setDate(d.getDate()+7-dow);
+  if(kind==='week')return nextMon;
+  if(nextMon.getMonth()!==d.getMonth())return new Date(d.getFullYear(),d.getMonth()+1,1);
+  return d;
+}
+let state={view:['week','month','year'].includes(localStorage.getItem('planningView'))?localStorage.getItem('planningView'):'week',employeeId:null,date:null,teamMode:false,teamYear:new Date().getFullYear(),compareMode:false,statsMode:false};
+state.date=smartAnchor(state.view);
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const isoDate=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -626,7 +638,7 @@ function persistSelectedEmployee(employee){
 }
 
 function initializeState(preferredId){
-  state.date=new Date();
+  state.date=smartAnchor(state.view);
 
   const authenticatedEmail=localStorage.getItem(AUTHENTICATED_EMAIL_KEY);
   const matchedEmployee=bestEmployeeForEmail(authenticatedEmail);
@@ -2018,7 +2030,7 @@ function teamCountsFor(dISO){
 
 const TEAM_SCALE_KEY='teamScale';
 state.teamScale=(()=>{ try{ return localStorage.getItem(TEAM_SCALE_KEY)==='year'?'year':'week'; }catch(e){ return 'week'; } })();
-state.teamDate=new Date();state.teamDate.setHours(0,0,0,0);
+state.teamDate=smartAnchor('week');
 
 const TEAM_SHIFTS=[['RM','rm','Matin'],['RA','ra','Après-midi'],['RN','rn','Nuit']];
 function teamPeople(dISO,code){
@@ -2785,7 +2797,7 @@ const cmp=(()=>{
   }catch(e){ /* stockage indisponible */ }
   return {
     scale:['week','month','year'].includes(s.scale)?s.scale:'week',
-    date:new Date(),
+    date:smartAnchor(['week','month','year'].includes(s.scale)?s.scale:'week'),
     people:new Set(Array.isArray(s.people)?s.people.map(String):[]),
     search:''
   };
@@ -4406,7 +4418,7 @@ function renderLegend(e){
 
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   state.view=b.dataset.view;
-  state.date=new Date();
+  state.date=smartAnchor(state.view);
   localStorage.setItem('planningView',state.view);
   render();
 }));
