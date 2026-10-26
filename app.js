@@ -4371,7 +4371,7 @@ function renderYear(e){
       // Dernière ligne entièrement hors du mois : on ne l'affiche pas (gain de place).
       if(i>=28 && i%7===0 && d.getMonth()!==m)break;
       const c=safeCode(e.schedule[isoDate(d)]);
-      const isToday=isoDate(d)===todayISO();
+      const isToday=d.getMonth()===m&&isoDate(d)===todayISO();
       const dISO=isoDate(d);
       const visible=codeMatchesFilter(c);
       const hasComment=d.getMonth()===m && c!=='HOR' && c!=='HSR' && !!commentFor(e,dISO);

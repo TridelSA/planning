@@ -2095,3 +2095,35 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmptl-desk .cmptl-vbar{font-size:10px!important;line-height:15px!important}
   .cmptl-desk .cmptl-info{font-size:12.5px;margin-top:6px}
 }
+/* ===== PC : pages tenant sur un écran (en-tête, cartes et calendriers plus compacts) ===== */
+@media (min-width:701px){
+  .hero{min-height:118px;padding:16px 22px 12px;margin-bottom:10px}
+  .controls-grid .field>label{display:none}
+  .card.controls{padding:10px 12px}
+  .upcoming-card{margin-bottom:10px;padding:8px 12px}
+  .upcoming-kicker,.upcoming-head{display:none}
+  .upcoming-list{gap:5px}
+  .upcoming-item{padding:7px 10px!important}
+  body:not(.compare-mode):not(.team-mode):not(.stats-mode) .main-card,body:not(.compare-mode):not(.team-mode):not(.stats-mode) main .card{padding-top:10px;padding-bottom:10px}
+  .month-cell{min-height:50px!important;padding:5px 9px!important}
+  .month-head span{padding:5px 0!important}
+  .week-day,.week-day.today{padding-top:4px;padding-bottom:4px}
+  .week-shift,.week-shift:not([class*="code-"]){min-height:38px;padding-top:3px;padding-bottom:3px}
+  .week-board{gap:3px}
+  .nav-btn{width:34px;height:34px}
+}
+
+/* ===== Cohérence « jour actuel » : même vert (accent) dans tous les plannings, clair et sombre ===== */
+.month-cell.today,.month-cell.is-schoolholiday.today{box-shadow:inset 0 0 0 2px var(--accent-solid)!important}
+.mini-cell.today,.mini-cell.is-schoolholiday.today{outline-color:var(--accent-solid)!important}
+.mini-cell.ind-cell.today,.mini-cell.ind-cell.today.is-holiday,#viewContainer .year-calendar .mini-cell.ind-cell.today{box-shadow:0 0 0 2px var(--accent-solid)!important;color:var(--ink)!important}
+.yg-c.is-today,.yg-c.is-sel,.yg-grid .yg-c.is-today,.yg-grid .yg-c.is-sel{box-shadow:0 0 0 1.8px var(--accent-solid)!important}
+.cmpm-year i.is-today{box-shadow:inset 0 0 0 2px var(--accent-solid)}
+.tw-cell.is-today{border-color:var(--accent-solid);box-shadow:inset 0 0 0 1px var(--accent-solid)}
+.week-row.is-current-day{border-color:var(--accent-solid)}
+.cmp-todayframe,.cmp-yframe{border-color:var(--accent-solid)}
+/* numéro du jour dans les en-têtes : même vert, gras, partout */
+.tw-dayh.is-today small,.tw-dayh.is-today b,.cmp-day.is-today span,.cmp-day.is-today b,.cmptl-head b.is-today,.cmpm-weekhead .is-today,.pv-week.is-current{color:var(--accent-ink)!important;font-weight:900!important}
+.tw-dayh.is-today{background:transparent!important}
+.team-cell.mini-cell.today{background:color-mix(in srgb,var(--accent-solid) 16%,var(--surface))!important;color:var(--accent-ink)!important;box-shadow:inset 0 0 0 1.8px var(--accent-solid)!important}
+.tw-dayh,.tw-dayh.is-we,.tw-dayh.is-today{background:transparent!important}
