@@ -3195,7 +3195,7 @@ function cmpDeskTodayFrame(){
   const a=cells[0].getBoundingClientRect(),z=cells[cells.length-1].getBoundingClientRect();
   if(getComputedStyle(grid).position==='static')grid.style.position='relative';
   const d=document.createElement('div');d.className='cmp-todayframe';
-  d.style.cssText=`left:${a.left-g.left+grid.scrollLeft}px;top:${a.top-g.top+grid.scrollTop-2}px;width:${a.width}px;height:${z.bottom-a.top+4}px;box-sizing:border-box`;
+  d.style.cssText=`left:${a.left-g.left+grid.scrollLeft-1}px;top:${a.top-g.top+grid.scrollTop-1}px;width:${a.width+2}px;height:${z.bottom-a.top+2}px;box-sizing:border-box`;
   grid.appendChild(d);
 }
 addEventListener('resize',()=>{try{cmpDeskTodayFrame()}catch(e){}});

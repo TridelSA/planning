@@ -2069,3 +2069,5 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .pv-cell.is-current,.pv-cell.is-current:hover{box-shadow:none!important;transform:none}
 .pv-week.is-current{background:transparent!important;color:var(--accent-ink)!important;font-weight:900;border-radius:999px;box-shadow:inset 0 0 0 1.8px var(--accent-solid)!important}
 .cmp-yframe{position:absolute;pointer-events:none;z-index:1;border:1.8px solid var(--accent-solid);border-radius:7px}
+.cmp-day.is-today{background:transparent!important;border-radius:0}
+.cmp-day.is-today b{color:var(--accent-ink);font-weight:900}
