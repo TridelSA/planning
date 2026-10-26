@@ -2081,3 +2081,17 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .week-shift,.week-shift:not([class*="code-"]){min-height:42px;padding:5px 18px 5px 4px}
   .week-shift .shift-mainline b{padding:5px 9px;min-width:48px;font-size:14px;border-radius:8px}
 }
+/* Collègues · mois PC : plus compact (largeur et hauteur) */
+@media (min-width:701px){
+  body.compare-mode.cmp-month .app{max-width:1120px}
+  .cmptl-desk{padding:10px 16px 10px!important}
+  .cmptl-desk .cmptl{--nm:112px}
+  .cmptl-desk .cmptl-c.yg-c{height:25px;font-size:10.5px;border-radius:5px}
+  .cmptl-desk .cmptl-row{margin-bottom:3px}
+  .cmptl-desk .cmptl-head b{font-size:10.5px!important;height:18px;line-height:18px!important}
+  .cmptl-desk .cmptl-name{font-size:11.5px}
+  .cmptl-desk .cmptl-ev{height:16px;margin:0 0 5px}
+  .cmptl-desk .cmptl-vbar,.cmptl-desk .cmptl-vhol{height:15px!important}
+  .cmptl-desk .cmptl-vbar{font-size:10px!important;line-height:15px!important}
+  .cmptl-desk .cmptl-info{font-size:12.5px;margin-top:6px}
+}

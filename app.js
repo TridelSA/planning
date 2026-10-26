@@ -3105,6 +3105,7 @@ function renderCompareView(){
   const isYear=cmp.scale==='year';
   document.body.classList.toggle('cmp-week',cmp.scale==='week');
   document.body.classList.toggle('cmp-year',isYear);
+  document.body.classList.toggle('cmp-month',cmp.scale==='month');
   $('cmpTitle').textContent=view.title;
   $('cmpPrintYear').textContent=String(cmp.date.getFullYear());
   document.querySelectorAll('[data-cmp-scale]').forEach(b=>b.classList.toggle('active',b.dataset.cmpScale===cmp.scale));
