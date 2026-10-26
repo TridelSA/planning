@@ -2394,7 +2394,7 @@ function restoreSavedPage(){
   if(pageRestored)return false;
   pageRestored=true;
   let saved='individual';
-  try{ saved=localStorage.getItem(PAGE_KEY)||'individual'; }catch(e){ saved='individual'; }
+  try{ saved=sessionStorage.getItem(PAGE_KEY)||localStorage.getItem(PAGE_KEY)||'individual'; }catch(e){ saved='individual'; }
   if(saved==='presence'){ saved='compare'; cmp.scale='year'; saveCmp(); }  // ancienne page Maintenance
   const shared=readSharedHash();
   if(shared){
@@ -2547,6 +2547,7 @@ function setPage(page){
 
   updateTeamToggleLabel();
   try{ localStorage.setItem(PAGE_KEY,page); }catch(e){ /* stockage indisponible */ }
+  try{ sessionStorage.setItem(PAGE_KEY,page); }catch(e){ /* ignoré */ }
   histNote(page);
   render();
   pageTransitionRun(pageTrans);
@@ -4173,7 +4174,7 @@ function renderRotationWidget(){
   // Avant la restauration de la page au chargement : on se fie à la page mémorisée,
   // pour ne pas faire clignoter le bandeau après un rafraîchissement.
   if(typeof pageRestored!=='undefined' && !pageRestored){
-    try{ const sv=localStorage.getItem(PAGE_KEY); if(sv&&sv!=='individual')pg=sv; }catch(e){ /* ignoré */ }
+    try{ const sv=sessionStorage.getItem(PAGE_KEY)||localStorage.getItem(PAGE_KEY); if(sv&&sv!=='individual')pg=sv; }catch(e){ /* ignoré */ }
     if(/[#&]p=stats/.test(location.hash))pg='stats';
   }
   // Visible sur Mon planning et Équipe ; masqué sur les statistiques.
