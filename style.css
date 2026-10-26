@@ -2071,3 +2071,13 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .cmp-yframe{position:absolute;pointer-events:none;z-index:1;border:1.8px solid var(--accent-solid);border-radius:7px}
 .cmp-day.is-today{background:transparent!important;border-radius:0}
 .cmp-day.is-today b{color:var(--accent-ink);font-weight:900}
+/* Individuel · semaine PC : lignes plus basses */
+@media (min-width:701px){
+  .week-board{gap:4px}
+  .week-row{grid-template-columns:92px 1fr;border-radius:10px}
+  .week-day,.week-day.today{flex-direction:row;align-items:baseline;justify-content:flex-start;gap:8px;padding:6px 10px 6px 18px}
+  .week-day strong{font-size:10.5px;width:30px}
+  .week-day span{font-size:18px}
+  .week-shift,.week-shift:not([class*="code-"]){min-height:42px;padding:5px 18px 5px 4px}
+  .week-shift .shift-mainline b{padding:5px 9px;min-width:48px;font-size:14px;border-radius:8px}
+}
