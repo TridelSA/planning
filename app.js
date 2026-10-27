@@ -303,6 +303,67 @@ function isVacantEmployee(name){
   return clean==='poste vacant' || clean==='poste-vacant' || clean==='vacant';
 }
 
+// ---------- Soldes de vacances (colonnes NN…NT du classeur Excel) ----------
+// « conges » dans le JSON : report (jours non pris, négatif = pris en trop),
+// droit de l'année, planifié et solde restant. Le JSON ne contient que ce que
+// l'Excel renseigne ; sans ces données, rien ne s'affiche.
+function normLeave(c,year){
+  if(!c||typeof c!=='object'||Array.isArray(c))return null;
+  const n=k=>{const v=c[k];if(v===null||v===undefined||v==='')return null;const x=Number(v);return Number.isFinite(x)?x:null;};
+  const o={year,report:n('report'),reportJub:n('report_jub'),droit:n('droit'),droitJub:n('droit_jub'),vn:n('vn'),planned:n('planifie'),balance:n('solde')};
+  return ['report','reportJub','droit','droitJub','vn','planned','balance'].some(k=>o[k]!==null)?o:null;
+}
+function leaveOf(emp){
+  if(!emp||!emp.leaves)return null;
+  const y=new Date().getFullYear();
+  return emp.leaves[y]||null;
+}
+function fmtDays(n){
+  if(n===null||n===undefined)return '—';
+  const v=Math.round(n*100)/100;
+  return (v<0?'−':'')+Math.abs(v).toLocaleString('fr-CH',{maximumFractionDigits:2});
+}
+function leaveCardHTML(emp,opts={}){
+  const L=leaveOf(emp);
+  if(!L)return '';
+  const rep=L.report||0,droit=L.droit;
+  let bal=L.balance;
+  if(bal===null&&droit!==null)bal=rep+droit-(L.planned||0);
+  if(bal===null)return '';
+  const total=rep+(droit||0);
+  const planned=L.planned!==null?L.planned:Math.max(0,total-bal);
+  const pct=total>0?Math.max(0,Math.min(100,planned/total*100)):(bal<=0?100:0);
+  const month=new Date().getMonth();
+  let tone='ok',note='';
+  if(bal<0){tone='over';note=`${fmtDays(Math.abs(bal))} j pris en trop`;}
+  else if(bal===0){tone='done';note='Tout est posé';}
+  else if(month>=8){tone='warn';note='À poser avant fin décembre';}
+  else note='Encore disponibles pour cette année';
+  const fact=(l,v,t)=>`<div${t?` title="${escapeHTML(t)}"`:''}><dt>${l}</dt><dd>${v}</dd></div>`;
+  let facts='';
+  if(L.report!==null)facts+=fact('Report',fmtDays(L.report),L.report<0?'Jours pris en trop sur l’année précédente':'Jours non pris l’année précédente');
+  if(L.droit!==null)facts+=fact(`Droit ${L.year||''}`.trim(),fmtDays(L.droit),'Jours de vacances auxquels vous avez droit cette année');
+  if(L.planned!==null)facts+=fact('Planifié',fmtDays(L.planned),'Jours de vacances déjà posés dans le planning');
+  const jub=(L.reportJub||L.droitJub)
+    ?`<div class="leave-jub"><span>Jubilaire</span>${L.reportJub!==null?`<em>report ${fmtDays(L.reportJub)}</em>`:''}${L.droitJub!==null?`<em>droit ${fmtDays(L.droitJub)}</em>`:''}</div>`:'';
+  return `<div class="leave ${tone}${opts.compact?' is-compact':''}">
+    <div class="leave-num"><small>Vacances ${L.year||''}</small><b>${fmtDays(bal)}</b><span>${Math.abs(bal)>1?'jours':'jour'} à poser</span></div>
+    <div class="leave-mid">
+      <div class="leave-bar" role="img" aria-label="${fmtDays(planned)} jours planifiés sur ${fmtDays(total)}"><i style="width:${pct.toFixed(1)}%"></i></div>
+      ${note?`<p class="leave-note">${escapeHTML(note)}</p>`:''}
+      ${jub}
+    </div>
+    <dl class="leave-facts">${facts}</dl>
+  </div>`;
+}
+function renderLeaveCard(emp){
+  const card=$('leaveCard');
+  if(!card)return;
+  const h=emp?leaveCardHTML(emp):'';
+  card.innerHTML=h;
+  card.classList.toggle('hidden',!h);
+}
+
 // Combine les employés de plusieurs fichiers (un par année) en une seule
 // liste, en fusionnant par nom -- les identifiants (basés sur le numéro de
 // ligne Excel) ne sont pas comparables d'un fichier à l'autre. Le planning
@@ -315,11 +376,13 @@ function mergeEmployeesByName(perYearData){
     for(const emp of data.employees){
       const key=emp.name.toLocaleUpperCase('fr');
       if(!byName.has(key)){
-        byName.set(key,{id:emp.id,name:emp.name,category:'',schedule:{},comments:{}});
+        byName.set(key,{id:emp.id,name:emp.name,category:'',schedule:{},comments:{},leaves:{},timeCat:''});
       }
       const merged=byName.get(key);
       // Fichiers triés par année croissante : la catégorie la plus récente l'emporte.
       if(emp.category)merged.category=emp.category;
+      if(emp.leave&&emp.leave.year)merged.leaves[emp.leave.year]=emp.leave;
+      if(emp.timeCat)merged.timeCat=emp.timeCat;
       Object.assign(merged.schedule,emp.schedule);
       Object.assign(merged.comments,emp.comments);
     }
@@ -439,7 +502,9 @@ function normalizeData(raw){
         name,
         category,
         schedule,
-        comments
+        comments,
+        leave:normLeave(e.conges||e.leave,Number(raw.annee||raw.year)||null),
+        timeCat:String(e.horaire||'').trim().toUpperCase().slice(0,4)
       };
     })
     .filter(e=>e.name && !isVacantEmployee(e.name));
@@ -2536,6 +2601,7 @@ function setPage(page){
   try{ localStorage.setItem('planningLastInGroup',JSON.stringify(lastInGroup)); }catch(e){ /* ignoré */ }
   if(alternate){
     if($('upcomingEventsCard'))$('upcomingEventsCard').classList.add('hidden');
+    renderLeaveCard(null);
   }
   // « En poste / Ensuite » : affiché tout de suite sur Individuel, masqué ailleurs.
   renderRotationWidget();
@@ -3677,6 +3743,8 @@ function renderStatsView(){
     <div class="st-kpi" style="--st-c:var(--accent)"><small>Prochain congé</small><b style="font-size:${upcoming?'24px':'18px'};line-height:1.2">${nextTxt}</b><span>${nextSub||'—'}</span></div>
   </div>`;
 
+  const leaveHTML=leaveCardHTML(emp,{compact:true});
+  if(leaveHTML)h+=`<div class="st-leave">${leaveHTML}</div>`;
   h+=stYearGridHTML(emp);
   const blocks=[];
   const affYear=stSum(months,ST_AFF,'all');
@@ -3915,6 +3983,7 @@ function render(){
   if($('noEmployeeState'))$('noEmployeeState').classList.toggle('hidden',!!e);
   if($('employeeContent'))$('employeeContent').classList.toggle('hidden',!e);
   if($('upcomingEventsCard') && !e)$('upcomingEventsCard').classList.add('hidden');
+  if(!e)renderLeaveCard(null);
 
   if(!e){
     renderRotationWidget();
@@ -3935,6 +4004,7 @@ function render(){
   }
 
   renderLegend(e);
+  renderLeaveCard(e);
   renderUpcomingEvents(e);
   renderRotationWidget();
   updateTodayButtonState();

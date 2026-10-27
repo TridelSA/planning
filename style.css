@@ -2127,3 +2127,35 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .tw-dayh.is-today{background:transparent!important}
 .team-cell.mini-cell.today{background:color-mix(in srgb,var(--accent-solid) 16%,var(--surface))!important;color:var(--accent-ink)!important;box-shadow:inset 0 0 0 1.8px var(--accent-solid)!important}
 .tw-dayh,.tw-dayh.is-we,.tw-dayh.is-today{background:transparent!important}
+
+/* ===== Soldes de vacances ===== */
+.leave-card{padding:12px 14px !important}
+.leave{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center}
+.leave-num{display:flex;flex-direction:column;align-items:flex-start;line-height:1.05;min-width:84px}
+.leave-num small{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.leave-num b{font-size:2.3rem;font-weight:800;color:var(--accent-ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.leave-num span{font-size:.74rem;color:var(--muted);font-weight:600}
+.leave-mid{display:flex;flex-direction:column;gap:6px;min-width:0}
+.leave-bar{height:9px;border-radius:99px;background:var(--line);overflow:hidden}
+.leave-bar i{display:block;height:100%;border-radius:99px;background:var(--accent-solid)}
+.leave-note{margin:0;font-size:.78rem;font-weight:600;color:var(--muted)}
+.leave-jub{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.74rem;color:var(--muted);align-items:baseline}
+.leave-jub span{font-weight:700;color:var(--ink)}
+.leave-jub em{font-style:normal}
+.leave-facts{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;margin:0;padding-top:8px;border-top:1px solid var(--line)}
+.leave-facts div{display:flex;flex-direction:column;gap:1px}
+.leave-facts dt{font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.leave-facts dd{margin:0;font-size:1rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.leave.warn .leave-num b{color:var(--signal)}
+.leave.warn .leave-bar i{background:var(--signal)}
+.leave.warn .leave-note{color:var(--signal)}
+.leave.over .leave-num b,.leave.over .leave-note{color:var(--danger)}
+.leave.over .leave-bar i{background:var(--danger)}
+.leave.done .leave-num b{color:var(--muted)}
+.st-leave{margin:0 0 10px}
+.st-leave .leave{padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+@media (min-width:701px){
+  .leave{grid-template-columns:auto minmax(180px,1fr) auto;gap:18px}
+  .leave-facts{grid-column:auto;border-top:0;padding-top:0;border-left:1px solid var(--line);padding-left:18px;grid-template-columns:repeat(3,auto);gap:4px 20px}
+  .leave-num b{font-size:2.6rem}
+}
