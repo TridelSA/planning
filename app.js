@@ -2371,7 +2371,6 @@ function updateTeamToggleLabel(){
   const page=currentPage();
   const grp=groupOf(page);
   $('navMenuLabel').textContent=grp.label;
-  { const hb=$('heroStatsBtn'); if(hb){ const onStats=grp.id==='stats'; hb.textContent=onStats?'Planning':'Statistiques'; hb.dataset.dest=onStats?lastInGroup.plan:'stats'; } }
   $('navMenuPanel').innerHTML=NAV_GROUPS.map(g=>{
     const on=g.id===grp.id;
     return `<button type="button" class="navm-item ${on?'is-active':''}" role="menuitem" data-nav-page="${on?page:lastInGroup[g.id]}">
@@ -2387,7 +2386,8 @@ function updateTeamToggleLabel(){
 
 function openNavMenu(){
   const btn=$('navMenuBtn'),panel=$('navMenuPanel');
-  const r=btn.getBoundingClientRect();
+  const hs=document.getElementById('heroSettings');
+  const r=(window.innerWidth>700&&hs?hs:btn).getBoundingClientRect();
   panel.classList.remove('hidden');
   if(window.innerWidth<=700){
     // Téléphone : volet au-dessus de la barre d'onglets.
@@ -2402,13 +2402,14 @@ function openNavMenu(){
   }
   btn.setAttribute('aria-expanded','true');
   const st=document.getElementById('tabSettings');if(st)st.setAttribute('aria-expanded','true');
+  const hs2=document.getElementById('heroSettings');if(hs2)hs2.setAttribute('aria-expanded','true');
 }
 function closeNavMenu(){
   $('navMenuPanel').classList.add('hidden');
   $('navMenuBtn').setAttribute('aria-expanded','false');
   const st=document.getElementById('tabSettings');if(st)st.setAttribute('aria-expanded','false');
+  const hs2=document.getElementById('heroSettings');if(hs2)hs2.setAttribute('aria-expanded','false');
 }
-if($('heroStatsBtn'))$('heroStatsBtn').addEventListener('click',()=>{const p=$('heroStatsBtn').dataset.dest||'stats';setPage(p);});
 $('navMenuBtn').addEventListener('click',event=>{
   event.stopPropagation();
   if($('navMenuPanel').classList.contains('hidden'))openNavMenu(); else closeNavMenu();
@@ -4731,11 +4732,36 @@ window.addEventListener('popstate',e=>{
     setPage(g.pages.includes(cur)?cur:lastInGroup[g.id]);
   });
 })();
+(function(){
+  const hn=document.getElementById('heroNav');
+  if(!hn)return;
+  const ico=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  hn.innerHTML=NAV_GROUPS.map(g=>`<button type="button" class="hero-nav-btn" data-tab-group="${g.id}">${ico(g.icon)}<span>${g.label}</span></button>`).join('')
+    +`<button type="button" class="hero-nav-btn" id="heroSettings" aria-haspopup="true" aria-expanded="false">${ico('<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>')}<span>Réglages</span></button>`;
+  hn.addEventListener('click',e=>{
+    if(e.target.closest('#heroSettings')){
+      e.stopPropagation();
+      if($('navMenuPanel').classList.contains('hidden'))openNavMenu(); else closeNavMenu();
+      return;
+    }
+    const b=e.target.closest('[data-tab-group]');
+    if(!b)return;
+    closeNavMenu();
+    const g=NAV_GROUPS.find(x=>x.id===b.dataset.tabGroup);
+    const cur=currentPage();
+    setPage(g.pages.includes(cur)?cur:lastInGroup[g.id]);
+  });
+})();
 function tabBarSync(){
   const nav=document.getElementById('tabBar');
   if(!nav)return;
   nav.hidden=!(planning&&planning.employees&&planning.employees.length);
   const gid=groupOf(currentPage()).id;
+  document.querySelectorAll('#heroNav [data-tab-group]').forEach(b=>{
+    const on=b.dataset.tabGroup===gid;
+    b.classList.toggle('is-active',on);
+    if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
+  });
   nav.querySelectorAll('[data-tab-group]').forEach(b=>{
     const on=b.dataset.tabGroup===gid;
     b.classList.toggle('is-active',on);
