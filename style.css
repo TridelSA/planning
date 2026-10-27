@@ -2159,3 +2159,20 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .leave-facts{grid-column:auto;border-top:0;padding-top:0;border-left:1px solid var(--line);padding-left:18px;grid-template-columns:repeat(3,auto);gap:4px 20px}
   .leave-num b{font-size:2.6rem}
 }
+.hero-stats-btn{display:none}
+@media (min-width:701px){
+  .hero-actions{display:flex;gap:8px;align-items:center}
+  .hero-stats-btn{display:inline-flex;align-items:center;height:34px;padding:0 14px;font-weight:700}
+}
+.hero .hero-stats-btn{background:rgba(8,28,16,.55);border:1px solid rgba(255,255,255,.32);color:#fff;border-radius:999px;font-size:11px;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.hero .hero-stats-btn:hover{background:rgba(8,28,16,.72)}
+
+/* PC : calendrier mensuel individuel plus compact, travaux collés à la date */
+@media (min-width:701px){
+  #viewContainer .month-calendar{max-width:640px;margin-left:auto;margin-right:auto}
+  #viewContainer .month-cell{min-height:40px!important;padding:3px 7px!important}
+  #viewContainer .month-head span{padding:4px 0!important}
+  .travaux-section:not(.hidden) .upcoming-item{display:inline-flex!important;width:auto!important;max-width:100%;gap:10px}
+  .travaux-section .upcoming-copy{flex:0 1 auto!important}
+  .travaux-section .upcoming-calendar-btn{margin-left:0!important}
+}

@@ -341,7 +341,7 @@ function leaveCardHTML(emp,opts={}){
   else note='Encore disponibles pour cette année';
   const fact=(l,v,t)=>`<div${t?` title="${escapeHTML(t)}"`:''}><dt>${l}</dt><dd>${v}</dd></div>`;
   let facts='';
-  if(L.report!==null)facts+=fact('Report',fmtDays(L.report),L.report<0?'Jours pris en trop sur l’année précédente':'Jours non pris l’année précédente');
+  if(L.report!==null)facts+=fact(`Report ${L.year?L.year-1:''}`.trim(),fmtDays(L.report),L.report<0?'Jours pris en trop sur l’année précédente':'Jours non pris l’année précédente');
   if(L.droit!==null)facts+=fact(`Droit ${L.year||''}`.trim(),fmtDays(L.droit),'Jours de vacances auxquels vous avez droit cette année');
   if(L.planned!==null)facts+=fact('Planifié',fmtDays(L.planned),'Jours de vacances déjà posés dans le planning');
   const jub=(L.reportJub||L.droitJub)
@@ -2371,6 +2371,7 @@ function updateTeamToggleLabel(){
   const page=currentPage();
   const grp=groupOf(page);
   $('navMenuLabel').textContent=grp.label;
+  { const hb=$('heroStatsBtn'); if(hb){ const onStats=grp.id==='stats'; hb.textContent=onStats?'Planning':'Statistiques'; hb.dataset.dest=onStats?lastInGroup.plan:'stats'; } }
   $('navMenuPanel').innerHTML=NAV_GROUPS.map(g=>{
     const on=g.id===grp.id;
     return `<button type="button" class="navm-item ${on?'is-active':''}" role="menuitem" data-nav-page="${on?page:lastInGroup[g.id]}">
@@ -2407,6 +2408,7 @@ function closeNavMenu(){
   $('navMenuBtn').setAttribute('aria-expanded','false');
   const st=document.getElementById('tabSettings');if(st)st.setAttribute('aria-expanded','false');
 }
+if($('heroStatsBtn'))$('heroStatsBtn').addEventListener('click',()=>{const p=$('heroStatsBtn').dataset.dest||'stats';setPage(p);});
 $('navMenuBtn').addEventListener('click',event=>{
   event.stopPropagation();
   if($('navMenuPanel').classList.contains('hidden'))openNavMenu(); else closeNavMenu();
@@ -4004,7 +4006,7 @@ function render(){
   }
 
   renderLegend(e);
-  renderLeaveCard(e);
+  renderLeaveCard(null);
   renderUpcomingEvents(e);
   renderRotationWidget();
   updateTodayButtonState();
