@@ -2183,3 +2183,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .rotation-travaux .rt-cal{margin-left:2px}
   .rotation-travaux{flex:1 1 100%;justify-content:flex-start}
 }
+/* Ligne Travaux : même police/couleur que les noms, centrée verticalement */
+.rotation-travaux{color:var(--muted)!important;font:500 10.5px/1.4 var(--font-body)!important;align-items:center!important;padding:7px 0 1px!important;margin-top:3px!important}
+.rotation-travaux .rt-ico{font-size:11px;line-height:1;display:inline-flex;align-items:center}
+.rotation-travaux .rt-cal{line-height:1;display:inline-flex;align-items:center}
+.rotation-travaux span{display:inline-flex;align-items:center}
