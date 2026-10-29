@@ -392,7 +392,9 @@ function mergeEmployeesByName(perYearData){
   // première apparition de chaque personne en parcourant les années de
   // publication croissantes (voir boucle ci-dessus), donc aucun tri
   // alphabétique ici.
-  return [...byName.values()];
+  const out=[...byName.values()];
+  for(const e of out){ if(!e.category)e.category=CATEGORY_FALLBACK[e.name.trim().toUpperCase()]||''; }
+  return out;
 }
 
 function combinePlannings(perYearData){
@@ -2665,6 +2667,8 @@ const CATEGORY_LABELS={
 // permanence, sans bouton ni case pour les révéler).
 const PRESENCE_EXCLUDED_CATEGORIES=new Set(['Equipe 1','Equipe 2','Equipe 3','Equipe 4','Equipe 5','Admin.','Cadres']);
 
+// Secours : catégories connues (dernière publication complète) si le JSON arrive sans catégorie.
+const CATEGORY_FALLBACK={"AQUILLON":"Equipe 1","HODZIC":"Equipe 1","MIGUEL":"Equipe 1","DUC":"Equipe 2","IONITA":"Equipe 2","YILDIRIM":"Equipe 2","GARCIA":"Equipe 3","FELISBERTO":"Equipe 3","BRAHIMI":"Equipe 3","SIMONIN":"Equipe 4","LAUNAZ":"Equipe 4","NAHOUNOU":"Equipe 4","MERMOUD":"Equipe 5","SERRANO":"Equipe 5","DA ROCHA":"Equipe 5","LUCAS COUTO":"Elect","RAUSIS":"Autom.","PACHE":"Autom.","DURGNIAT":"Mécanique","PINTO":"Mécanique","CHAMBAZ":"Mécanique","LIMA":"Mécanique","MEYER":"Mécanique","BURGENER":"Intendance","AFONSO":"Intendance","DUFAUX":"Intendance","MONTHE VERRILLI":"Intendance","COLOMA":"Intendance","DE JESUS MARQUES LUIS":"Intendance","PAIVA":"Chauffeurs-grutiers","MAGES":"Chauffeurs-grutiers","DUARTE MACHADO":"Chauffeurs-grutiers","PEREIRA":"Chauffeurs-grutiers","ROBERT":"Chauffeurs-grutiers","BRUESCH":"Chauffeurs-grutiers","ANTIC":"Chauffeurs-grutiers","GRAVELHO":"Chauffeurs-grutiers","PEDROSA":"Chauffeurs-grutiers","MARQUES":"Admin.","ROPRAZ":"Admin.","SAFAR":"Admin.","PITTET":"Admin.","CARRASCO":"Admin.","GALLIKER":"Admin.","MORIER":"Admin.","VAUCHER":"Cadres","GUEX":"Cadres","FONTANNAZ":"Cadres","ANUSCA":"Cadres","GAUSSEN":"Cadres","GONTHIER":"Cadres","BONNANT":"Cadres","MUHAXHERI":"Cadres","WUTHRICH":"Cadres","SCHNEIDER":"Cadres","UMUHIRE":"Cadres","ZERMATTEN":"Cadres"};
 // Comparaison tolérante (casse, accents, espaces, point final) : « Mécanique »,
 // « mecanique » ou « Autom » doivent tomber dans le bon groupe.
 function categoryKey(raw){
@@ -3199,7 +3203,11 @@ function renderCompareView(){
   const main=cmpMainPeople();
   const allOn=main.length>0 && main.every(e=>cmp.people.has(presencePersonKey(e)));
   let chips=`<button type="button" class="pv-chip ${allOn?'is-on':''}" data-cmp-all aria-pressed="${allOn}" title="Tout le personnel de métier (hors Équipes, Admin., Cadres)">Tous</button>`;
-  chips+=groups.map(g=>{
+  // « Sans catégorie » n'est plus proposé ; le groupe de la personne choisie dans
+  // Individuel passe juste après « Tous ».
+  const meGroup=(()=>{ const me=selectedEmployee(); return me?presenceGroupOf(me):''; })();
+  const chipGroups=groups.filter(g=>g.name!==OTHER_GROUP_LABEL).sort((a,b)=>(b.name===meGroup)-(a.name===meGroup));
+  chips+=chipGroups.map(g=>{
     const n=g.people.filter(e=>cmp.people.has(presencePersonKey(e))).length;
     const cls=n===g.people.length?'is-on':n>0?'is-partial':'';
     return `<button type="button" class="pv-chip ${cls}" data-cmp-grp="${escapeHTML(g.name)}" aria-pressed="${n===g.people.length}" title="Ajouter / retirer tout le groupe">${escapeHTML(g.name)}</button>`;
