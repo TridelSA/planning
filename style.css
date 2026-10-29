@@ -2222,3 +2222,12 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .controls .field label{margin-bottom:4px!important;font-size:9px!important}
   .controls-grid{gap:6px!important}
 }
+/* Téléphone : liste des employés (feuille de sélection) plus basse, nom toujours lisible en entier */
+@media (max-width:700px){
+  .employee-picker-panel .employee-results{gap:0!important}
+  .employee-picker-panel .employee-result{padding:5px 8px!important;gap:8px!important;min-height:0!important}
+  .employee-picker-panel .employee-result-avatar{width:22px!important;height:22px!important;flex-basis:22px!important;font-size:8px!important}
+  .employee-picker-panel .employee-result-name{font-size:13px!important;line-height:1.2!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+  .employee-picker-panel .employee-result-group+.employee-result-group{margin-top:4px!important}
+  .employee-picker-panel .employee-result-group-label{padding:4px 8px 1px!important}
+}
