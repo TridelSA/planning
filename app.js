@@ -3206,7 +3206,11 @@ function renderCompareView(){
   // « Sans catégorie » n'est plus proposé ; le groupe de la personne choisie dans
   // Individuel passe juste après « Tous ».
   const meGroup=(()=>{ const me=selectedEmployee(); return me?presenceGroupOf(me):''; })();
-  const chipGroups=groups.filter(g=>g.name!==OTHER_GROUP_LABEL).sort((a,b)=>(b.name===meGroup)-(a.name===meGroup));
+  const chipGroups=groups.filter(g=>g.name!==OTHER_GROUP_LABEL).sort((a,b)=>{
+    const isTeam=/^Équipe\s/.test(meGroup);
+    const rank=g=>g.name===meGroup?0:(isTeam&&/^Équipe\s/.test(g.name))?1:2;
+    return rank(a)-rank(b);
+  });
   chips+=chipGroups.map(g=>{
     const n=g.people.filter(e=>cmp.people.has(presencePersonKey(e))).length;
     const cls=n===g.people.length?'is-on':n>0?'is-partial':'';
