@@ -2171,11 +2171,18 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 
 .hero-nav{display:none}
 @media (min-width:701px){
-  .hero-nav{display:flex;gap:3px;padding:3px;border-radius:999px;background:rgba(8,28,16,.55);border:1px solid rgba(255,255,255,.28);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-  .hero-nav-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 13px;border:0;border-radius:999px;background:transparent;color:rgba(255,255,255,.88);font:700 12px/1 var(--font-body);cursor:pointer}
-  .hero-nav-btn svg{width:15px;height:15px}
-  .hero-nav-btn:hover{background:rgba(255,255,255,.14);color:#fff}
-  .hero-nav-btn.is-active,.hero-nav-btn[aria-expanded="true"]{background:#fff;color:var(--accent-ink)}
+  .hero-nav{display:flex;align-items:center;gap:26px;padding:0 4px;background:rgba(8,28,16,.4);box-shadow:0 0 14px 10px rgba(8,28,16,.4);border-radius:999px;border:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .hero-nav-btn{position:relative;display:inline-flex;align-items:center;gap:0;height:30px;padding:0 1px;border:0;border-radius:0;background:transparent!important;color:rgba(255,255,255,.82);font:600 13px/1 var(--font-body);letter-spacing:.01em;cursor:pointer;text-shadow:0 1px 6px rgba(0,0,0,.55);transition:color .15s}
+  .hero-nav-btn svg{display:none}
+  .hero-nav-btn::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;background:#fff;transform:scaleX(0);transform-origin:center;transition:transform .18s ease}
+  .hero-nav-btn:hover{color:#fff}
+  .hero-nav-btn.is-active{color:#fff}
+  .hero-nav-btn.is-active::after{transform:scaleX(1)}
+  #heroSettings{width:32px;height:32px;padding:0;justify-content:center;border-radius:50%;background:rgba(8,28,16,.45)!important;border:1px solid rgba(255,255,255,.3);text-shadow:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  #heroSettings::after{display:none}
+  #heroSettings svg{display:block;width:16px;height:16px}
+  #heroSettings span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  #heroSettings:hover,#heroSettings[aria-expanded="true"]{background:rgba(255,255,255,.95)!important;color:var(--accent-ink)}
   .hero #navMenuBtn{display:none}
   #navMenuPanel .navm-item[data-nav-page]{display:none}
 }
