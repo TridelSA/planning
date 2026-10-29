@@ -2188,3 +2188,9 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 .rotation-travaux .rt-ico{font-size:11px;line-height:1;display:inline-flex;align-items:center}
 .rotation-travaux .rt-cal{line-height:1;display:inline-flex;align-items:center}
 .rotation-travaux span{display:inline-flex;align-items:center}
+@media (min-width:701px){
+  .hero-nav{padding:2px;gap:2px;border-radius:10px;box-shadow:none;background:color-mix(in srgb,var(--paper) 55%,transparent);border-color:color-mix(in srgb,var(--line-strong) 45%,transparent)}
+  .hero-nav-btn{height:25px;padding:0 10px;gap:5px;border-radius:8px;font-size:11px;font-weight:600}
+  .hero-nav-btn svg{width:12px;height:12px}
+  .hero-nav-btn.is-active,.hero-nav-btn[aria-expanded="true"]{box-shadow:0 1px 2px rgba(0,0,0,.1)}
+}
