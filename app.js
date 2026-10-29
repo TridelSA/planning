@@ -4989,7 +4989,7 @@ document.addEventListener('click',e=>{
 (function(){
   const btn=document.getElementById('cmpGroupsToggle'),box=document.getElementById('cmpFiltersBox'),groups=document.getElementById('cmpGroups'),cnt=document.getElementById('cmpCount');
   if(!btn||!box)return;
-  let open=false; try{ open=localStorage.getItem('cmpGroupsOpen')==='1'; }catch(e){}
+  let open=false; if(window.innerWidth>700){ try{ open=localStorage.getItem('cmpGroupsOpen')==='1'; }catch(e){} } // téléphone : toujours replié à l'ouverture
   const apply=()=>{
     box.classList.toggle('is-collapsed',!open);
     btn.setAttribute('aria-expanded',String(open));

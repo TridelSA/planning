@@ -2194,3 +2194,8 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .hero-nav-btn svg{width:12px;height:12px}
   .hero-nav-btn.is-active,.hero-nav-btn[aria-expanded="true"]{box-shadow:0 1px 2px rgba(0,0,0,.1)}
 }
+/* Téléphone : tous les groupes visibles d'un coup (plus de défilement horizontal) */
+@media (max-width:700px){
+  #cmpGroups.cmp-groups{flex-wrap:wrap!important;overflow:visible!important;gap:6px!important;padding-bottom:2px!important}
+  #cmpGroups.cmp-groups .pv-chip,#cmpGroups.cmp-groups .pv-saved{flex:0 0 auto}
+}
