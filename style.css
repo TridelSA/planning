@@ -2238,3 +2238,15 @@ body:not(.cmp-week) .cmp-cell{height:30px}
 @media (min-width:701px){
   #viewContainer .month-cell{min-height:56px!important;padding:6px 8px!important}
 }
+/* Collègues · Mois : lignes et cases plus grandes */
+@media (min-width:701px){
+  .cmptl-desk .cmptl-c.yg-c{height:34px!important;font-size:12px!important;letter-spacing:-.2px!important;border-radius:6px!important}
+  .cmptl-desk .cmptl-row{margin-bottom:5px!important}
+  .cmptl-desk .cmptl-name{font-size:13px!important}
+  .cmptl-desk .cmptl-head b{font-size:12px!important}
+}
+@media (max-width:700px){
+  .cmptl .cmptl-c.yg-c{height:26px!important;border-radius:4px!important}
+  .cmptl .cmptl-row{margin-bottom:4px!important}
+  .cmptl .cmptl-name{font-size:11px!important}
+}
