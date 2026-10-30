@@ -2231,3 +2231,10 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .employee-picker-panel .employee-result-group+.employee-result-group{margin-top:4px!important}
   .employee-picker-panel .employee-result-group-label{padding:4px 8px 1px!important}
 }
+/* Mois individuel : lignes plus hautes (téléphone et PC) */
+@media (max-width:700px){
+  #viewContainer .month-cell,#viewContainer .month-cell.outside{min-height:66px!important;padding-top:8px!important;padding-bottom:8px!important}
+}
+@media (min-width:701px){
+  #viewContainer .month-cell{min-height:56px!important;padding:6px 8px!important}
+}
