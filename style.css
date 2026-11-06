@@ -2265,3 +2265,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmpm-block.is-wk .cmpm-card{grid-template-columns:84px 1fr!important}
   .cmpm-block.is-wk .cmpm-weekhead{grid-template-columns:84px repeat(7,1fr)!important}
 }
+@media (max-width:700px){
+  .cmp-name-inner span,.pv-name-inner span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.15!important;word-break:break-word}
+  .cmp-nav strong{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+}
