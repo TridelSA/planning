@@ -2250,3 +2250,18 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .cmptl .cmptl-row{margin-bottom:4px!important}
   .cmptl .cmptl-name{font-size:11px!important}
 }
+/* Nom de l'employé toujours lisible en entier (Safari réduisait la zone à son minimum) */
+.employee-picker-button .employee-picker-main{flex:1 1 auto;min-width:0}
+.employee-picker-button .employee-picker-copy{flex:1 1 auto;min-width:0}
+.employee-picker-button .employee-picker-copy strong{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+.employee-picker-button .employee-picker-chevron{flex:0 0 auto}
+/* Téléphone : noms des collègues jamais coupés (retour à la ligne au besoin) */
+@media (max-width:700px){
+  .cmptl{--nm:84px!important}
+  .cmptl .cmptl-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:10px!important;line-height:1.1!important;word-break:break-word}
+}
+@media (max-width:700px){
+  .cmpm-block.is-wk .cmpm-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.1!important;font-size:10.5px!important;word-break:break-word}
+  .cmpm-block.is-wk .cmpm-card{grid-template-columns:84px 1fr!important}
+  .cmpm-block.is-wk .cmpm-weekhead{grid-template-columns:84px repeat(7,1fr)!important}
+}
