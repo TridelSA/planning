@@ -2317,3 +2317,16 @@ button:not(:disabled):active{transition-duration:.08s}
   .hero-nav-btn{color:var(--ink-soft)!important}
   .hero-nav-btn.is-active,.hero-nav-btn[aria-expanded="true"]{color:var(--accent-ink)!important}
 }
+
+/* Aide raccourcis (PC) */
+.shortcut-help{position:fixed;right:20px;bottom:20px;z-index:90;max-width:300px;padding:14px 16px;border:1px solid var(--line-strong);border-radius:14px;background:var(--surface);color:var(--ink);box-shadow:0 12px 32px rgba(0,0,0,.2);font:600 12.5px/1.4 var(--font-body);cursor:pointer;transition:opacity .16s cubic-bezier(.23,1,.32,1),transform .16s cubic-bezier(.23,1,.32,1)}
+.shortcut-help.hidden{display:none}
+.shortcut-help b{display:block;margin-bottom:8px;font:700 13px/1 var(--font-display)}
+.shortcut-help dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.shortcut-help dt{font-weight:800;color:var(--accent-ink);white-space:nowrap}
+.shortcut-help dd{margin:0;color:var(--ink-soft)}
+@media (max-width:700px){.shortcut-help{display:none!important}}
+/* Finitions de mouvement : retour immédiat à la pression, respect de « réduire les animations » */
+.nav-btn,.today-btn,.seg-btn,.tab,.cmp-tab,.tabbar-btn,.hero-nav-btn{transition:transform .12s cubic-bezier(.23,1,.32,1),background-color .15s,color .15s,border-color .15s}
+.nav-btn:active,.today-btn:active,.seg-btn:active,.tab:active,.cmp-tab:active,.tabbar-btn:active,.hero-nav-btn:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){.nav-btn:active,.today-btn:active,.seg-btn:active,.tab:active,.cmp-tab:active,.tabbar-btn:active,.hero-nav-btn:active{transform:none}}

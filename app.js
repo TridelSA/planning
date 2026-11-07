@@ -4820,6 +4820,18 @@ document.addEventListener('keydown',e=>{
   if(!(planning&&planning.employees&&planning.employees.length))return;
   const k=e.key;
   if(/^[1-4]$/.test(k)&&NAV_PAGES[+k-1]){ setPage(NAV_PAGES[+k-1].id); e.preventDefault(); return; }
+  // w / m / y : semaine, mois, année (individuel et collègues) ; / : choisir une personne ; ? : aide
+  if(!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    const sc={w:'week',m:'month',y:'year'}[k.toLowerCase()];
+    if(sc){
+      const pg0=currentPage();
+      const b0=pg0==='individual'?document.querySelector('.tab[data-view="'+sc+'"]'):pg0==='compare'?document.querySelector('[data-cmp-scale="'+sc+'"]'):null;
+      if(b0&&b0.offsetParent!==null){ b0.click(); e.preventDefault(); return; }
+    }
+    if(k==='/'&&currentPage()==='individual'){ const pb=document.getElementById('employeePickerButton'); if(pb&&pb.offsetParent!==null){ pb.click(); e.preventDefault(); return; } }
+    if(k==='?'){ toggleShortcutHelp(); e.preventDefault(); return; }
+    if(k==='Escape'){ const h=document.getElementById('shortcutHelp'); if(h&&!h.classList.contains('hidden')){ h.classList.add('hidden'); return; } }
+  }
   const ids={individual:['previousBtn','nextBtn','todayBtn'],team:['teamPrevBtn','teamNextBtn','teamTodayBtn'],compare:['cmpPrevBtn','cmpNextBtn','cmpTodayBtn']}[currentPage()];
   if(!ids)return;
   const id=k==='ArrowLeft'?ids[0]:k==='ArrowRight'?ids[1]:(k==='t'||k==='T')?ids[2]:null;
@@ -4827,6 +4839,19 @@ document.addEventListener('keydown',e=>{
   const b=document.getElementById(id);
   if(b&&!b.disabled&&b.offsetParent!==null){ b.click(); e.preventDefault(); }
 });
+
+
+// --- Aide raccourcis clavier (PC) ---
+function toggleShortcutHelp(){
+  let h=document.getElementById('shortcutHelp');
+  if(!h){
+    h=document.createElement('div');h.id='shortcutHelp';h.className='shortcut-help hidden';h.setAttribute('role','dialog');h.setAttribute('aria-label','Raccourcis clavier');
+    h.innerHTML='<b>Raccourcis clavier</b><dl><dt>← →</dt><dd>Période précédente / suivante</dd><dt>T</dt><dd>Aujourd’hui</dd><dt>W · M · Y</dt><dd>Semaine · mois · année</dd><dt>1 2 3 4</dt><dd>Changer de page</dd><dt>/</dt><dd>Choisir une personne</dd><dt>?</dt><dd>Afficher / masquer cette aide</dd></dl>';
+    h.addEventListener('click',()=>h.classList.add('hidden'));
+    document.body.appendChild(h);
+  }
+  h.classList.toggle('hidden');
+}
 
 // --- Lien partageable + mémoire de la période ---
 const parseYMD=s=>{ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m?new Date(+m[1],+m[2]-1,+m[3]):null; };
