@@ -2340,7 +2340,6 @@ button:not(:disabled):active{transition-duration:.08s}
 @media (prefers-reduced-motion:reduce){.nav-btn:active,.today-btn:active,.seg-btn:active,.tab:active,.cmp-tab:active,.tabbar-btn:active,.hero-nav-btn:active{transform:none}}
 
 /* Outils : qui est là, export calendrier, prochain événement */
-.hero-next{margin:3px 0 0;font:600 12px/1.3 var(--font-body);color:rgba(255,255,255,.88)}
 .tool-ico{display:inline-flex;width:17px;height:17px;flex:none}
 .who-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .who-date{margin-left:auto;font:600 13px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);min-height:36px}

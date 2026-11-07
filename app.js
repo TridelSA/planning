@@ -336,7 +336,7 @@ function leaveCardHTML(emp,opts={}){
   const month=new Date().getMonth();
   let tone='ok',note='';
   if(bal<0){tone='over';} // le chiffre principal le dit déjà : « 2 jours pris en trop »
-  else if(bal===0){tone='done';note='Tout est posé';}
+  else if(bal===0){tone='done';}
   else if(month>=8){tone='warn';note='À poser avant fin décembre';}
   else note='Encore disponibles pour cette année';
   const fact=(l,v,t)=>`<div${t?` title="${escapeHTML(t)}"`:''}><dt>${l}</dt><dd>${v}</dd></div>`;
@@ -1860,12 +1860,10 @@ window.addTravauxToCalendar=addTravauxToCalendar;
 function renderUpcomingEvents(employee){
   const card=$('upcomingEventsCard');
   const list=$('upcomingEvents');
-  const count=$('upcomingCount');
   const events=buildUpcomingEvents(employee);
   upcomingCalendarEvents=events;
 
   card.classList.remove('hidden');
-  count.textContent=events.length||'';
   const t0=new Date();t0.setHours(0,0,0,0);
   const whenOf=ev=>{ const d=new Date(ev.date);d.setHours(0,0,0,0); const n=Math.round((d-t0)/86400000); return n<=0?(ev.endDate&&new Date(ev.endDate)>=t0&&n<0?'En cours':'Aujourd’hui'):n===1?'Demain':'Dans '+n+' j'; };
 
@@ -2387,11 +2385,8 @@ function updateTeamToggleLabel(){
     <span class="navm-txt"><b>${g.label}</b><small>${g.desc}</small></span>
     ${on?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
   </button>`;}).join('')+themeSegHTML()+profileHTML()+shareHTML()+installHTML();
-  const subtitle=$('heroSubtitle');
-  if(subtitle){
-    subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
-    { const ph=document.getElementById('pageHeading'); if(ph)ph.textContent=subtitle.textContent; }
-  }
+  // Titre de la page pour les lecteurs d'écran seulement : à l'écran, l'onglet actif l'indique déjà.
+  { const ph=document.getElementById('pageHeading'); if(ph)ph.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel'; }
 }
 
 function openNavMenu(){
@@ -3764,7 +3759,7 @@ function renderStatsView(){
     const first=upcoming.list.find(i=>i>=today)||upcoming.start;
     const diff=Math.round((parseISODateOnly(first)-parseISODateOnly(today))/86400000);
     nextTxt=diff===0?"Aujourd'hui":stShortDate(first);
-    nextSub=`${diff===0?'En cours':diff===1?'Demain':`Dans ${diff} jours`} · ${stRange(upcoming.start,upcoming.end)} (${stDays(upcoming.list.length)})`;
+    nextSub=`${diff===0?'En cours':diff===1?'Demain':`Dans ${diff} jours`}${upcoming.end!==first?` · jusqu’au ${stShortDate(upcoming.end)}`:''} (${stDays(upcoming.list.length)})`;
   }
 
   let h=`<div class="st-kpis">
@@ -3985,7 +3980,6 @@ window.addEventListener('resize',()=>{ if(heroFocusReady)updateHeroFocus(true); 
 
 function render(){
   updateHeroFocus();
-  try{ renderNextEvent(); }catch(e){ /* ignoré */ }
   try{ renderRotationWidget(); }catch(e){ /* ignoré */ }
   if(state.statsMode){ renderStatsView(); return; }
   if(state.compareMode){
@@ -5018,32 +5012,6 @@ function openIcsModal(){
   m.classList.add('open');
 }
 window.openIcsModal=openIcsModal;
-
-// Prochain événement perso, affiché sous le titre de la page
-function nextEventText(){
-  const emp=selectedEmployee();if(!emp)return '';
-  const t=todayISO();
-  const keys=Object.keys(emp.schedule).sort().filter(k=>k>=t);
-  const WANT={PIQ:'Piquet',VA:'Vacances',VJ:'Vacances'};
-  let prev=safeCode(emp.schedule[isoDate(new Date(Date.now()-86400000))]);
-  for(const k of keys){
-    const c=safeCode(emp.schedule[k]);
-    if(WANT[c]&&!(k===t&&prev===c)&&!(k>t&&safeCode(emp.schedule[isoDate(new Date(parseYMD(k).getTime()-86400000+3600000))])===c)){
-      const diff=Math.round((parseYMD(k)-parseYMD(t))/86400000);
-      return `${WANT[c]} ${diff===0?'aujourd’hui':diff===1?'demain':'dans '+diff+' jours'}`;
-    }
-    if(WANT[c]&&k===t)return `${WANT[c]} en cours`;
-  }
-  return '';
-}
-function renderNextEvent(){
-  let el=document.getElementById('heroNext');
-  const txt=currentPage()==='individual'?nextEventText():'';
-  if(!txt){ if(el)el.remove(); return; }
-  if(!el){ el=document.createElement('p');el.id='heroNext';el.className='hero-next';const sub=document.getElementById('heroSubtitle');if(!sub)return;sub.insertAdjacentElement('afterend',el); }
-  el.textContent='→ '+txt;
-}
-
 
 // --- Recherche globale : nom, code de service, date ---
 function parseSearchDate(q){
