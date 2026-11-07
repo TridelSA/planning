@@ -1987,7 +1987,7 @@ function openDayModal(dateObj,employee=selectedEmployee()){
     <div class="day-detail-top">
       <div class="day-detail-code">${escapeHTML(code||'—')}</div>
       <div class="day-detail-info"><strong>${escapeHTML(info[0])}</strong><small>${escapeHTML(detailText)}</small></div>
-    </div>${teamHTML}</div>`;
+    </div>${teamHTML}</div><button type="button" class="install-btn who-link" data-who-iso="${dISO}"><span>Qui est là ce jour<small>Voir tous les métiers</small></span></button>`;
 
   $('dayModalBackdrop').classList.toggle('is-team-day',false);$('dayModalBackdrop').classList.add('open');
 }
@@ -2004,6 +2004,7 @@ $('cmpGrid').addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' ')ret
 
 function closeDayModal(){ $('dayModalBackdrop').classList.remove('open'); $('dayModalBackdrop').classList.remove('is-team-day'); }
 $('dayModalClose').addEventListener('click',closeDayModal);
+$('dayModalBody').addEventListener('click',e=>{ const b=e.target.closest('[data-who-iso]'); if(b){ closeDayModal(); openWhoModal(parseYMD(b.dataset.whoIso)); } });
 $('dayModalBackdrop').addEventListener('click',e=>{ if(e.target===$('dayModalBackdrop'))closeDayModal(); });
 
 function formatJournalDate(horodatage){
@@ -2380,7 +2381,7 @@ function updateTeamToggleLabel(){
     <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g.icon}</svg></span>
     <span class="navm-txt"><b>${g.label}</b><small>${g.desc}</small></span>
     ${on?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
-  </button>`;}).join('')+themeSegHTML()+profileHTML()+shareHTML()+installHTML();
+  </button>`;}).join('')+themeSegHTML()+profileHTML()+toolsHTML()+shareHTML()+installHTML();
   const subtitle=$('heroSubtitle');
   if(subtitle){
     subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
@@ -2421,6 +2422,8 @@ $('navMenuBtn').addEventListener('click',event=>{
 $('navMenuPanel').addEventListener('click',async event=>{
   if(event.target.closest('[data-navm-close]')){ closeNavMenu(); return; }
   if(event.target.closest('[data-share-link]')){ shareCurrentView(); return; }
+  if(event.target.closest('[data-open-who]')){ closeNavMenu&&closeNavMenu(); openWhoModal(); return; }
+  if(event.target.closest('[data-open-ics]')){ closeNavMenu&&closeNavMenu(); openIcsModal(); return; }
   if(event.target.closest('[data-profile-export]')){ profileExport(); return; }
   if(event.target.closest('[data-profile-import]')){ profileImport(); return; }
   if(event.target.closest('[data-install]')){
@@ -3972,6 +3975,7 @@ window.addEventListener('resize',()=>{ if(heroFocusReady)updateHeroFocus(true); 
 
 function render(){
   updateHeroFocus();
+  try{ renderNextEvent(); }catch(e){ /* ignoré */ }
   try{ renderRotationWidget(); }catch(e){ /* ignoré */ }
   if(state.statsMode){ renderStatsView(); return; }
   if(state.compareMode){
@@ -4829,6 +4833,7 @@ document.addEventListener('keydown',e=>{
       if(b0&&b0.offsetParent!==null){ b0.click(); e.preventDefault(); return; }
     }
     if(k==='/'&&currentPage()==='individual'){ const pb=document.getElementById('employeePickerButton'); if(pb&&pb.offsetParent!==null){ pb.click(); e.preventDefault(); return; } }
+    if(k.toLowerCase()==='q'){ openWhoModal(); e.preventDefault(); return; }
     if(k==='?'){ toggleShortcutHelp(); e.preventDefault(); return; }
     if(k==='Escape'){ const h=document.getElementById('shortcutHelp'); if(h&&!h.classList.contains('hidden')){ h.classList.add('hidden'); return; } }
   }
@@ -4846,11 +4851,181 @@ function toggleShortcutHelp(){
   let h=document.getElementById('shortcutHelp');
   if(!h){
     h=document.createElement('div');h.id='shortcutHelp';h.className='shortcut-help hidden';h.setAttribute('role','dialog');h.setAttribute('aria-label','Raccourcis clavier');
-    h.innerHTML='<b>Raccourcis clavier</b><dl><dt>← →</dt><dd>Période précédente / suivante</dd><dt>T</dt><dd>Aujourd’hui</dd><dt>W · M · Y</dt><dd>Semaine · mois · année</dd><dt>1 2 3 4</dt><dd>Changer de page</dd><dt>/</dt><dd>Choisir une personne</dd><dt>?</dt><dd>Afficher / masquer cette aide</dd></dl>';
+    h.innerHTML='<b>Raccourcis clavier</b><dl><dt>← →</dt><dd>Période précédente / suivante</dd><dt>T</dt><dd>Aujourd’hui</dd><dt>Q</dt><dd>Qui est là ce jour</dd><dt>W · M · Y</dt><dd>Semaine · mois · année</dd><dt>1 2 3 4</dt><dd>Changer de page</dd><dt>/</dt><dd>Choisir une personne</dd><dt>?</dt><dd>Afficher / masquer cette aide</dd></dl>';
     h.addEventListener('click',()=>h.classList.add('hidden'));
     document.body.appendChild(h);
   }
   h.classList.toggle('hidden');
+}
+
+
+// --- Outils : « Qui est là », export calendrier, prochain événement ---
+function toolsHTML(){
+  const ic=(d)=>`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  return `<button type="button" class="install-btn" data-open-who><span class="tool-ico">${ic('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3.2 3.2 0 0 1 0 5.6M18 14.4c2 .8 3.4 2.9 3.4 5.6"/>')}</span><span>Qui est là ce jour<small>Présents, réserve et absents par métier</small></span></button>`+
+  `<button type="button" class="install-btn" data-open-ics><span class="tool-ico">${ic('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/>')}</span><span>Exporter mon planning<small>Fichier calendrier (.ics) avec rappels</small></span></button>`;
+}
+
+function ensureToolModal(id,title,subtitle){
+  let b=document.getElementById(id);
+  if(b)return b;
+  b=document.createElement('div');b.id=id;b.className='day-modal-backdrop tool-modal';b.setAttribute('aria-hidden','true');
+  b.innerHTML=`<div class="day-modal" role="dialog" aria-modal="true" aria-labelledby="${id}T">
+    <div class="day-modal-head"><div><h3 id="${id}T" class="day-modal-title">${title}</h3><div class="day-modal-date" id="${id}S">${subtitle||''}</div></div>
+    <button type="button" class="day-modal-close" data-tool-close aria-label="Fermer">×</button></div>
+    <div class="day-modal-body" id="${id}B"></div></div>`;
+  b.addEventListener('click',e=>{ if(e.target===b||e.target.closest('[data-tool-close]'))b.classList.remove('open'); });
+  document.body.appendChild(b);
+  return b;
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')document.querySelectorAll('.tool-modal.open').forEach(m=>m.classList.remove('open')); });
+
+// Qui est là ce jour
+let whoDate=null;
+function whoStatus(emp,iso){
+  if(!cmpHas(emp,iso))return 'none';
+  const c=safeCode(emp.schedule[iso]);
+  if(PRESENCE_CODES.has(c))return 'present';
+  if(PRESENCE_RESERVE_CODES.has(c))return 'reserve';
+  if(ROTATION_CODES.includes(c))return 'rotation';
+  if(ABSENCE_CODES.includes(c))return 'absent';
+  return c?'other':'off';
+}
+function renderWho(){
+  const iso=isoDate(whoDate);
+  const me=state.employeeId;
+  const B=document.getElementById('whoModalB');
+  const S=document.getElementById('whoModalS');
+  S.textContent=whoDate.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const holiday=swissHolidayName(iso);
+  const order=[['present','Présents'],['rotation','En rotation'],['reserve','Réserve / piquet'],['absent','Absents'],['other','Autre'],['off','Repos']];
+  const groups=presenceGroups(true).map(g=>{
+    const buckets={};
+    for(const p of g.people){ const st=whoStatus(p,iso); if(st==='none')continue; (buckets[st]=buckets[st]||[]).push(p); }
+    return {name:g.name,buckets};
+  }).filter(g=>Object.keys(g.buckets).some(k=>k!=='off'));
+  const nav=`<div class="who-nav"><button type="button" class="nav-btn" data-who-step="-1" aria-label="Jour précédent">‹</button>
+    <button type="button" class="pv-filter-btn" data-who-step="0">Aujourd’hui</button>
+    <button type="button" class="nav-btn" data-who-step="1" aria-label="Jour suivant">›</button>
+    <input type="date" class="who-date" value="${iso}" aria-label="Choisir une date"></div>`;
+  const body=groups.length?groups.map(g=>{
+    const n=k=>(g.buckets[k]||[]).length;
+    const sum=[n('present')?`${n('present')} présent${n('present')>1?'s':''}`:'',n('reserve')?`${n('reserve')} réserve`:'',n('absent')?`${n('absent')} absent${n('absent')>1?'s':''}`:''].filter(Boolean).join(' · ');
+    return `<section class="who-group"><h4>${escapeHTML(g.name)}<small>${sum||'—'}</small></h4>`+
+      order.filter(([k])=>g.buckets[k]&&k!=='off').map(([k,lab])=>`<div class="who-row who-${k}"><span class="who-lab">${lab}</span><span class="who-people">`+
+        g.buckets[k].map(p=>`<span class="who-chip ${classFor(safeCode(p.schedule[iso]))}${p.id===me?' is-me':''}" title="${escapeHTML(CODE_INFO[safeCode(p.schedule[iso])]?CODE_INFO[safeCode(p.schedule[iso])][0]:'')}">${escapeHTML(cleanEmployeeName(p.name))}<i>${escapeHTML(safeCode(p.schedule[iso]))}</i></span>`).join('')+
+        `</span></div>`).join('')+`</section>`;
+  }).join(''):'<p class="journal-empty">Aucune donnée de planning pour ce jour.</p>';
+  B.innerHTML=nav+(holiday?`<div class="day-detail-holiday">${escapeHTML(holiday)}</div>`:'')+body;
+}
+function openWhoModal(date){
+  whoDate=date?new Date(date):new Date();whoDate.setHours(0,0,0,0);
+  const m=ensureToolModal('whoModal','Qui est là ce jour','');
+  if(!m.dataset.bound){
+    m.dataset.bound='1';
+    m.addEventListener('click',e=>{ const b=e.target.closest('[data-who-step]'); if(!b)return; const n=+b.dataset.whoStep; if(n===0){whoDate=new Date();whoDate.setHours(0,0,0,0);}else whoDate.setDate(whoDate.getDate()+n); renderWho(); });
+    m.addEventListener('change',e=>{ if(e.target.classList.contains('who-date')){ const d=parseYMD(e.target.value); if(d){whoDate=d;renderWho();} } });
+    m.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT')return; if(e.key==='ArrowLeft'){whoDate.setDate(whoDate.getDate()-1);renderWho();e.preventDefault();} if(e.key==='ArrowRight'){whoDate.setDate(whoDate.getDate()+1);renderWho();e.preventDefault();} });
+  }
+  renderWho();
+  m.classList.add('open');
+}
+window.openWhoModal=openWhoModal;
+
+// Export .ics du planning personnel
+function icsFold(line){ const out=[];while(line.length>73){out.push(line.slice(0,73));line=' '+line.slice(73);}out.push(line);return out.join('\r\n'); }
+function buildPersonalICS(emp,opts){
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
+  const name=cleanEmployeeName(emp.name);
+  const todayStr=todayISO();
+  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TRIDEL//Planning//FR','CALSCALE:GREGORIAN','METHOD:PUBLISH',`X-WR-CALNAME:${escapeICS('Planning Tridel — '+name)}`,'X-WR-TIMEZONE:Europe/Zurich'];
+  const times={RM:['05:00','13:00'],RA:['13:00','21:00'],RN:['21:00','05:00']};
+  const days=Object.keys(emp.schedule).sort().filter(k=>k>=todayStr);
+  const pad2=n=>String(n).padStart(2,'0');
+  const alarm=(desc,trig)=>['BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${escapeICS(desc)}`,`TRIGGER:${trig}`,'END:VALARM'];
+  let n=0;
+  const ev=(uid,title,body,extra)=>{ n++; lines.push('BEGIN:VEVENT',`UID:${uid}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,...extra,`SUMMARY:${escapeICS(title)}`,`DESCRIPTION:${escapeICS(body)}`,'TRANSP:TRANSPARENT','END:VEVENT'); };
+  // regroupe les jours consécutifs de même code (piquets, vacances)
+  const runs=[];
+  for(const iso of days){
+    const c=safeCode(emp.schedule[iso]);
+    const last=runs[runs.length-1];
+    const nextDay=last&&isoDate(new Date(parseYMD(last.end).getTime()+86400000+3600000));
+    if(last&&last.code===c&&nextDay===iso)last.end=iso; else runs.push({code:c,start:iso,end:iso});
+  }
+  for(const r of runs){
+    const c=r.code, info=CODE_INFO[c]||[c,''];
+    const sd=parseYMD(r.start), ed=parseYMD(r.end);
+    const ymd=d=>`${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
+    if(times[c]&&opts.services){
+      const [a,b]=times[c];
+      const ds=new Date(sd);
+      for(let d=new Date(sd);d<=ed;d.setDate(d.getDate()+1)){
+        const iso2=isoDate(d);
+        const e2=new Date(d);if(c==='RN')e2.setDate(e2.getDate()+1);
+        const extra=[`DTSTART;TZID=Europe/Zurich:${ymd(d)}T${a.replace(':','')}00`,`DTEND;TZID=Europe/Zurich:${ymd(e2)}T${b.replace(':','')}00`];
+        const al=opts.alarm?alarm(`${info[0]} demain`,c==='RM'?'-PT10H':'-PT14H'):[];
+        n++;lines.push('BEGIN:VEVENT',`UID:${c}-${iso2}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,...extra,`SUMMARY:${escapeICS(info[0]+' ('+c+')')}`,`DESCRIPTION:${escapeICS(info[0]+' '+a+'–'+b+'\nPlanning Tridel — '+name)}`,'TRANSP:OPAQUE',...al,'END:VEVENT');
+      }
+    }else if(c==='PIQ'&&opts.piquets){
+      const e2=new Date(ed);e2.setDate(e2.getDate()+1);
+      n++;lines.push('BEGIN:VEVENT',`UID:PIQ-${r.start}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${ymd(sd)}`,`DTEND;VALUE=DATE:${ymd(e2)}`,`SUMMARY:${escapeICS('Piquet')}`,`DESCRIPTION:${escapeICS('Service de piquet\nPlanning Tridel — '+name)}`,'TRANSP:OPAQUE',...(opts.alarm?alarm('Piquet demain','-PT6H'):[]),'END:VEVENT');
+    }else if(['VA','VJ'].includes(c)&&opts.vacances){
+      const e2=new Date(ed);e2.setDate(e2.getDate()+1);
+      n++;lines.push('BEGIN:VEVENT',`UID:VAC-${r.start}-${emp.id}@planning.tridelsa.ch`,`DTSTART;VALUE=DATE:${ymd(sd)}`.replace(/^/,''),`DTEND;VALUE=DATE:${ymd(e2)}`,`DTSTAMP:${stamp}`,`SUMMARY:${escapeICS('Vacances')}`,`DESCRIPTION:${escapeICS('Planning Tridel — '+name)}`,'TRANSP:TRANSPARENT','END:VEVENT');
+    }
+  }
+  lines.push('END:VCALENDAR');
+  return {text:lines.map(icsFold).join('\r\n'),count:n};
+}
+function openIcsModal(){
+  const emp=selectedEmployee();
+  const m=ensureToolModal('icsModal','Exporter mon planning','');
+  const B=document.getElementById('icsModalB');
+  if(!emp){ B.innerHTML='<p class="journal-empty">Choisis d’abord une personne dans le planning individuel.</p>'; document.getElementById('icsModalS').textContent=''; m.classList.add('open'); return; }
+  document.getElementById('icsModalS').textContent=cleanEmployeeName(emp.name)+' · à partir d’aujourd’hui';
+  B.innerHTML=`<div class="ics-opts">
+    <label><input type="checkbox" data-ics="services" checked> Services de rotation (matin, après-midi, nuit) avec horaires</label>
+    <label><input type="checkbox" data-ics="piquets" checked> Piquets</label>
+    <label><input type="checkbox" data-ics="vacances" checked> Vacances</label>
+    <label><input type="checkbox" data-ics="alarm" checked> Rappel la veille</label>
+  </div><button type="button" class="install-btn ics-go"><span>Télécharger le fichier .ics<small id="icsCount"></small></span></button>
+  <p class="leave-src">Ajoute le fichier à ton calendrier (Apple, Google, Outlook). Il contient les jours déjà publiés ; à refaire après une mise à jour du planning.</p>`;
+  const get=()=>{ const o={}; B.querySelectorAll('[data-ics]').forEach(i=>o[i.dataset.ics]=i.checked); return o; };
+  const upd=()=>{ B.querySelector('#icsCount').textContent=buildPersonalICS(emp,get()).count+' événements'; };
+  B.onchange=upd;upd();
+  B.querySelector('.ics-go').onclick=()=>{
+    const r=buildPersonalICS(emp,get());
+    const blob=new Blob([r.text],{type:'text/calendar;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='planning-tridel.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  };
+  m.classList.add('open');
+}
+window.openIcsModal=openIcsModal;
+
+// Prochain événement perso, affiché sous le titre de la page
+function nextEventText(){
+  const emp=selectedEmployee();if(!emp)return '';
+  const t=todayISO();
+  const keys=Object.keys(emp.schedule).sort().filter(k=>k>=t);
+  const WANT={PIQ:'Piquet',VA:'Vacances',VJ:'Vacances'};
+  let prev=safeCode(emp.schedule[isoDate(new Date(Date.now()-86400000))]);
+  for(const k of keys){
+    const c=safeCode(emp.schedule[k]);
+    if(WANT[c]&&!(k===t&&prev===c)&&!(k>t&&safeCode(emp.schedule[isoDate(new Date(parseYMD(k).getTime()-86400000+3600000))])===c)){
+      const diff=Math.round((parseYMD(k)-parseYMD(t))/86400000);
+      return `${WANT[c]} ${diff===0?'aujourd’hui':diff===1?'demain':'dans '+diff+' jours'}`;
+    }
+    if(WANT[c]&&k===t)return `${WANT[c]} en cours`;
+  }
+  return '';
+}
+function renderNextEvent(){
+  let el=document.getElementById('heroNext');
+  const txt=currentPage()==='individual'?nextEventText():'';
+  if(!txt){ if(el)el.remove(); return; }
+  if(!el){ el=document.createElement('p');el.id='heroNext';el.className='hero-next';const sub=document.getElementById('heroSubtitle');if(!sub)return;sub.insertAdjacentElement('afterend',el); }
+  el.textContent='→ '+txt;
 }
 
 // --- Lien partageable + mémoire de la période ---

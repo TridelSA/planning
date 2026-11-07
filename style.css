@@ -2330,3 +2330,25 @@ button:not(:disabled):active{transition-duration:.08s}
 .nav-btn,.today-btn,.seg-btn,.tab,.cmp-tab,.tabbar-btn,.hero-nav-btn{transition:transform .12s cubic-bezier(.23,1,.32,1),background-color .15s,color .15s,border-color .15s}
 .nav-btn:active,.today-btn:active,.seg-btn:active,.tab:active,.cmp-tab:active,.tabbar-btn:active,.hero-nav-btn:active{transform:scale(.97)}
 @media (prefers-reduced-motion:reduce){.nav-btn:active,.today-btn:active,.seg-btn:active,.tab:active,.cmp-tab:active,.tabbar-btn:active,.hero-nav-btn:active{transform:none}}
+
+/* Outils : qui est là, export calendrier, prochain événement */
+.hero-next{margin:3px 0 0;font:600 12px/1.3 var(--font-body);color:rgba(255,255,255,.88)}
+.tool-ico{display:inline-flex;width:17px;height:17px;flex:none}
+.who-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.who-date{margin-left:auto;font:600 13px var(--font-body);padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);min-height:36px}
+.who-group{margin:0 0 14px}
+.who-group h4{margin:0 0 6px;font:700 13px/1.3 var(--font-body);color:var(--ink);display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.who-group h4 small{font-weight:600;font-size:11px;color:var(--muted)}
+.who-row{display:flex;gap:8px;padding:5px 0;border-top:1px solid var(--line);align-items:flex-start}
+.who-lab{flex:0 0 86px;font:600 11px/1.6 var(--font-body);color:var(--muted)}
+.who-people{display:flex;flex-wrap:wrap;gap:4px}
+.who-chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font:600 12px/1.5 var(--font-body);background:var(--surface-2,rgba(128,128,128,.12));color:var(--ink)}
+.who-chip i{font-style:normal;font-size:10px;opacity:.65}
+.who-chip.is-me{outline:2px solid var(--accent);outline-offset:1px}
+.who-absent .who-chip{opacity:.7}
+.who-link{margin-top:12px;width:100%}
+.ics-opts{display:grid;gap:10px;margin-bottom:14px}
+.ics-opts label{display:flex;gap:10px;align-items:flex-start;font:500 14px/1.4 var(--font-body);color:var(--ink)}
+.ics-opts input{margin-top:3px;accent-color:var(--accent)}
+.ics-go{width:100%}
+#icsModalS,#whoModalS{text-transform:none}#whoModalS{text-transform:capitalize}.ics-go{margin-top:2px}.tool-modal .day-modal-body{padding-bottom:18px}
