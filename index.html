@@ -20,7 +20,7 @@
 <meta name="app-version" content="17.1">
 <link rel="preload" href="fonts/inter-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="fonts/spacegrotesk-var.woff" as="font" type="font/woff" crossorigin>
-<link rel="stylesheet" href="style.css?v=202611070856">
+<link rel="stylesheet" href="style.css?v=202611070909">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Aller au contenu</a>
@@ -43,6 +43,7 @@
           <span id="updateStatus"></span>
         </div>
         <div class="hero-actions">
+          <button id="heroSearch" class="navm-btn hero-search" type="button" aria-label="Rechercher (touche F)" title="Rechercher (F)" data-open-search><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg></button>
           <nav id="heroNav" class="hero-nav" aria-label="Navigation"></nav>
           <button id="navMenuBtn" class="navm-btn" type="button" aria-label="Menu et réglages" aria-haspopup="true" aria-expanded="false" aria-controls="navMenuPanel">
             <svg class="navm-ico-desk" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -84,7 +85,7 @@
           </div>
         </div>
       </div>
-      <button id="todayBtn" class="today-btn" type="button">Aujourd’hui</button>
+      <div class="controls-btns"><button id="todayBtn" class="today-btn" type="button">Aujourd’hui</button><button id="icsBtn" class="today-btn ics-btn" type="button" aria-label="Exporter mon planning (calendrier .ics)" title="Exporter mon planning (.ics)" data-open-ics><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></button></div>
     </div>
   </section>
 
@@ -216,6 +217,7 @@
       </div>
       <div class="cmp-actions">
       <button id="cmpTodayBtn" class="pv-filter-btn" type="button">Aujourd’hui</button>
+      <button id="cmpWhoBtn" class="pv-filter-btn" type="button" title="Qui est là ce jour (Q)" data-open-who>Qui est là</button>
       <button id="cmpTitlesBtn" class="pv-filter-btn hidden" type="button" aria-pressed="false" title="Afficher / masquer les titres de groupes à gauche (jamais dans le PDF)">Titres</button>
       <button id="cmpExportBtn" class="pv-filter-btn hidden" type="button" title="Exporter en PDF (A4 paysage)">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h9l3 3v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
@@ -317,7 +319,7 @@
   </div>
 </div>
 
-<script src="app.js?v=202611070856"></script>
+<script src="app.js?v=202611070909"></script>
 
 
 

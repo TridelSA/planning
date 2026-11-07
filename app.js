@@ -2384,7 +2384,7 @@ function updateTeamToggleLabel(){
     <span class="navm-ico"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${g.icon}</svg></span>
     <span class="navm-txt"><b>${g.label}</b><small>${g.desc}</small></span>
     ${on?'<svg class="navm-check" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>':''}
-  </button>`;}).join('')+themeSegHTML()+profileHTML()+toolsHTML()+shareHTML()+installHTML();
+  </button>`;}).join('')+themeSegHTML()+profileHTML()+shareHTML()+installHTML();
   const subtitle=$('heroSubtitle');
   if(subtitle){
     subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
@@ -2425,9 +2425,6 @@ $('navMenuBtn').addEventListener('click',event=>{
 $('navMenuPanel').addEventListener('click',async event=>{
   if(event.target.closest('[data-navm-close]')){ closeNavMenu(); return; }
   if(event.target.closest('[data-share-link]')){ shareCurrentView(); return; }
-  if(event.target.closest('[data-open-search]')){ closeNavMenu(); openSearchModal(); return; }
-  if(event.target.closest('[data-open-who]')){ closeNavMenu&&closeNavMenu(); openWhoModal(); return; }
-  if(event.target.closest('[data-open-ics]')){ closeNavMenu&&closeNavMenu(); openIcsModal(); return; }
   if(event.target.closest('[data-profile-export]')){ profileExport(); return; }
   if(event.target.closest('[data-profile-import]')){ profileImport(); return; }
   if(event.target.closest('[data-install]')){
@@ -4864,12 +4861,15 @@ function toggleShortcutHelp(){
 }
 
 
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-open-search]')){ openSearchModal(); }
+  else if(e.target.closest('[data-open-who]')){ openWhoModal(); }
+  else if(e.target.closest('[data-open-ics]')){ openIcsModal(); }
+});
 // --- Outils : « Qui est là », export calendrier, prochain événement ---
 function toolsHTML(){
   const ic=(d)=>`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  return `<button type="button" class="install-btn" data-open-search><span class="tool-ico">${ic('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>')}</span><span>Rechercher<small>Nom, code de service ou date</small></span></button>`+
-  `<button type="button" class="install-btn" data-open-who><span class="tool-ico">${ic('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3.2 3.2 0 0 1 0 5.6M18 14.4c2 .8 3.4 2.9 3.4 5.6"/>')}</span><span>Qui est là ce jour<small>Présents, réserve et absents par métier</small></span></button>`+
-  `<button type="button" class="install-btn" data-open-ics><span class="tool-ico">${ic('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/>')}</span><span>Exporter mon planning<small>Fichier calendrier (.ics) avec rappels</small></span></button>`;
+  return '';
 }
 
 function ensureToolModal(id,title,subtitle){

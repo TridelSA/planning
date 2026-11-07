@@ -2362,3 +2362,10 @@ button:not(:disabled):active{transition-duration:.08s}
 .search-item b{font:600 14px var(--font-body)}
 .search-item small{font:500 12px var(--font-body);color:var(--muted)}
 @media (hover:hover) and (pointer:fine){.search-item:hover{border-color:var(--accent)}}
+
+/* Emplacements des outils */
+.controls-btns{display:flex;gap:6px;align-items:end}
+.controls-btns .today-btn{flex:1}
+.controls-btns .ics-btn{flex:0 0 auto;width:44px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.hero .hero-search{width:34px;height:34px;padding:0;justify-content:center}
+@media (max-width:700px){.controls-btns .ics-btn{width:36px}}
