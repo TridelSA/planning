@@ -2352,3 +2352,13 @@ button:not(:disabled):active{transition-duration:.08s}
 .ics-opts input{margin-top:3px;accent-color:var(--accent)}
 .ics-go{width:100%}
 #icsModalS,#whoModalS{text-transform:none}#whoModalS{text-transform:capitalize}.ics-go{margin-top:2px}.tool-modal .day-modal-body{padding-bottom:18px}
+
+/* Recherche */
+.search-input{width:100%;box-sizing:border-box;font:500 16px var(--font-body);padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);margin-bottom:10px}
+.search-input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.search-res{display:grid;gap:6px}
+.search-sec{font:700 11px var(--font-body);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 2px}
+.search-item{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
+.search-item b{font:600 14px var(--font-body)}
+.search-item small{font:500 12px var(--font-body);color:var(--muted)}
+@media (hover:hover) and (pointer:fine){.search-item:hover{border-color:var(--accent)}}

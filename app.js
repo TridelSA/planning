@@ -2345,10 +2345,11 @@ const PAGE_KEY='planningPage';
 
 // ---- Thème : Auto (suit l'appareil) / Clair / Sombre -------------------
 const THEME_KEY='themeMode';
-function themeMode(){ try{ const m=localStorage.getItem(THEME_KEY); return m==='light'||m==='dark'?m:'auto'; }catch(e){ return 'auto'; } }
+function themeMode(){ try{ const m=localStorage.getItem(THEME_KEY); return m==='light'||m==='dark'||m==='night'?m:'auto'; }catch(e){ return 'auto'; } }
 function applyTheme(){
   const m=themeMode();
-  const dark=m==='dark'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+  const hr=new Date().getHours();
+  const dark=m==='dark'||(m==='night'&&(hr>=20||hr<7))||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-theme',dark?'dark':'light');
 }
 // Installation sur l'écran d'accueil (Android : fenêtre native ; iPhone : mode d'emploi).
@@ -2364,9 +2365,11 @@ function installHTML(){
 }
 function themeSegHTML(){
   const m=themeMode();
-  return `<span class="theme-label">Apparence</span><div class="theme-seg" role="group" aria-label="Apparence">${[['auto','Auto'],['light','Clair'],['dark','Sombre']].map(([v,l])=>`<button type="button" data-theme-mode="${v}" class="${m===v?'is-on':''}">${l}</button>`).join('')}</div>`;
+  return `<span class="theme-label">Apparence</span><div class="theme-seg" role="group" aria-label="Apparence">${[['auto','Auto'],['light','Clair'],['dark','Sombre'],['night','Nuit']].map(([v,l])=>`<button type="button" data-theme-mode="${v}" class="${m===v?'is-on':''}">${l}</button>`).join('')}</div>`;
 }
 try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme); }catch(e){ /* ignoré */ }
+setInterval(()=>{ if(themeMode()==='night')applyTheme(); },300000);
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&themeMode()==='night')applyTheme(); });
 // À l'impression : toujours le thème clair (papier).
 window.addEventListener('beforeprint',()=>document.documentElement.setAttribute('data-theme','light'));
 window.addEventListener('afterprint',applyTheme);
@@ -2422,6 +2425,7 @@ $('navMenuBtn').addEventListener('click',event=>{
 $('navMenuPanel').addEventListener('click',async event=>{
   if(event.target.closest('[data-navm-close]')){ closeNavMenu(); return; }
   if(event.target.closest('[data-share-link]')){ shareCurrentView(); return; }
+  if(event.target.closest('[data-open-search]')){ closeNavMenu(); openSearchModal(); return; }
   if(event.target.closest('[data-open-who]')){ closeNavMenu&&closeNavMenu(); openWhoModal(); return; }
   if(event.target.closest('[data-open-ics]')){ closeNavMenu&&closeNavMenu(); openIcsModal(); return; }
   if(event.target.closest('[data-profile-export]')){ profileExport(); return; }
@@ -4833,6 +4837,7 @@ document.addEventListener('keydown',e=>{
       if(b0&&b0.offsetParent!==null){ b0.click(); e.preventDefault(); return; }
     }
     if(k==='/'&&currentPage()==='individual'){ const pb=document.getElementById('employeePickerButton'); if(pb&&pb.offsetParent!==null){ pb.click(); e.preventDefault(); return; } }
+    if(k==='f'||k==='F'){ openSearchModal(); e.preventDefault(); return; }
     if(k.toLowerCase()==='q'){ openWhoModal(); e.preventDefault(); return; }
     if(k==='?'){ toggleShortcutHelp(); e.preventDefault(); return; }
     if(k==='Escape'){ const h=document.getElementById('shortcutHelp'); if(h&&!h.classList.contains('hidden')){ h.classList.add('hidden'); return; } }
@@ -4851,7 +4856,7 @@ function toggleShortcutHelp(){
   let h=document.getElementById('shortcutHelp');
   if(!h){
     h=document.createElement('div');h.id='shortcutHelp';h.className='shortcut-help hidden';h.setAttribute('role','dialog');h.setAttribute('aria-label','Raccourcis clavier');
-    h.innerHTML='<b>Raccourcis clavier</b><dl><dt>← →</dt><dd>Période précédente / suivante</dd><dt>T</dt><dd>Aujourd’hui</dd><dt>Q</dt><dd>Qui est là ce jour</dd><dt>W · M · Y</dt><dd>Semaine · mois · année</dd><dt>1 2 3 4</dt><dd>Changer de page</dd><dt>/</dt><dd>Choisir une personne</dd><dt>?</dt><dd>Afficher / masquer cette aide</dd></dl>';
+    h.innerHTML='<b>Raccourcis clavier</b><dl><dt>← →</dt><dd>Période précédente / suivante</dd><dt>T</dt><dd>Aujourd’hui</dd><dt>F</dt><dd>Rechercher</dd><dt>Q</dt><dd>Qui est là ce jour</dd><dt>W · M · Y</dt><dd>Semaine · mois · année</dd><dt>1 2 3 4</dt><dd>Changer de page</dd><dt>/</dt><dd>Choisir une personne</dd><dt>?</dt><dd>Afficher / masquer cette aide</dd></dl>';
     h.addEventListener('click',()=>h.classList.add('hidden'));
     document.body.appendChild(h);
   }
@@ -4862,7 +4867,8 @@ function toggleShortcutHelp(){
 // --- Outils : « Qui est là », export calendrier, prochain événement ---
 function toolsHTML(){
   const ic=(d)=>`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  return `<button type="button" class="install-btn" data-open-who><span class="tool-ico">${ic('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3.2 3.2 0 0 1 0 5.6M18 14.4c2 .8 3.4 2.9 3.4 5.6"/>')}</span><span>Qui est là ce jour<small>Présents, réserve et absents par métier</small></span></button>`+
+  return `<button type="button" class="install-btn" data-open-search><span class="tool-ico">${ic('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>')}</span><span>Rechercher<small>Nom, code de service ou date</small></span></button>`+
+  `<button type="button" class="install-btn" data-open-who><span class="tool-ico">${ic('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3.2 3.2 0 0 1 0 5.6M18 14.4c2 .8 3.4 2.9 3.4 5.6"/>')}</span><span>Qui est là ce jour<small>Présents, réserve et absents par métier</small></span></button>`+
   `<button type="button" class="install-btn" data-open-ics><span class="tool-ico">${ic('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/>')}</span><span>Exporter mon planning<small>Fichier calendrier (.ics) avec rappels</small></span></button>`;
 }
 
@@ -5027,6 +5033,69 @@ function renderNextEvent(){
   if(!el){ el=document.createElement('p');el.id='heroNext';el.className='hero-next';const sub=document.getElementById('heroSubtitle');if(!sub)return;sub.insertAdjacentElement('afterend',el); }
   el.textContent='→ '+txt;
 }
+
+
+// --- Recherche globale : nom, code de service, date ---
+function parseSearchDate(q){
+  q=q.trim().toLowerCase();
+  const t=new Date();t.setHours(0,0,0,0);
+  if(q==='aujourd\'hui'||q==='auj'||q==='ajd')return t;
+  if(q==='demain'){t.setDate(t.getDate()+1);return t;}
+  if(q==='hier'){t.setDate(t.getDate()-1);return t;}
+  const m=/^(\d{1,2})[./\-](\d{1,2})(?:[./\-](\d{2,4}))?$/.exec(q);
+  if(m){ let y=m[3]?+m[3]:t.getFullYear(); if(y<100)y+=2000; const d=new Date(y,+m[2]-1,+m[1]); if(d.getMonth()===+m[2]-1)return d; }
+  const iso=parseYMD(q); if(iso)return iso;
+  return null;
+}
+function openSearchModal(){
+  const m=ensureToolModal('searchModal','Rechercher','Nom, code de service (PIQ, RM…) ou date (12.11, demain)');
+  const B=document.getElementById('searchModalB');
+  if(!B.dataset.bound){
+    B.dataset.bound='1';
+    B.innerHTML='<input type="search" id="searchInput" class="search-input" placeholder="Rechercher…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Rechercher"><div id="searchRes" class="search-res"></div>';
+    const inp=B.querySelector('#searchInput'),res=B.querySelector('#searchRes');
+    const run=()=>{
+      const raw=inp.value.trim();
+      if(!raw){res.innerHTML='<p class="journal-empty">Tape un nom, un code ou une date.</p>';return;}
+      const parts=raw.split(/\s+/);
+      let date=parseSearchDate(raw),term=raw;
+      if(!date&&parts.length>1){ const last=parseSearchDate(parts[parts.length-1]); if(last){date=last;term=parts.slice(0,-1).join(' ');} }
+      else if(date)term='';
+      const out=[];
+      if(date&&!term){
+        const lab=date.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+        out.push(`<button type="button" class="search-item" data-s-who="${isoDate(date)}"><b>Qui est là le ${escapeHTML(lab)}</b><small>Présents, réserve, absents</small></button>`);
+        out.push(`<button type="button" class="search-item" data-s-day="${isoDate(date)}"><b>Voir ce jour dans le planning</b><small>Planning individuel</small></button>`);
+      }
+      const d=date||new Date(); const iso=isoDate(d); const dlab=date?d.toLocaleDateString('fr-CH',{day:'numeric',month:'short'}):'aujourd’hui';
+      const up=term.toUpperCase();
+      if(term&&CODE_INFO[up]){
+        const who=planning.employees.filter(e=>safeCode(e.schedule[iso])===up);
+        out.push(`<div class="search-sec">${escapeHTML(CODE_INFO[up][0])} (${up}) · ${dlab} : ${who.length}</div>`);
+        who.slice(0,40).forEach(e=>out.push(`<button type="button" class="search-item" data-s-emp="${escapeHTML(e.id)}"><b>${escapeHTML(cleanEmployeeName(e.name))}</b><small>${escapeHTML(e.category||'')}</small></button>`));
+      }
+      if(term){
+        const ranked=planning.employees.map(e=>({e,sc:fuzzyEmployeeScore(e.name,term)})).filter(x=>x.sc>=0).sort((a,b)=>b.sc-a.sc).slice(0,12);
+        if(ranked.length)out.push('<div class="search-sec">Personnes</div>');
+        ranked.forEach(({e})=>{ const c=safeCode(e.schedule[iso]); out.push(`<button type="button" class="search-item" data-s-emp="${escapeHTML(e.id)}"${date?` data-s-day="${iso}"`:''}><b>${escapeHTML(cleanEmployeeName(e.name))}</b><small>${escapeHTML(e.category||'')}${c?` · ${dlab} : ${escapeHTML(CODE_INFO[c]?CODE_INFO[c][0]:c)} (${escapeHTML(c)})`:''}</small></button>`); });
+      }
+      res.innerHTML=out.join('')||'<p class="journal-empty">Aucun résultat.</p>';
+    };
+    inp.addEventListener('input',run);
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const f=res.querySelector('.search-item'); if(f)f.click(); } });
+    res.addEventListener('click',e=>{
+      const b=e.target.closest('.search-item'); if(!b)return;
+      document.getElementById('searchModal').classList.remove('open');
+      if(b.dataset.sWho){ openWhoModal(parseYMD(b.dataset.sWho)); return; }
+      if(b.dataset.sEmp){ openPersonIndividual(b.dataset.sEmp); }
+      if(b.dataset.sDay){ const d=parseYMD(b.dataset.sDay); state.date=d; state.view=state.view||'week'; if(!b.dataset.sEmp)setPage('individual'); try{ render(); }catch(_){ /* ignoré */ } }
+    });
+    run();
+  }
+  m.classList.add('open');
+  const inp=B.querySelector('#searchInput'); inp.value=''; inp.dispatchEvent(new Event('input')); setTimeout(()=>inp.focus(),30);
+}
+window.openSearchModal=openSearchModal;
 
 // --- Lien partageable + mémoire de la période ---
 const parseYMD=s=>{ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m?new Date(+m[1],+m[2]-1,+m[3]):null; };

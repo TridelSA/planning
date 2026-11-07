@@ -15,12 +15,12 @@
 <meta name="apple-mobile-web-app-title" content="Planning">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <script>
-(function(){try{var m=localStorage.getItem('themeMode')||'auto';var d=m==='dark'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+(function(){try{var m=localStorage.getItem('themeMode')||'auto';var hr=new Date().getHours();var d=m==='dark'||(m==='night'&&(hr>=20||hr<7))||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
 <meta name="app-version" content="17.1">
 <link rel="preload" href="fonts/inter-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="fonts/spacegrotesk-var.woff" as="font" type="font/woff" crossorigin>
-<link rel="stylesheet" href="style.css?v=202611070855">
+<link rel="stylesheet" href="style.css?v=202611070856">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Aller au contenu</a>
@@ -317,7 +317,7 @@
   </div>
 </div>
 
-<script src="app.js?v=202611070855"></script>
+<script src="app.js?v=202611070856"></script>
 
 
 
