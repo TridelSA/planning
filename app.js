@@ -1868,7 +1868,7 @@ function renderUpcomingEvents(employee){
   count.textContent=events.length||'';
 
   if(!events.length){
-    list.innerHTML='<div class="upcoming-empty">Aucun événement important dans les 30 prochains jours.</div>';
+    list.innerHTML='<div class="upcoming-empty">Aucun événement important à venir.</div>';
     return;
   }
 
