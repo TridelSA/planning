@@ -4948,23 +4948,31 @@ window.openWhoModal=openWhoModal;
 function icsFold(line){ const ch=Array.from(line),out=[];let cur='',bytes=0;for(const c of ch){const b=new TextEncoder().encode(c).length;if(bytes+b>73){out.push(cur);cur=' ';bytes=1;}cur+=c;bytes+=b;}out.push(cur);return out.join('\r\n'); }
 // Événements à exporter : mêmes regroupements que « 30 prochains jours »
 // (week-ends et jours de repos inclus dans une période), sur tout le planning publié.
-const ICS_KIND={vacation:'conges',piquet:'piquets',training:'autres',medical:'autres',comment:'autres'};
-const ICS_ICON={vacation:'🏖️',piquet:'📞',training:'🎓',medical:'🩺',comment:'📝'};
+const ICS_KIND={vacation:'conges',piquet:'piquets',training:'autres',medical:'autres',comment:'autres',travaux:'travaux'};
+const ICS_ICON={vacation:'🏖️',piquet:'📞',training:'🎓',medical:'🩺',comment:'📝',travaux:'⚒️'};
 function icsHorizonDays(emp){
   const last=Object.keys(emp.schedule||{}).sort().pop();
   const t=parseYMD(todayISO()),l=last?parseYMD(last):null;
   return l?Math.max(29,Math.round((l-t)/86400000)):29;
 }
 function icsEventList(emp){
-  return buildUpcomingEvents(emp,{days:icsHorizonDays(emp),allLeave:true})
+  const evs=buildUpcomingEvents(emp,{days:icsHorizonDays(emp),allLeave:true});
+  // Période de travaux (commune à tous), si elle n'est pas déjà passée.
+  const t=travauxPeriod();
+  if(t&&t.start&&t.end&&t.end>=todayISO()){
+    const a=parseISODateOnly(t.start),b=parseISODateOnly(t.end);
+    if(a&&b)evs.push({type:'travaux',date:a,endDate:b,allDay:true,title:'Travaux',detail:'Période de travaux : pas de congés durant cette période.'});
+  }
+  return evs
     .filter(ev=>ICS_KIND[ev.type])
     .map(ev=>{
       const d=calendarEventData(ev);
       // Dans un calendrier, la date est déjà visible : titre court, sans « du … au … ».
-      const short=ev.type==='vacation'?(/^Vacances/.test(ev.title)?'Vacances':'Congé'):ev.type==='piquet'?'Piquet':ev.title;
+      const short=ev.type==='vacation'?(/^Vacances/.test(ev.title)?'Vacances':'Congé'):ev.type==='piquet'?'Piquet':ev.type==='travaux'?'Travaux':ev.title;
       const days=d.allDay?Math.round((d.end-d.start)/86400000):0;
       return {ev,data:d,kind:ICS_KIND[ev.type],icon:ICS_ICON[ev.type]||'•',short,days};
-    });
+    })
+    .sort((x,y)=>x.data.start-y.data.start);
 }
 function icsServiceDays(emp){
   const t=todayISO();
@@ -5027,18 +5035,19 @@ function openIcsModal(){
   const list=icsEventList(emp),services=icsServiceDays(emp);
   const cnt=k=>list.filter(x=>x.kind===k).length;
   const lastDay=Object.keys(emp.schedule).sort().pop();
-  document.getElementById('icsModalS').textContent=`${cleanEmployeeName(emp.name)} · jusqu’au ${lastDay?parseYMD(lastDay).toLocaleDateString('fr-CH',{day:'numeric',month:'long',year:'numeric'}):'—'}`;
+  document.getElementById('icsModalS').textContent=`${cleanEmployeeName(emp.name)} · planning publié jusqu’au ${lastDay?parseYMD(lastDay).toLocaleDateString('fr-CH',{day:'numeric',month:'long',year:'numeric'}):'—'}`;
   const opt=(k,label,n,on)=>n?`<label class="ics-opt"><input type="checkbox" data-ics="${k}"${on?' checked':''}><span>${label}</span><b>${n}</b></label>`:'';
   B.innerHTML=`<div class="ics-opts">
     ${opt('conges','Congés et vacances',cnt('conges'),true)}
     ${opt('piquets','Piquets',cnt('piquets'),true)}
     ${opt('autres','Formations, rendez-vous',cnt('autres'),true)}
+    ${opt('travaux','Période de travaux',cnt('travaux'),true)}
     ${opt('services','Services (matin, après-midi, nuit)',services.length,false)}
     <label class="ics-opt"><input type="checkbox" data-ics="alarm" checked><span>Rappel la veille à 18 h</span></label>
   </div>
   <ul class="ics-preview" aria-label="Aperçu"></ul>
   <button type="button" class="install-btn ics-go"><span>Ajouter au calendrier<small id="icsCount"></small></span></button>
-  <p class="leave-src">${isAndroid()?'Sur Android, ouvre le fichier avec ton agenda (ou importe-le dans Google Agenda sur ordinateur).':'Le fichier s’ouvre dans ton calendrier : touche « Tout ajouter ». Sur iPhone, l’aperçu range chaque événement à son premier jour ; une fois ajouté, il couvre toute la période.'} Chaque période garde toute sa durée. À refaire après une mise à jour du planning.</p>`;
+  <p class="leave-src">${isAndroid()?'Sur Android, ouvre le fichier avec ton agenda (ou importe-le dans Google Agenda sur ordinateur).':'Touche « Tout ajouter » dans ton calendrier. Sur iPhone, l’aperçu montre seulement le premier jour de chaque période, mais elle est ajoutée en entier.'} À refaire après une mise à jour du planning.</p>`;
   const get=()=>{ const o={}; B.querySelectorAll('[data-ics]').forEach(i=>o[i.dataset.ics]=i.checked); return o; };
   const upd=()=>{
     const o=get(),shown=list.filter(x=>o[x.kind]);

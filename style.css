@@ -2416,3 +2416,4 @@ button:not(:disabled):active{transition-duration:.08s}
 .install-btn.ics-go span,.install-btn.ics-go small{color:#fff}
 .install-btn.ics-go small{opacity:.85}
 .install-btn.ics-go:active{transform:scale(.97)}
+.ics-travaux{box-shadow:inset 3px 0 0 var(--signal,#C77700),0 0 0 1px var(--line)}
