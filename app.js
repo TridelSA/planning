@@ -3281,8 +3281,9 @@ function cmpDeskTodayFrame(){
   const g=grid.getBoundingClientRect();
   const a=cells[0].getBoundingClientRect(),z=cells[cells.length-1].getBoundingClientRect();
   if(getComputedStyle(grid).position==='static')grid.style.position='relative';
+  const k=grid.offsetWidth?g.width/grid.offsetWidth:1; // zoom CSS des grands écrans
   const d=document.createElement('div');d.className='cmp-todayframe';
-  d.style.cssText=`left:${a.left-g.left+grid.scrollLeft-1}px;top:${a.top-g.top+grid.scrollTop-1}px;width:${a.width+2}px;height:${z.bottom-a.top+2}px;box-sizing:border-box`;
+  d.style.cssText=`left:${(a.left-g.left)/k-grid.clientLeft+grid.scrollLeft-1}px;top:${(a.top-g.top)/k-grid.clientTop+grid.scrollTop-1}px;width:${a.width/k+2}px;height:${(z.bottom-a.top)/k+2}px;box-sizing:border-box`;
   grid.appendChild(d);
 }
 addEventListener('resize',()=>{try{cmpDeskTodayFrame()}catch(e){}});
@@ -3382,9 +3383,16 @@ function cmpYearTodayFrame(){
   const cells=[...wrap.querySelectorAll('td.pv-cell.is-current')];
   if(!cells.length)return;
   if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';
+  // Un seul rectangle, du numéro de semaine jusqu'à la dernière case, centré sur les cases.
+  // (positions relatives à l'intérieur du cadre : on retire sa bordure via clientLeft / clientTop)
   const w=wrap.getBoundingClientRect(),a=cells[0].getBoundingClientRect(),z=cells[cells.length-1].getBoundingClientRect();
+  const head=wrap.querySelector('th.pv-week.is-current'),h=head?head.getBoundingClientRect():a;
+  // Grand écran : la page est agrandie (zoom CSS) ; les mesures sont à l'échelle, pas les positions.
+  const k=wrap.offsetWidth?w.width/wrap.offsetWidth:1;
+  const x0=w.left+wrap.clientLeft*k,y0=w.top+wrap.clientTop*k,pad=3;
+  const top=Math.min(h.top,a.top);
   const d=document.createElement('div');d.className='cmp-yframe';
-  d.style.cssText=`left:${a.left-w.left+wrap.scrollLeft-2}px;top:${a.top-w.top+wrap.scrollTop-3}px;width:${a.width+4}px;height:${z.bottom-a.top+6}px;box-sizing:border-box`;
+  d.style.cssText=`left:${(a.left-x0)/k+wrap.scrollLeft-pad}px;top:${(top-y0)/k+wrap.scrollTop-pad}px;width:${a.width/k+pad*2}px;height:${(z.bottom-top)/k+pad*2}px;box-sizing:border-box`;
   wrap.appendChild(d);
 }
 addEventListener('resize',()=>{try{cmpYearTodayFrame()}catch(e){}});
