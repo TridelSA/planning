@@ -4994,17 +4994,24 @@ function buildPersonalICS(emp,opts){
   for(const it of icsEventList(emp)){
     if(!opts[it.kind])continue;
     const d=it.data;
+    // Dates complètes en tête de description : visibles en touchant l'événement dans le calendrier.
+    const desc=(d.allDay?`${icsRangeLong(it)}\n`:'')+d.description;
     const when=d.allDay
       ?[`DTSTART;VALUE=DATE:${calendarDateOnly(d.start)}`,`DTEND;VALUE=DATE:${calendarDateOnly(d.end)}`]
       :[`DTSTART;TZID=Europe/Zurich:${calendarLocalDateTime(d.start)}`,`DTEND;TZID=Europe/Zurich:${calendarLocalDateTime(d.end)}`];
     n++;lines.push('BEGIN:VEVENT',`UID:${it.ev.type}-${isoDate(d.start)}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,...when,
-      `SUMMARY:${escapeICS(it.icon+' '+it.short)}`,`DESCRIPTION:${escapeICS(d.description)}`,
+      `SUMMARY:${escapeICS(it.icon+' '+it.short)}`,`DESCRIPTION:${escapeICS(desc)}`,
       ...(d.location?[`LOCATION:${escapeICS(d.location)}`]:[]),
       it.kind==='piquets'?'TRANSP:OPAQUE':'TRANSP:TRANSPARENT',
-      ...(it.kind==='piquets'?alarm('Piquet demain','-PT6H'):[]),'END:VEVENT');
+      ...(d.allDay?alarm(`${it.short} demain`,'-PT6H'):alarm(it.short,'-PT1H')),'END:VEVENT');
   }
   lines.push('END:VCALENDAR');
   return {text:lines.map(icsFold).join('\r\n'),count:n};
+}
+function icsRangeLong(it){
+  const d=it.data,f=x=>x.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
+  const last=new Date(d.end);last.setDate(last.getDate()-1);
+  return it.days<=1?`Le ${f(d.start)}`:`Du ${f(d.start)} au ${f(last)} (${it.days} jours)`;
 }
 function icsRangeText(it){
   const d=it.data,f=x=>x.toLocaleDateString('fr-CH',{weekday:'short',day:'numeric',month:'short'});
@@ -5027,11 +5034,11 @@ function openIcsModal(){
     ${opt('piquets','Piquets',cnt('piquets'),true)}
     ${opt('autres','Formations, rendez-vous',cnt('autres'),true)}
     ${opt('services','Services (matin, après-midi, nuit)',services.length,false)}
-    <label class="ics-opt"><input type="checkbox" data-ics="alarm" checked><span>Rappel la veille</span></label>
+    <label class="ics-opt"><input type="checkbox" data-ics="alarm" checked><span>Rappel la veille à 18 h</span></label>
   </div>
   <ul class="ics-preview" aria-label="Aperçu"></ul>
   <button type="button" class="install-btn ics-go"><span>Ajouter au calendrier<small id="icsCount"></small></span></button>
-  <p class="leave-src">${isAndroid()?'Sur Android, ouvre le fichier avec ton agenda (ou importe-le dans Google Agenda sur ordinateur).':'Le fichier s’ouvre dans ton calendrier (Apple, Outlook, Google) : choisis « Tout ajouter ».'} Chaque période garde toute sa durée. À refaire après une mise à jour du planning.</p>`;
+  <p class="leave-src">${isAndroid()?'Sur Android, ouvre le fichier avec ton agenda (ou importe-le dans Google Agenda sur ordinateur).':'Le fichier s’ouvre dans ton calendrier : touche « Tout ajouter ». Sur iPhone, l’aperçu range chaque événement à son premier jour ; une fois ajouté, il couvre toute la période.'} Chaque période garde toute sa durée. À refaire après une mise à jour du planning.</p>`;
   const get=()=>{ const o={}; B.querySelectorAll('[data-ics]').forEach(i=>o[i.dataset.ics]=i.checked); return o; };
   const upd=()=>{
     const o=get(),shown=list.filter(x=>o[x.kind]);
