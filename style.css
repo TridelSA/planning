@@ -167,7 +167,7 @@ button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
   outline:2px solid var(--accent);outline-offset:2px;
 }
 .app{max-width:1120px;margin:auto;padding:16px}
-.app.app-anim{transition:max-width .55s cubic-bezier(.22,1,.36,1)}
+.app.app-anim{transition:max-width .28s cubic-bezier(.23,1,.32,1)} /* changement d'onglet : action fréquente, donc bref */
 @media (prefers-reduced-motion:reduce){.app.app-anim{transition:none}}
 .hidden{display:none!important}
 .skip-link{position:absolute;left:12px;top:-60px;z-index:100;background:#fff;color:#0E2818;font:700 13px/1 var(--font-body);padding:10px 14px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.3);text-decoration:none}
@@ -193,7 +193,7 @@ select:focus-visible,a:focus-visible,summary:focus-visible,[role="tab"]:focus-vi
 .hero-art{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;border-radius:inherit}
 .hero-art::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,30,17,.9) 0%,rgba(9,30,17,.62) 30%,rgba(9,30,17,.12) 58%,rgba(9,30,17,0) 75%)}
 .hero-art-stage{position:absolute;left:0;top:0;width:2079px;height:513px;transform-origin:0 0;opacity:.96;text-rendering:geometricPrecision;shape-rendering:geometricPrecision}
-.hero-art-stage.is-anim{transition:transform .85s cubic-bezier(.22,1,.36,1)}
+.hero-art-stage.is-anim{transition:transform .3s cubic-bezier(.23,1,.32,1)}
 .hero-art-stage svg{display:block;width:100%;height:100%}
 .hero .update-chip{background:rgba(8,28,16,.55);border-color:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .hero .navm-btn{background:rgba(8,28,16,.55);border-color:rgba(255,255,255,.32);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
@@ -312,7 +312,7 @@ select:focus-visible,a:focus-visible,summary:focus-visible,[role="tab"]:focus-vi
 .employee-picker-search-wrap{position:relative}
 .employee-picker-search-icon{
   position:absolute;left:11px;top:50%;transform:translateY(-50%);
-  color:var(--muted);font-size:14px;pointer-events:none
+  color:var(--muted);font-size:14px;pointer-events:none;display:flex
 }
 .employee-picker-search{
   width:100%;height:40px;border:1px solid var(--line);border-radius:var(--radius-sm);
@@ -612,7 +612,13 @@ select:focus-visible,a:focus-visible,summary:focus-visible,[role="tab"]:focus-vi
 @media (min-width:701px){.st-person .pv-panel{left:0;right:auto}}
 .st-lab{display:block;margin-bottom:5px;font:700 10px/1 var(--font-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .st-period{display:block}
-.st-period select{height:46px;min-width:170px;padding:0 12px;border:1px solid var(--line-strong);border-radius:var(--radius-md);background:var(--surface);font:700 13px/1 var(--font-body);color:var(--ink)}
+.st-period select{height:46px;min-width:170px;padding:0 38px 0 12px;border:1px solid var(--line);border-radius:var(--radius-sm);font:700 13px/1 var(--font-body);color:var(--ink);
+  /* même allure que le sélecteur Employé : flèche verte maison au lieu de celle du système */
+  -webkit-appearance:none;appearance:none;background:var(--surface) no-repeat right 12px center/14px 14px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F7A4D' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  transition:border-color .15s var(--ease)}
+@media (hover:hover) and (pointer:fine){.st-period select:hover{border-color:var(--line-strong)}}
+:root[data-theme="dark"] .st-period select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234CC184' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
 .st-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
 .st-kpi i.st-sub{display:block;font:600 11.5px/1.4 var(--font-body);font-style:normal;color:var(--muted);margin-top:2px}
 .st-periods{display:flex;flex-direction:column;max-height:300px;overflow:auto;padding-right:4px}
@@ -1161,7 +1167,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .navm-panel .install-btn{padding:7px 9px;margin:5px 6px 2px}
   /* Bandeau compact : plus de logo, titre à gauche, mise à jour + réglages côte à côte à droite. */
   .hero .logo{display:none}
-  .hero{min-height:96px;padding:12px 12px}
+  .hero{min-height:82px;padding:12px 12px}
   .hero-inner{flex-wrap:nowrap;gap:8px;align-items:center}
   .hero .update-wrap{flex-direction:row;align-items:center;gap:6px;margin-left:auto}
   .hero .update-chip{max-width:none;white-space:nowrap;text-align:right;padding:6px 8px;font-size:8.5px}
@@ -1323,7 +1329,9 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   .st-kpi:first-child{border-top:0}
   .st-kpi small{grid-column:1;grid-row:1}
   .st-kpi span{grid-column:1;grid-row:2}
-  .st-kpi b{grid-column:2;grid-row:1/3;margin:0;font-size:28px;text-align:right;color:var(--st-c,var(--ink))}
+  /* Chiffre neutre (le rouge est réservé aux dépassements) ; la catégorie reste indiquée par une pastille. */
+  .st-kpi b{grid-column:2;grid-row:1/3;margin:0;font-size:28px;text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+  .st-kpi small::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--st-c,var(--accent));margin-right:7px;vertical-align:1px}
   .st-blocks{gap:0}
   .st-block{border:0;border-radius:0;background:transparent;border-top:1px solid var(--line);padding:14px 2px;margin:0}
   .st-block h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
@@ -2214,7 +2222,7 @@ body:not(.cmp-week) .cmp-cell{height:30px}
   #upcomingEvents .upcoming-item{flex:0 0 auto!important;width:100%!important;grid-template-columns:20px minmax(0,1fr) 24px!important;gap:7px!important;padding:5px 7px 5px 8px!important;border-radius:10px!important;min-height:0!important}
   #upcomingEvents .upcoming-icon{width:20px!important;height:20px!important;font-size:13px!important}
   #upcomingEvents .upcoming-copy strong{font-size:11.5px!important;line-height:1.2!important;-webkit-line-clamp:1!important}
-  #upcomingEvents .upcoming-copy small{font-size:10px!important;line-height:1.25!important;margin-top:0!important}
+  #upcomingEvents .upcoming-copy small{font-size:10px!important;line-height:1.25!important;margin-top:0!important;white-space:normal!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden} /* détail sur 2 lignes au lieu d'être coupé */
   #upcomingEvents .upcoming-calendar-btn{width:24px!important;height:24px!important;flex-basis:24px!important;font-size:11px!important}
 }
 /* Téléphone : bandeau du bas (En poste / Ensuite / Travaux) et sélecteur d'employé plus compacts */
@@ -2374,3 +2382,20 @@ button:not(:disabled):active{transition-duration:.08s}
 @media (min-width:701px){ .upcoming-head{display:flex!important;margin-bottom:6px} .upcoming-head strong{font-size:12px;color:var(--muted)} .upcoming-count{min-width:20px;height:20px;background:var(--accent-solid);color:#fff} }
 .upcoming-when{font-weight:800;color:var(--accent-ink)}
 @media (max-width:700px){.upcoming-kicker{display:none}}
+
+/* Téléphone, vue Semaine : les jours sans service sont plus bas et grisés,
+   pour que les jours travaillés ressortent d'un coup d'œil. */
+@media (max-width:700px){
+  .week-row.is-off .week-day{padding-top:6px;padding-bottom:6px}
+  .week-row.is-off .week-day span{color:var(--muted)}
+  .week-row.is-off .week-shift{min-height:0!important;padding-top:6px!important;padding-bottom:6px!important}
+  .week-row.is-off .shift-mainline b{display:none!important}
+  .week-row.is-off .shift-mainline span{font-weight:500!important;color:var(--muted)!important}
+}
+/* Chiffres à largeur fixe là où ils s'alignent en colonne */
+.week-day span,.shift-time,.month-grid,.st-kpi b,.upcoming-when,.update-chip{font-variant-numeric:tabular-nums}
+/* Grands écrans de PC : tout un peu plus grand (le texte était petit et le bas de l'écran vide). */
+@media (min-width:1280px) and (min-height:760px){
+  .app{zoom:1.12}
+}
+@media print{.app{zoom:1}}

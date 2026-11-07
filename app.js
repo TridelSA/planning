@@ -335,19 +335,19 @@ function leaveCardHTML(emp,opts={}){
   const pct=total>0?Math.max(0,Math.min(100,planned/total*100)):(bal<=0?100:0);
   const month=new Date().getMonth();
   let tone='ok',note='';
-  if(bal<0){tone='over';note=`${fmtDays(Math.abs(bal))} j pris en trop`;}
+  if(bal<0){tone='over';} // le chiffre principal le dit déjà : « 2 jours pris en trop »
   else if(bal===0){tone='done';note='Tout est posé';}
   else if(month>=8){tone='warn';note='À poser avant fin décembre';}
   else note='Encore disponibles pour cette année';
   const fact=(l,v,t)=>`<div${t?` title="${escapeHTML(t)}"`:''}><dt>${l}</dt><dd>${v}</dd></div>`;
   let facts='';
   if(L.report!==null)facts+=fact(`Report ${L.year?L.year-1:''}`.trim(),fmtDays(L.report),L.report<0?'Jours pris en trop sur l’année précédente':'Jours non pris l’année précédente');
-  if(L.droit!==null)facts+=fact(`Droit ${L.year||''}`.trim(),fmtDays(L.droit),'Jours de vacances auxquels vous avez droit cette année');
+  if(L.droit!==null)facts+=fact(`Droit ${L.year||''}`.trim(),fmtDays(L.droit),'Jours de vacances auxquels tu as droit cette année');
   if(L.planned!==null)facts+=fact('Planifié',fmtDays(L.planned),'Jours de vacances déjà posés dans le planning');
   const jub=(L.reportJub||L.droitJub)
     ?`<div class="leave-jub"><span>Jubilaire</span>${L.reportJub!==null?`<em>report ${fmtDays(L.reportJub)}</em>`:''}${L.droitJub!==null?`<em>droit ${fmtDays(L.droitJub)}</em>`:''}</div>`:'';
   return `<div class="leave ${tone}${opts.compact?' is-compact':''}">
-    <div class="leave-num"><small>Vacances ${L.year||''}</small><b>${fmtDays(bal)}</b><span>${Math.abs(bal)>1?'jours':'jour'} à poser</span></div>
+    <div class="leave-num"><small>Vacances ${L.year||''}</small><b>${fmtDays(Math.abs(bal))}</b><span>${Math.abs(bal)>1?'jours':'jour'} ${bal<0?'pris en trop':'à poser'}</span></div>
     <div class="leave-mid">
       <div class="leave-bar" role="img" aria-label="${fmtDays(planned)} jours planifiés sur ${fmtDays(total)}"><i style="width:${pct.toFixed(1)}%"></i></div>
       ${note?`<p class="leave-note">${escapeHTML(note)}</p>`:''}
@@ -1408,7 +1408,7 @@ function buildUpcomingEvents(employee){
           detail:longWeekend
             ? `${leaveDays} jour${leaveDays>1?'s':''} ${vacOnly?'de congé':'de congé / récupération'} · week-end prolongé : ${totalDays+(dowEnd===5?2:0)+(dowStart===1?2:0)} jours de repos d'affilée`
             : vacOnly
-            ? `${totalDays} jours de vacances, week-ends compris · Profitez-en bien !`
+            ? `${totalDays} jours de vacances, week-ends compris · Profites-en bien !`
             : `${totalDays} jours de congé, week-ends compris${(recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
         },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
       }
@@ -2528,7 +2528,7 @@ function pageTransitionStart(prev,page){
     app.classList.remove('app-anim');
     const st=document.getElementById('heroArtStage');
     if(st&&heroFocusReady)st.style.transform=heroArtTransform(heroFocusCurrent||'full');
-  },640);
+  },320);
   return {app,prev,page};
 }
 function pageTransitionRun(t){
@@ -2536,29 +2536,29 @@ function pageTransitionRun(t){
   const order=NAV_PAGES.map(p=>p.id);
   const dir=order.indexOf(t.page)>=order.indexOf(t.prev)?1:-1;
   const phone=innerWidth<=700;
-  const dx=44*dir;
+  const dx=16*dir;
   const els=[...t.app.children].filter(el=>!el.classList.contains('hero')&&!el.classList.contains('hidden')&&el.offsetParent!==null&&el.tagName!=='SCRIPT');
   if(phone){
     // Mobile : simple et fluide — tout le contenu monte d'un bloc en fondu,
     // sans glissement latéral ni décalage entre les cartes.
     if(window.scrollY>40)window.scrollTo({top:0,behavior:'smooth'});
     els.forEach(el=>{
-      el.animate([{opacity:0,transform:'translateY(18px)'},{opacity:1,transform:'none'}],
-        {duration:340,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'});
+      el.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],
+        {duration:220,easing:'cubic-bezier(.23,1,.32,1)',fill:'backwards'});
     });
   }else{
     els.forEach((el,i)=>{
       el.animate(
         [{opacity:0,transform:`translateX(${dx}px) scale(.985)`,transformOrigin:'50% 0'},
          {opacity:1,transform:'none',transformOrigin:'50% 0'}],
-        {duration:480,delay:i*50,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+        {duration:240,delay:Math.min(i,2)*30,easing:'cubic-bezier(.23,1,.32,1)',fill:'backwards'});
     });
   }
   // Pendant l'élargissement, on recale l'illustration du bandeau à chaque image.
   const t0=performance.now(),key=heroFocusCurrent;
   const stage=document.getElementById('heroArtStage');
   (function tick(){
-    if(!stage||!heroFocusReady||performance.now()-t0>640)return;
+    if(!stage||!heroFocusReady||performance.now()-t0>320)return;
     if(heroFocusKey()===key&&!stage.classList.contains('is-anim'))stage.style.transform=heroArtTransform(key);
     requestAnimationFrame(tick);
   })();
@@ -3102,7 +3102,7 @@ function cmpTimelineHTML(view,groups,desk){
   if(ti>=0)h+=`<div class="cmptl-today" style="--ti:${ti}"></div>`;
   h+='</div></div>';
   const leg=legendCodes([...used]).map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('');
-  h+=`<div class="yg-info cmptl-info" id="cmpTlInfo">Touchez une case ou un jour pour le détail.</div>
+  h+=`<div class="yg-info cmptl-info" id="cmpTlInfo">Touche une case ou un jour pour le détail.</div>
     ${periodNotesHTML(view.cols.map(c=>c.iso))}
     <button type="button" class="cmptl-lg-toggle" data-tl-legend aria-expanded="${lgOpen}"><span class="pm">${lgOpen?'−':'+'}</span> Légende</button>
     <div class="cmptl-legend"><div class="yg-legend">${leg}</div></div></div>`;
@@ -3232,7 +3232,7 @@ function renderCompareView(){
 
   if(!selected.length){
     presence.rows=[];
-    grid.innerHTML='<div class="pv-empty-state">Aucune personne sélectionnée.<br>Touchez un groupe ci-dessus, ou « Collègues » pour choisir des personnes.<br><button type="button" class="pv-link" data-cmp-all>Afficher tout le personnel de métier</button></div>';
+    grid.innerHTML='<div class="pv-empty-state">Aucune personne sélectionnée.<br>Ouvre les <button type="button" class="pv-link" data-open-filters>filtres</button> pour choisir un groupe ou des collègues.<br><button type="button" class="pv-link" data-cmp-all>Afficher tout le personnel de métier</button></div>';
     return;
   }
 
@@ -3466,6 +3466,11 @@ $('compareViewSection').addEventListener('click',event=>{
   const scaleBtn=event.target.closest('[data-cmp-scale]');
   if(scaleBtn){ cmp.scale=scaleBtn.dataset.cmpScale; saveCmp(); renderCompareView(); return; }
   if(event.target.closest('#cmpExportBtn')){ window.print(); return; }
+  if(event.target.closest('[data-open-filters]')){
+    const t=$('cmpGroupsToggle');
+    if(t){ if(t.getAttribute('aria-expanded')!=='true')t.click(); t.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+    return;
+  }
   if(event.target.closest('#cmpTitlesBtn')){ presence.showTitles=!presence.showTitles; savePresenceTitles(); renderCompareView(); return; }
   if(event.target.closest('[data-cmp-all]')){
     const main=cmpMainPeople();
@@ -3665,7 +3670,9 @@ function stLeavePeriods(emp,monthSel){
   const year=String(stYear());
   const days=Object.keys(emp.schedule||{}).filter(iso=>iso.startsWith(year+'-') && ST_VAC.includes(safeCode(emp.schedule[iso]))).sort();
   const inSel=iso=>monthSel==='all'||Number(iso.slice(5,7))-1===monthSel;
-  const off=iso=>{ const d=parseISODateOnly(iso); return d&&(d.getDay()===0||d.getDay()===6||!!swissHolidayName(iso)||safeCode(emp.schedule[iso])==='RF'); };
+  // Jours qui relient deux congés (comme dans « Événements à 30 jours ») :
+  // week-end, férié, repos (R / RF) ou jour sans service.
+  const off=iso=>{ const d=parseISODateOnly(iso); if(!d)return false; const c=safeCode(emp.schedule[iso]); return d.getDay()===0||d.getDay()===6||!!swissHolidayName(iso)||c===''||c==='R'||c==='RF'; };
   const out=[];
   let cur=null;
   for(const iso of days){
@@ -3713,7 +3720,7 @@ function stYearGridHTML(emp){
   const leg=legendCodes([...usedCodes]).map(([c,l])=>`<span><i class="yg-c ${classFor(c)}"></i>${escapeHTML(l)}</span>`).join('')+(usedHol?'<span><i class="yg-dot"></i>Férié</span>':'');
   return `<div class="st-block yg-block"><h3>Mon année ${y}</h3>
     <div class="yg-grid">${head}${rows}</div>
-    <div class="yg-info" id="ygInfo">Touchez une case pour voir le détail du jour.</div>
+    <div class="yg-info" id="ygInfo">Touche une case pour voir le détail du jour.</div>
     <div class="yg-legend">${leg}</div></div>`;
 }
 
@@ -3735,7 +3742,7 @@ function renderStatsView(){
 
   const body=$('stBody');
   if(!emp){
-    body.innerHTML='<div class="pv-empty-state">Choisissez une personne pour voir ses statistiques.</div>';
+    body.innerHTML='<div class="pv-empty-state">Choisis une personne pour voir ses statistiques.</div>';
     return;
   }
 
@@ -4394,7 +4401,8 @@ function renderWeek(e){
     const dots=
       (isHoliday?'<span class="week-holiday-dot" aria-hidden="true"></span>':'')+
       (inTravaux?'<span class="week-travaux-dot" aria-hidden="true"></span>':'');
-    h+=`<div class="week-row ${isToday?'is-current-day':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${dots}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
+    const isOff=!safeCode(e.schedule[dISO]);
+    h+=`<div class="week-row ${isToday?'is-current-day':''}${isOff?' is-off':''}"><div class="week-day ${isToday?'today':''}"><strong>${DAY_NAMES[i]}</strong><span>${d.getDate()}${dots}</span></div>${codeHTML(e.schedule[dISO],dISO,e.id)}</div>`;
   }
   h+='</div>';
   $('viewContainer').innerHTML=h;
