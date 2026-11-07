@@ -2349,11 +2349,10 @@ const PAGE_KEY='planningPage';
 
 // ---- Thème : Auto (suit l'appareil) / Clair / Sombre -------------------
 const THEME_KEY='themeMode';
-function themeMode(){ try{ const m=localStorage.getItem(THEME_KEY); return m==='light'||m==='dark'||m==='night'?m:'auto'; }catch(e){ return 'auto'; } }
+function themeMode(){ try{ const m=localStorage.getItem(THEME_KEY); return m==='light'||m==='dark'?m:'auto'; }catch(e){ return 'auto'; } }
 function applyTheme(){
   const m=themeMode();
-  const hr=new Date().getHours();
-  const dark=m==='dark'||(m==='night'&&(hr>=20||hr<7))||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+  const dark=m==='dark'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-theme',dark?'dark':'light');
 }
 // Installation sur l'écran d'accueil (Android : fenêtre native ; iPhone : mode d'emploi).
@@ -2369,11 +2368,9 @@ function installHTML(){
 }
 function themeSegHTML(){
   const m=themeMode();
-  return `<span class="theme-label">Apparence</span><div class="theme-seg" role="group" aria-label="Apparence">${[['auto','Auto'],['light','Clair'],['dark','Sombre'],['night','Nuit']].map(([v,l])=>`<button type="button" data-theme-mode="${v}" class="${m===v?'is-on':''}">${l}</button>`).join('')}</div>`;
+  return `<span class="theme-label">Apparence</span><div class="theme-seg" role="group" aria-label="Apparence">${[['auto','Auto'],['light','Clair'],['dark','Sombre']].map(([v,l])=>`<button type="button" data-theme-mode="${v}" class="${m===v?'is-on':''}">${l}</button>`).join('')}</div>`;
 }
 try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme); }catch(e){ /* ignoré */ }
-setInterval(()=>{ if(themeMode()==='night')applyTheme(); },300000);
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&themeMode()==='night')applyTheme(); });
 // À l'impression : toujours le thème clair (papier).
 window.addEventListener('beforeprint',()=>document.documentElement.setAttribute('data-theme','light'));
 window.addEventListener('afterprint',applyTheme);
