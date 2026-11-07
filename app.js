@@ -354,6 +354,7 @@ function leaveCardHTML(emp,opts={}){
       ${jub}
     </div>
     <dl class="leave-facts">${facts}</dl>
+    <p class="leave-src">Soldes tels qu’inscrits dans le fichier Excel ; le détail des congés ci-dessous est compté depuis le planning.</p>
   </div>`;
 }
 function renderLeaveCard(emp){
@@ -3304,7 +3305,7 @@ function renderCmpYear(view,groups){
   }
 
   let h='<table class="pv-table"><thead><tr><th class="pv-name" rowspan="2"><div class="pv-name-inner"><span>Semaine</span></div></th>';
-  h+=monthSpans.map(ms=>`<th class="pv-month" colspan="${ms.span}">${escapeHTML(MONTH_NAMES[ms.month])}</th>`).join('');
+  h+=monthSpans.map(ms=>`<th class="pv-month" colspan="${ms.span}"><span class="pv-month-t">${escapeHTML(MONTH_NAMES[ms.month])}</span></th>`).join('');
   h+='</tr><tr>';
   h+=weeks.map((w,i)=>`<th class="pv-week ${i===currentWeekIndex?'is-current':''}" data-pv-wk="${i}" title="Semaine ${w.num} · ${escapeHTML(presenceWeekRange(w))}">${w.num}</th>`).join('');
   h+='</tr></thead><tbody>';
