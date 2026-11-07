@@ -1866,9 +1866,11 @@ function renderUpcomingEvents(employee){
 
   card.classList.remove('hidden');
   count.textContent=events.length||'';
+  const t0=new Date();t0.setHours(0,0,0,0);
+  const whenOf=ev=>{ const d=new Date(ev.date);d.setHours(0,0,0,0); const n=Math.round((d-t0)/86400000); return n<=0?(ev.endDate&&new Date(ev.endDate)>=t0&&n<0?'En cours':'Aujourd’hui'):n===1?'Demain':'Dans '+n+' j'; };
 
   if(!events.length){
-    list.innerHTML='<div class="upcoming-empty">Aucun événement important à venir.</div>';
+    list.innerHTML='<div class="upcoming-empty">Aucun événement important dans les 30 prochains jours.</div>';
     return;
   }
 
@@ -1879,7 +1881,7 @@ function renderUpcomingEvents(employee){
       <div class="upcoming-icon">${iconFor(ev.type)}</div>
       <div class="upcoming-copy">
         <strong>${escapeHTML(ev.title)}</strong>
-        <small>${escapeHTML(ev.detail)}</small>
+        <small><b class="upcoming-when">${whenOf(ev)}</b> · ${escapeHTML(ev.detail)}</small>
       </div>
       <button
         class="upcoming-calendar-btn"
