@@ -1,3 +1,6 @@
+@font-face{font-family:'Inter';src:url('fonts/inter-var.woff') format('woff');font-weight:400 800;font-style:normal;font-display:swap}
+@font-face{font-family:'Space Grotesk';src:url('fonts/spacegrotesk-var.woff') format('woff');font-weight:500 700;font-style:normal;font-display:swap}
+.sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 :root{
   /* Couleurs de base — identité Tridel : vert forêt + accent orange/or du logo */
   --ink:#17211C;--ink-soft:#47594E;--muted:#5E6E64;

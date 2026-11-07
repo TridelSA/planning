@@ -2384,6 +2384,7 @@ function updateTeamToggleLabel(){
   const subtitle=$('heroSubtitle');
   if(subtitle){
     subtitle.textContent=page==='stats'?'Statistiques':page==='compare'?'Comparer des collègues':page==='team'?'Rotations':'Planning individuel';
+    { const ph=document.getElementById('pageHeading'); if(ph)ph.textContent=subtitle.textContent; }
   }
 }
 
