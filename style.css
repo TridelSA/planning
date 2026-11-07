@@ -2354,9 +2354,22 @@ button:not(:disabled):active{transition-duration:.08s}
 .who-chip.is-me{outline:2px solid var(--accent);outline-offset:1px}
 .who-absent .who-chip{opacity:.7}
 .who-link{margin-top:12px;width:100%}
-.ics-opts{display:grid;gap:10px;margin-bottom:14px}
-.ics-opts label{display:flex;gap:10px;align-items:flex-start;font:500 14px/1.4 var(--font-body);color:var(--ink)}
-.ics-opts input{margin-top:3px;accent-color:var(--accent)}
+.ics-opts{display:grid;gap:2px;margin-bottom:12px}
+.ics-opt{display:flex;gap:10px;align-items:center;min-height:40px;padding:0 4px;font:500 14px/1.3 var(--font-body);color:var(--ink);cursor:pointer}
+.ics-opt span{flex:1}
+.ics-opt b{min-width:24px;padding:2px 7px;border-radius:999px;background:var(--paper);color:var(--muted);font:700 11.5px/1.4 var(--font-body);text-align:center;font-variant-numeric:tabular-nums}
+.ics-opts input{margin:0;width:18px;height:18px;accent-color:var(--accent)}
+/* Aperçu de ce qui sera ajouté au calendrier */
+.ics-preview{list-style:none;margin:0 0 14px;padding:4px;max-height:min(300px,38vh);overflow:auto;border-radius:14px;background:var(--paper);display:grid;gap:4px}
+.ics-item{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--surface);box-shadow:0 0 0 1px var(--line)}
+.ics-ico{font-size:17px;text-align:center}
+.ics-txt strong{display:block;font:700 13.5px/1.25 var(--font-body);color:var(--ink)}
+.ics-txt small{display:block;font:500 12px/1.35 var(--font-body);color:var(--muted);font-variant-numeric:tabular-nums}
+.ics-item em{font:700 11.5px/1 var(--font-body);font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums}
+.ics-vacation{box-shadow:inset 3px 0 0 var(--c-va-ink),0 0 0 1px var(--line)}
+.ics-piquet{box-shadow:inset 3px 0 0 var(--c-piq-ink),0 0 0 1px var(--line)}
+.ics-empty{padding:14px;text-align:center;font:500 13px/1.4 var(--font-body);color:var(--muted)}
+.ics-go:disabled{opacity:.5;pointer-events:none}
 .ics-go{width:100%}
 #icsModalS,#whoModalS{text-transform:none}#whoModalS{text-transform:capitalize}.ics-go{margin-top:2px}.tool-modal .day-modal-body{padding-bottom:18px}
 
@@ -2398,3 +2411,8 @@ button:not(:disabled):active{transition-duration:.08s}
   .app{zoom:1.12}
 }
 @media print{.app{zoom:1}}
+/* Export calendrier : bouton principal plein, comme « Aujourd'hui » */
+.install-btn.ics-go{width:100%;margin:2px 0 10px;border:0;background:var(--accent-solid,var(--accent));color:#fff;justify-content:center;text-align:center;min-height:52px;border-radius:14px;transition:transform .12s cubic-bezier(.23,1,.32,1)}
+.install-btn.ics-go span,.install-btn.ics-go small{color:#fff}
+.install-btn.ics-go small{opacity:.85}
+.install-btn.ics-go:active{transform:scale(.97)}

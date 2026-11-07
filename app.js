@@ -1225,12 +1225,14 @@ function enrichEventForCalendar(ev){
   };
 }
 
-function buildUpcomingEvents(employee){
+// opts.days : longueur de la fenêtre (30 jours par défaut) ;
+// opts.allLeave : garder aussi les congés courts (export calendrier complet).
+function buildUpcomingEvents(employee,opts={}){
   const start=new Date();
   start.setHours(0,0,0,0);
 
   const end=new Date(start);
-  end.setDate(end.getDate()+29);
+  end.setDate(end.getDate()+(opts.days||29));
 
   // La fenêtre d'affichage (30 jours) ne doit borner QUE la recherche de
   // nouveaux événements, pas la durée réelle d'une période déjà entamée :
@@ -1397,7 +1399,7 @@ function buildUpcomingEvents(employee){
       for(let d=new Date(vacStart);d<=vacEnd&&!touchesWeekend;d.setDate(d.getDate()+1)){ if(d.getDay()===6||d.getDay()===0)touchesWeekend=true; }
       const hasWeekdayLeave=(()=>{for(let d=new Date(vacStart);d<=vacEnd;d.setDate(d.getDate()+1)){const c=safeCode(employee.schedule[isoDate(d)]);if(isVacationCode(c)&&d.getDay()!==0&&d.getDay()!==6)return true;}return false;})();
       const longWeekend=leaveDays<5&&touchesWeekend&&hasWeekdayLeave;
-      if(leaveDays>=5||longWeekend){
+      if(leaveDays>=5||longWeekend||opts.allLeave){
         pushUnique({
           type:'vacation',
           date:new Date(vacStart),
@@ -1407,6 +1409,8 @@ function buildUpcomingEvents(employee){
           calendarTitle:vacOnly?`🏖️ Vacances ${range}`:`🌴 Congé ${range}`,
           detail:longWeekend
             ? `${leaveDays} jour${leaveDays>1?'s':''} ${vacOnly?'de congé':'de congé / récupération'} · week-end prolongé : ${totalDays+(dowEnd===5?2:0)+(dowStart===1?2:0)} jours de repos d'affilée`
+            : totalDays===1
+            ? (vacOnly?'1 jour de vacances':'1 jour de congé / récupération')
             : vacOnly
             ? `${totalDays} jours de vacances, week-ends compris · Profites-en bien !`
             : `${totalDays} jours de congé, week-ends compris${(recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
@@ -4943,71 +4947,110 @@ function openWhoModal(date){
 window.openWhoModal=openWhoModal;
 
 // Export .ics du planning personnel
-function icsFold(line){ const out=[];while(line.length>73){out.push(line.slice(0,73));line=' '+line.slice(73);}out.push(line);return out.join('\r\n'); }
+// Lignes .ics repliées sans couper un emoji ni un accent (≈ 75 octets max).
+function icsFold(line){ const ch=Array.from(line),out=[];let cur='',bytes=0;for(const c of ch){const b=new TextEncoder().encode(c).length;if(bytes+b>73){out.push(cur);cur=' ';bytes=1;}cur+=c;bytes+=b;}out.push(cur);return out.join('\r\n'); }
+// Événements à exporter : mêmes regroupements que « 30 prochains jours »
+// (week-ends et jours de repos inclus dans une période), sur tout le planning publié.
+const ICS_KIND={vacation:'conges',piquet:'piquets',training:'autres',medical:'autres',comment:'autres'};
+const ICS_ICON={vacation:'🏖️',piquet:'📞',training:'🎓',medical:'🩺',comment:'📝'};
+function icsHorizonDays(emp){
+  const last=Object.keys(emp.schedule||{}).sort().pop();
+  const t=parseYMD(todayISO()),l=last?parseYMD(last):null;
+  return l?Math.max(29,Math.round((l-t)/86400000)):29;
+}
+function icsEventList(emp){
+  return buildUpcomingEvents(emp,{days:icsHorizonDays(emp),allLeave:true})
+    .filter(ev=>ICS_KIND[ev.type])
+    .map(ev=>{
+      const d=calendarEventData(ev);
+      // Dans un calendrier, la date est déjà visible : titre court, sans « du … au … ».
+      const short=ev.type==='vacation'?(/^Vacances/.test(ev.title)?'Vacances':'Congé'):ev.type==='piquet'?'Piquet':ev.title;
+      const days=d.allDay?Math.round((d.end-d.start)/86400000):0;
+      return {ev,data:d,kind:ICS_KIND[ev.type],icon:ICS_ICON[ev.type]||'•',short,days};
+    });
+}
+function icsServiceDays(emp){
+  const t=todayISO();
+  return Object.keys(emp.schedule).sort().filter(k=>k>=t&&['RM','RA','RN'].includes(safeCode(emp.schedule[k])));
+}
 function buildPersonalICS(emp,opts){
   const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');
   const name=cleanEmployeeName(emp.name);
-  const todayStr=todayISO();
   const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//TRIDEL//Planning//FR','CALSCALE:GREGORIAN','METHOD:PUBLISH',`X-WR-CALNAME:${escapeICS('Planning Tridel — '+name)}`,'X-WR-TIMEZONE:Europe/Zurich'];
-  const times={RM:['05:00','13:00'],RA:['13:00','21:00'],RN:['21:00','05:00']};
-  const days=Object.keys(emp.schedule).sort().filter(k=>k>=todayStr);
   const pad2=n=>String(n).padStart(2,'0');
-  const alarm=(desc,trig)=>['BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${escapeICS(desc)}`,`TRIGGER:${trig}`,'END:VALARM'];
+  const ymd=d=>`${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
+  const alarm=(desc,trig)=>opts.alarm?['BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:${escapeICS(desc)}`,`TRIGGER:${trig}`,'END:VALARM']:[];
   let n=0;
-  const ev=(uid,title,body,extra)=>{ n++; lines.push('BEGIN:VEVENT',`UID:${uid}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,...extra,`SUMMARY:${escapeICS(title)}`,`DESCRIPTION:${escapeICS(body)}`,'TRANSP:TRANSPARENT','END:VEVENT'); };
-  // regroupe les jours consécutifs de même code (piquets, vacances)
-  const runs=[];
-  for(const iso of days){
-    const c=safeCode(emp.schedule[iso]);
-    const last=runs[runs.length-1];
-    const nextDay=last&&isoDate(new Date(parseYMD(last.end).getTime()+86400000+3600000));
-    if(last&&last.code===c&&nextDay===iso)last.end=iso; else runs.push({code:c,start:iso,end:iso});
-  }
-  for(const r of runs){
-    const c=r.code, info=CODE_INFO[c]||[c,''];
-    const sd=parseYMD(r.start), ed=parseYMD(r.end);
-    const ymd=d=>`${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`;
-    if(times[c]&&opts.services){
-      const [a,b]=times[c];
-      const ds=new Date(sd);
-      for(let d=new Date(sd);d<=ed;d.setDate(d.getDate()+1)){
-        const iso2=isoDate(d);
-        const e2=new Date(d);if(c==='RN')e2.setDate(e2.getDate()+1);
-        const extra=[`DTSTART;TZID=Europe/Zurich:${ymd(d)}T${a.replace(':','')}00`,`DTEND;TZID=Europe/Zurich:${ymd(e2)}T${b.replace(':','')}00`];
-        const al=opts.alarm?alarm(`${info[0]} demain`,c==='RM'?'-PT10H':'-PT14H'):[];
-        n++;lines.push('BEGIN:VEVENT',`UID:${c}-${iso2}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,...extra,`SUMMARY:${escapeICS(info[0]+' ('+c+')')}`,`DESCRIPTION:${escapeICS(info[0]+' '+a+'–'+b+'\nPlanning Tridel — '+name)}`,'TRANSP:OPAQUE',...al,'END:VEVENT');
-      }
-    }else if(c==='PIQ'&&opts.piquets){
-      const e2=new Date(ed);e2.setDate(e2.getDate()+1);
-      n++;lines.push('BEGIN:VEVENT',`UID:PIQ-${r.start}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${ymd(sd)}`,`DTEND;VALUE=DATE:${ymd(e2)}`,`SUMMARY:${escapeICS('Piquet')}`,`DESCRIPTION:${escapeICS('Service de piquet\nPlanning Tridel — '+name)}`,'TRANSP:OPAQUE',...(opts.alarm?alarm('Piquet demain','-PT6H'):[]),'END:VEVENT');
-    }else if(['VA','VJ'].includes(c)&&opts.vacances){
-      const e2=new Date(ed);e2.setDate(e2.getDate()+1);
-      n++;lines.push('BEGIN:VEVENT',`UID:VAC-${r.start}-${emp.id}@planning.tridelsa.ch`,`DTSTART;VALUE=DATE:${ymd(sd)}`.replace(/^/,''),`DTEND;VALUE=DATE:${ymd(e2)}`,`DTSTAMP:${stamp}`,`SUMMARY:${escapeICS('Vacances')}`,`DESCRIPTION:${escapeICS('Planning Tridel — '+name)}`,'TRANSP:TRANSPARENT','END:VEVENT');
+  // Services de rotation : un événement par jour, avec les horaires.
+  if(opts.services){
+    const times={RM:['05:00','13:00'],RA:['13:00','21:00'],RN:['21:00','05:00']};
+    for(const iso of icsServiceDays(emp)){
+      const c=safeCode(emp.schedule[iso]),[a,b]=times[c],info=CODE_INFO[c]||[c];
+      const d=parseYMD(iso),e2=new Date(d);if(c==='RN')e2.setDate(e2.getDate()+1);
+      n++;lines.push('BEGIN:VEVENT',`UID:${c}-${iso}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,
+        `DTSTART;TZID=Europe/Zurich:${ymd(d)}T${a.replace(':','')}00`,`DTEND;TZID=Europe/Zurich:${ymd(e2)}T${b.replace(':','')}00`,
+        `SUMMARY:${escapeICS(info[0]+' ('+c+')')}`,`DESCRIPTION:${escapeICS(info[0]+' '+a+'–'+b+'\nPlanning Tridel — '+name)}`,'TRANSP:OPAQUE',
+        ...alarm(`${info[0]} demain`,c==='RM'?'-PT10H':'-PT14H'),'END:VEVENT');
     }
+  }
+  // Périodes : congés, piquets, formations… sur toute leur durée.
+  for(const it of icsEventList(emp)){
+    if(!opts[it.kind])continue;
+    const d=it.data;
+    const when=d.allDay
+      ?[`DTSTART;VALUE=DATE:${calendarDateOnly(d.start)}`,`DTEND;VALUE=DATE:${calendarDateOnly(d.end)}`]
+      :[`DTSTART;TZID=Europe/Zurich:${calendarLocalDateTime(d.start)}`,`DTEND;TZID=Europe/Zurich:${calendarLocalDateTime(d.end)}`];
+    n++;lines.push('BEGIN:VEVENT',`UID:${it.ev.type}-${isoDate(d.start)}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,...when,
+      `SUMMARY:${escapeICS(it.icon+' '+it.short)}`,`DESCRIPTION:${escapeICS(d.description)}`,
+      ...(d.location?[`LOCATION:${escapeICS(d.location)}`]:[]),
+      it.kind==='piquets'?'TRANSP:OPAQUE':'TRANSP:TRANSPARENT',
+      ...(it.kind==='piquets'?alarm('Piquet demain','-PT6H'):[]),'END:VEVENT');
   }
   lines.push('END:VCALENDAR');
   return {text:lines.map(icsFold).join('\r\n'),count:n};
 }
+function icsRangeText(it){
+  const d=it.data,f=x=>x.toLocaleDateString('fr-CH',{weekday:'short',day:'numeric',month:'short'});
+  if(!d.allDay)return `${f(d.start)} · ${d.start.toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'})}`;
+  const last=new Date(d.end);last.setDate(last.getDate()-1);
+  return it.days<=1?f(d.start):`${f(d.start)} → ${f(last)}`;
+}
 function openIcsModal(){
   const emp=selectedEmployee();
-  const m=ensureToolModal('icsModal','Exporter mon planning','');
+  const m=ensureToolModal('icsModal','Ajouter à mon calendrier','');
   const B=document.getElementById('icsModalB');
   if(!emp){ B.innerHTML='<p class="journal-empty">Choisis d’abord une personne dans le planning individuel.</p>'; document.getElementById('icsModalS').textContent=''; m.classList.add('open'); return; }
-  document.getElementById('icsModalS').textContent=cleanEmployeeName(emp.name)+' · à partir d’aujourd’hui';
+  const list=icsEventList(emp),services=icsServiceDays(emp);
+  const cnt=k=>list.filter(x=>x.kind===k).length;
+  const lastDay=Object.keys(emp.schedule).sort().pop();
+  document.getElementById('icsModalS').textContent=`${cleanEmployeeName(emp.name)} · jusqu’au ${lastDay?parseYMD(lastDay).toLocaleDateString('fr-CH',{day:'numeric',month:'long',year:'numeric'}):'—'}`;
+  const opt=(k,label,n,on)=>n?`<label class="ics-opt"><input type="checkbox" data-ics="${k}"${on?' checked':''}><span>${label}</span><b>${n}</b></label>`:'';
   B.innerHTML=`<div class="ics-opts">
-    <label><input type="checkbox" data-ics="services" checked> Services de rotation (matin, après-midi, nuit) avec horaires</label>
-    <label><input type="checkbox" data-ics="piquets" checked> Piquets</label>
-    <label><input type="checkbox" data-ics="vacances" checked> Vacances</label>
-    <label><input type="checkbox" data-ics="alarm" checked> Rappel la veille</label>
-  </div><button type="button" class="install-btn ics-go"><span>Télécharger le fichier .ics<small id="icsCount"></small></span></button>
-  <p class="leave-src">Ajoute le fichier à ton calendrier (Apple, Google, Outlook). Il contient les jours déjà publiés ; à refaire après une mise à jour du planning.</p>`;
+    ${opt('conges','Congés et vacances',cnt('conges'),true)}
+    ${opt('piquets','Piquets',cnt('piquets'),true)}
+    ${opt('autres','Formations, rendez-vous',cnt('autres'),true)}
+    ${opt('services','Services (matin, après-midi, nuit)',services.length,false)}
+    <label class="ics-opt"><input type="checkbox" data-ics="alarm" checked><span>Rappel la veille</span></label>
+  </div>
+  <ul class="ics-preview" aria-label="Aperçu"></ul>
+  <button type="button" class="install-btn ics-go"><span>Ajouter au calendrier<small id="icsCount"></small></span></button>
+  <p class="leave-src">${isAndroid()?'Sur Android, ouvre le fichier avec ton agenda (ou importe-le dans Google Agenda sur ordinateur).':'Le fichier s’ouvre dans ton calendrier (Apple, Outlook, Google) : choisis « Tout ajouter ».'} Chaque période garde toute sa durée. À refaire après une mise à jour du planning.</p>`;
   const get=()=>{ const o={}; B.querySelectorAll('[data-ics]').forEach(i=>o[i.dataset.ics]=i.checked); return o; };
-  const upd=()=>{ B.querySelector('#icsCount').textContent=buildPersonalICS(emp,get()).count+' événements'; };
+  const upd=()=>{
+    const o=get(),shown=list.filter(x=>o[x.kind]);
+    const total=buildPersonalICS(emp,o).count;
+    B.querySelector('#icsCount').textContent=total?`${total} événement${total>1?'s':''}`:'Rien de sélectionné';
+    B.querySelector('.ics-go').disabled=!total;
+    B.querySelector('.ics-preview').innerHTML=shown.map(it=>`<li class="ics-item ics-${it.ev.type}"><span class="ics-ico" aria-hidden="true">${it.icon}</span><span class="ics-txt"><strong>${escapeHTML(it.short)}</strong><small>${escapeHTML(icsRangeText(it))}</small></span>${it.days>1?`<em>${it.days} j</em>`:''}</li>`).join('')
+      +(o.services&&services.length?`<li class="ics-item"><span class="ics-ico" aria-hidden="true">🕐</span><span class="ics-txt"><strong>Services de rotation</strong><small>${services.length} jour${services.length>1?'s':''} avec horaires</small></span></li>`:'')
+      ||'<li class="ics-empty">Aucun événement à venir.</li>';
+  };
   B.onchange=upd;upd();
   B.querySelector('.ics-go').onclick=()=>{
     const r=buildPersonalICS(emp,get());
+    if(!r.count)return;
     const blob=new Blob([r.text],{type:'text/calendar;charset=utf-8'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='planning-tridel.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`planning-tridel-${cleanEmployeeName(emp.name).toLowerCase().replace(/[^a-z0-9]+/g,'-')}.ics`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
   };
   m.classList.add('open');
 }
