@@ -2260,3 +2260,7 @@ button:not(:disabled):active{transition-duration:.08s}
 .pv-empty-state .pv-link{min-height:32px;padding:6px 8px;display:inline-flex;align-items:center}
 /* lien au milieu d'une phrase : grande zone à toucher sans décaler le texte */
 .pv-empty-state .pv-link[data-open-filters]{display:inline-block;min-height:0;padding:9px 2px;margin:-9px 0;font-size:inherit;line-height:inherit;text-decoration:underline;text-underline-offset:2px}
+
+/* 30 prochains jours / export : rotations (personnes hors équipes) */
+.upcoming-rotation{background:var(--c-rm-bg)}
+.ics-rotation{box-shadow:inset 3px 0 0 var(--c-rm-ink),0 0 0 1px var(--line)}
