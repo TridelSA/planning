@@ -2264,3 +2264,14 @@ button:not(:disabled):active{transition-duration:.08s}
 /* 30 prochains jours / export : rotations (personnes hors équipes) */
 .upcoming-rotation{background:var(--c-rm-bg)}
 .ics-rotation{box-shadow:inset 3px 0 0 var(--c-rm-ink),0 0 0 1px var(--line)}
+
+/* Événements à 30 jours : icônes au trait, boutons sobres */
+.upcoming-icon{background:transparent!important;display:grid;place-items:center}
+.upcoming-icon svg{display:block}
+.upcoming-vacation .upcoming-icon{color:var(--c-va-ink,#b7791f)}
+.upcoming-piquet .upcoming-icon{color:var(--c-piq-ink,#6d5bd0)}
+.upcoming-training .upcoming-icon{color:var(--c-ra-ink,#2b6cb0)}
+.upcoming-medical .upcoming-icon{color:var(--c-en-ink,#2f855a)}
+.upcoming-rotation .upcoming-icon,.upcoming-comment .upcoming-icon,.upcoming-travaux .upcoming-icon{color:var(--muted)}
+.rotation-travaux .rt-ico{display:inline-grid;place-items:center}
+.upcoming-calendar-btn{background:transparent!important;border-color:transparent!important}

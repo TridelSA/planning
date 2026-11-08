@@ -1429,10 +1429,10 @@ function buildUpcomingEvents(employee,opts={}){
           // « 2 jours de congé / récupération · week-end prolongé : 4 jours de repos d'affilée »
           // « 8 jours de vacances · 12 jours de repos d'affilée · Profites-en bien ! »
           detail:(()=>{
-            const kind=vacOnly?'de vacances':recupDays===leaveDays?'de congé / récupération':`de congé (dont ${recupDays} récupération${recupDays>1?'s':''})`;
-            const base=`${leaveDays} jour${leaveDays>1?'s':''} ${kind}`;
-            if(longWeekend)return `${base} · week-end prolongé : ${totalDays} jours de repos d'affilée`;
-            return base+(totalDays>leaveDays?` · ${totalDays} jours de repos d'affilée`:'')+(vacOnly&&leaveDays>=5?' · Profites-en bien !':'');
+            // Court : « 4 jours de repos (2 congés) » / « 8 jours de vacances »
+            if(longWeekend)return `${totalDays} jours de repos (${leaveDays} congé${leaveDays>1?'s':''})`;
+            if(vacOnly)return `${totalDays} jours de vacances`;
+            return `${totalDays} jours de congé`+(recupDays<leaveDays?` (dont ${recupDays} récup.)`:'');
           })()
         },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
       }
@@ -1929,7 +1929,14 @@ function renderUpcomingEvents(employee){
     return;
   }
 
-  const iconFor=type=>type==='vacation'?'🏖️':type==='piquet'?'📞':type==='rotation'?'🔄':type==='training'?'🎓':type==='medical'?'🩺':type==='travaux'?'⚒️':type==='comment'?'📝':'•';
+  const UI={vacation:`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>`,
+    piquet:`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>`,
+    rotation:`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4.5L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4.5L20 15M20 20v-5h-5"/></svg>`,
+    training:`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>`,
+    medical:`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/></svg>`,
+    travaux:`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5l3 3M4 20l6.5-6.5M13 4l7 7-2.5 2.5-7-7z"/></svg>`,
+    comment:`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6"/></svg>`};
+  const iconFor=type=>UI[type]||'•';
 
   list.innerHTML=events.map((ev,index)=>`
     <div class="upcoming-item upcoming-${ev.type}">
@@ -5342,7 +5349,7 @@ function travauxLineHTML(){
   const f=(d,y)=>d.toLocaleDateString('fr-CH',y?{day:'numeric',month:'short',year:'numeric'}:{day:'numeric',month:'short'});
   const showYear=a.getFullYear()!==yr||b.getFullYear()!==yr;
   const label=`Travaux · ${f(a,showYear&&a.getFullYear()!==b.getFullYear())} → ${f(b,showYear)}`;
-  return `<button type="button" class="rotation-travaux" onclick="addTravauxToCalendar()" title="Ajouter la période de travaux au calendrier" aria-label="${label} — ajouter au calendrier"><span class="rt-ico" aria-hidden="true">⚒️</span><span>${label}</span><span class="rt-cal" aria-hidden="true">${CAL_ICON}</span></button>`;
+  return `<button type="button" class="rotation-travaux" onclick="addTravauxToCalendar()" title="Ajouter la période de travaux au calendrier" aria-label="${label} — ajouter au calendrier"><span class="rt-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5l3 3M4 20l6.5-6.5M13 4l7 7-2.5 2.5-7-7z"/></svg></span><span>${label}</span><span class="rt-cal" aria-hidden="true">${CAL_ICON}</span></button>`;
 }
 
 document.addEventListener('click',e=>{
