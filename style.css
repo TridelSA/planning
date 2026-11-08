@@ -2418,3 +2418,16 @@ button:not(:disabled):active{transition-duration:.08s}
 .install-btn.ics-go small{opacity:.85}
 .install-btn.ics-go:active{transform:scale(.97)}
 .ics-travaux{box-shadow:inset 3px 0 0 var(--signal,#C77700),0 0 0 1px var(--line)}
+
+/* Icônes calendrier dessinées (remplacent l'emoji 📅) */
+.upcoming-calendar-btn span,.rotation-travaux .rt-cal{display:inline-flex!important;align-items:center;justify-content:center;width:auto!important;height:auto!important;font-size:0!important;color:var(--accent-ink)}
+.upcoming-calendar-btn svg{width:15px;height:15px;display:block}
+.rotation-travaux .rt-cal svg{width:14px;height:14px;display:block}
+.upcoming-calendar-btn.calendar-opening span{color:var(--ok-ink)}
+/* 30 prochains jours : détail lisible (contraste AA) sur fond rose / violet */
+#upcomingEvents .upcoming-copy small{font-size:11px!important;color:var(--ink-soft)!important}
+#upcomingEvents .upcoming-copy small .upcoming-when{color:var(--accent-ink)}
+/* Liens dans les états vides : zone à toucher d'au moins 32 px */
+.pv-empty-state .pv-link{min-height:32px;padding:6px 8px;display:inline-flex;align-items:center}
+/* lien au milieu d'une phrase : grande zone à toucher sans décaler le texte */
+.pv-empty-state .pv-link[data-open-filters]{display:inline-block;min-height:0;padding:9px 2px;margin:-9px 0;font-size:inherit;line-height:inherit;text-decoration:underline;text-underline-offset:2px}

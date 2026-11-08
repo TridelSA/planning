@@ -17,10 +17,10 @@
 <script>
 (function(){try{var m=localStorage.getItem('themeMode')||'auto';var d=m==='dark'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 </script>
-<meta name="app-version" content="17.8">
+<meta name="app-version" content="17.9">
 <link rel="preload" href="fonts/inter-var.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="fonts/spacegrotesk-var.woff" as="font" type="font/woff" crossorigin>
-<link rel="stylesheet" href="style.css?v=202611071017">
+<link rel="stylesheet" href="style.css?v=202611080754">
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Aller au contenu</a>
@@ -57,9 +57,9 @@
     </div>
   </header>
 
-  <section id="rotationCard" class="rotation-strip hidden"></section>
+  <section id="rotationCard" class="rotation-strip hidden" aria-label="Équipes en poste"></section>
 
-  <section class="card controls">
+  <section class="card controls" aria-label="Choix de la personne">
     <div class="controls-grid">
       <div class="field">
         <label>Employé</label>
@@ -84,14 +84,14 @@
           </div>
         </div>
       </div>
-      <div class="controls-btns"><button id="todayBtn" class="today-btn" type="button">Aujourd’hui</button><button id="icsBtn" class="today-btn ics-btn" type="button" aria-label="Exporter mon planning (calendrier .ics)" title="Exporter mon planning (.ics)" data-open-ics><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></button></div>
+      <div class="controls-btns"><button id="todayBtn" class="today-btn" type="button">Aujourd’hui</button><button id="icsBtn" class="today-btn ics-btn" type="button" aria-label="Ajouter à mon calendrier" title="Ajouter à mon calendrier" data-open-ics><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></button></div>
     </div>
   </section>
 
 
   <section id="leaveCard" class="card leave-card hidden" aria-label="Soldes de vacances"></section>
 
-  <section id="upcomingEventsCard" class="card upcoming-card hidden">
+  <section id="upcomingEventsCard" class="card upcoming-card hidden" aria-label="30 prochains jours">
     <span class="upcoming-kicker">Prochains événements</span>
 
     <div id="travauxSection" class="travaux-section hidden">
@@ -107,7 +107,7 @@
           onclick="addTravauxToCalendar()"
           aria-label="Ajouter au calendrier"
           title="Ajouter au calendrier"
-        ><span aria-hidden="true">📅</span></button>
+        ><span aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17M12 13.2v4.6M9.7 15.5h4.6"/></svg></span></button>
       </div>
     </div>
 
@@ -164,7 +164,7 @@
     </div>
   </main>
 
-  <section id="teamViewSection" class="card main-card hidden">
+  <section id="teamViewSection" class="card main-card hidden" role="main" aria-label="Rotations">
     <div class="team-view-head">
       <div class="team-view-title">
         <h2>Rotations</h2>
@@ -194,7 +194,7 @@
     <div id="teamViewContainer"></div>
   </section>
 
-  <section id="compareViewSection" class="card main-card pv-card hidden">
+  <section id="compareViewSection" class="card main-card pv-card hidden" role="main" aria-label="Collègues">
     <div class="pv-head">
       <div class="team-view-title">
         <h2>Comparer</h2>
@@ -252,7 +252,7 @@
     <div id="cmpBackdrop" class="pv-backdrop hidden"></div>
   </section>
 
-  <section id="statsViewSection" class="card main-card pv-card hidden">
+  <section id="statsViewSection" class="card main-card pv-card hidden" role="main" aria-label="Statistiques">
     <div class="pv-head">
       <div class="team-view-title">
         <h2>Statistiques</h2>
@@ -317,7 +317,7 @@
   </div>
 </div>
 
-<script src="app.js?v=202611071017"></script>
+<script src="app.js?v=202611080754"></script>
 
 
 

@@ -1,4 +1,7 @@
 const DATA_FILE_PREFIX='planning-';
+// Icônes calendrier dessinées (l'emoji 📅 affiche « JUL 17 » sur iPhone).
+const CAL_ICON='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17M12 13.2v4.6M9.7 15.5h4.6"/></svg>';
+const CHECK_ICON='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
 const DATA_FILE_SUFFIX='.json';
 const DAY_NAMES=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MONTH_NAMES=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
@@ -547,13 +550,20 @@ async function loadPlanning(preserve=true){
 
     // Une année sans fichier publié (ex. la suivante, pas encore commencée)
     // est simplement ignorée -- pas une erreur, juste rien à ajouter d'elle.
+    // Une archive absente (souvent l'année précédente) n'est redemandée qu'une fois par jour :
+    // évite une requête en erreur (404) à chaque ouverture.
+    const curYear=new Date().getFullYear();
+    let missing={};try{missing=JSON.parse(localStorage.getItem('planningMissingYears')||'{}')||{};}catch(e){}
     const fetched=await Promise.all(years.map(async year=>{
+      if(year!==curYear&&missing[year]&&Date.now()-missing[year]<86400000)return null;
       try{
         const response=await fetch(`${DATA_FILE_PREFIX}${year}${DATA_FILE_SUFFIX}?v=${Date.now()}`,{
           cache:'no-store',
           headers:{'Accept':'application/json'}
         });
+        if(response.status===404&&year!==curYear){ missing[year]=Date.now(); try{localStorage.setItem('planningMissingYears',JSON.stringify(missing));}catch(e){} }
         if(!response.ok)return null;
+        if(missing[year]){ delete missing[year]; try{localStorage.setItem('planningMissingYears',JSON.stringify(missing));}catch(e){} }
         const raw=await response.json();
         return {year,raw,data:normalizeData(raw)};
       }catch(e){
@@ -1794,13 +1804,12 @@ function calendarButtonFeedback(index){
   if(!button)return;
 
   const span=button.querySelector('span');
-  const previous=span?.textContent||'📅';
   button.classList.add('calendar-opening');
-  if(span)span.textContent='✓';
+  if(span)span.innerHTML=CHECK_ICON;
 
   window.setTimeout(()=>{
     button.classList.remove('calendar-opening');
-    if(span)span.textContent=previous;
+    if(span)span.innerHTML=CAL_ICON;
   },1300);
 }
 
@@ -1841,12 +1850,11 @@ function addTravauxToCalendar(){
   const button=$('travauxCalendarBtn');
   if(button){
     const span=button.querySelector('span');
-    const previous=span?.textContent||'📅';
     button.classList.add('calendar-opening');
-    if(span)span.textContent='✓';
+    if(span)span.innerHTML=CHECK_ICON;
     window.setTimeout(()=>{
       button.classList.remove('calendar-opening');
-      if(span)span.textContent=previous;
+      if(span)span.innerHTML=CAL_ICON;
     },1300);
   }
 
@@ -1891,7 +1899,7 @@ function renderUpcomingEvents(employee){
         onclick="addUpcomingEventToCalendar(${index})"
         aria-label="Ajouter au calendrier"
         title="Ajouter au calendrier"
-      ><span aria-hidden="true">📅</span></button>
+      ><span aria-hidden="true">${CAL_ICON}</span></button>
     </div>
   `).join('');
 }
@@ -4806,9 +4814,10 @@ function tabBarSync(){
   const mk=(items,active)=>`<div class="seg" role="tablist">${items.map(([id,l])=>`<button type="button" role="tab" aria-selected="${id===active}" class="seg-btn ${id===active?'is-on':''}" data-go="${id}">${l}</button>`).join('')}</div>`;
   const PLAN=[['individual','Individuel'],['compare','Collègues'],['team','Rotations']];
   const put=(sel,html)=>{ const el=document.querySelector(sel); if(el)el.innerHTML=html; };
-  put('#teamViewSection .team-view-title',mk(PLAN,'team'));
-  put('#compareViewSection .team-view-title',mk(PLAN,'compare'));
-  put('#statsViewSection .team-view-title','');{const t=document.querySelector('#statsViewSection .team-view-title');if(t)t.style.display='none';}
+  // Titres gardés pour les lecteurs d'écran (invisibles : les onglets indiquent déjà la page).
+  put('#teamViewSection .team-view-title','<h2 class="sr-only">Rotations</h2>'+mk(PLAN,'team'));
+  put('#compareViewSection .team-view-title','<h2 class="sr-only">Collègues</h2>'+mk(PLAN,'compare'));
+  put('#statsViewSection .team-view-title','<h2 class="sr-only">Statistiques</h2>');
   const ctl=document.querySelector('section.controls');
   if(ctl){ const w=document.createElement('div'); w.className='seg-wrap'; w.innerHTML=mk(PLAN,'individual'); ctl.insertBefore(w,ctl.firstChild); }
   document.addEventListener('click',e=>{
@@ -5284,7 +5293,7 @@ function travauxLineHTML(){
   const f=(d,y)=>d.toLocaleDateString('fr-CH',y?{day:'numeric',month:'short',year:'numeric'}:{day:'numeric',month:'short'});
   const showYear=a.getFullYear()!==yr||b.getFullYear()!==yr;
   const label=`Travaux · ${f(a,showYear&&a.getFullYear()!==b.getFullYear())} → ${f(b,showYear)}`;
-  return `<button type="button" class="rotation-travaux" onclick="addTravauxToCalendar()" title="Ajouter la période de travaux au calendrier" aria-label="${label} — ajouter au calendrier"><span class="rt-ico" aria-hidden="true">⚒️</span><span>${label}</span><span class="rt-cal" aria-hidden="true">📅</span></button>`;
+  return `<button type="button" class="rotation-travaux" onclick="addTravauxToCalendar()" title="Ajouter la période de travaux au calendrier" aria-label="${label} — ajouter au calendrier"><span class="rt-ico" aria-hidden="true">⚒️</span><span>${label}</span><span class="rt-cal" aria-hidden="true">${CAL_ICON}</span></button>`;
 }
 
 document.addEventListener('click',e=>{
