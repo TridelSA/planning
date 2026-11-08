@@ -112,8 +112,9 @@ function travauxApercu(){
 }
 
 function travauxPeriod(){
+  // Période publiée par Excel, si elle n'est pas déjà terminée ; sinon la prochaine connue.
   const t=planning.travaux;
-  if(t && t.start && t.end)return t;
+  if(t && t.start && t.end && t.end>=todayISO())return t;
   return travauxApercu();
 }
 
@@ -418,7 +419,7 @@ function combinePlannings(perYearData){
     dateCount:perYearData.reduce((sum,p)=>sum+p.data.dateCount,0),
     // La période de travaux est une donnée globale (pas propre à une année) :
     // on prend la première publication qui en contient une.
-    travaux:perYearData.map(p=>p.data.travaux).find(Boolean)||null,
+    travaux:(()=>{ const t=todayISO(),all=perYearData.map(p=>p.data.travaux).filter(Boolean); return all.filter(x=>x.end>=t).sort((a,b)=>a.start<b.start?-1:1)[0]||all[0]||null; })(),
     employees
   };
 }
