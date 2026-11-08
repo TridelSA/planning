@@ -1328,22 +1328,35 @@ function buildUpcomingEvents(employee,opts={}){
     return realStart;
   };
 
-  // Jours qui peuvent relier deux blocs de congé : cellule vide, repos (R) ou reprise férié (RF).
-  const isLeaveBridgeCode=code=>{
-    const c=safeCode(code);
-    return c==='' || c==='R' || c==='RF';
-  };
 
   // CONGÉS (vacances + récupérations)
-  // Fusionne les périodes quand les jours intermédiaires sont uniquement des repos / cellules vides.
+  // Un week-end (ou un férié) VIDE qui suit directement un congé en fait partie ;
+  // si le congé reprend juste après, tout forme un seul bloc. Les jours de semaine
+  // vides et les jours de réserve (R) ne prolongent pas un congé.
+  const codeAt=d=>safeCode(employee.schedule[isoDate(d)]);
+  const isLeaveRestDay=d=>{ const c=codeAt(d),dow=d.getDay(); return (dow===0||dow===6||!!swissHolidayName(isoDate(d))) && (c===''||c==='RF'); };
+  const leaveRealStart=from=>{
+    let s=new Date(from),p=new Date(from);p.setDate(p.getDate()-1);
+    while(p>=backProbeLimit){
+      if(isVacationCode(codeAt(p))){ s=new Date(p); p.setDate(p.getDate()-1); continue; }
+      if(isLeaveRestDay(p)){
+        const q=new Date(p); while(q>=backProbeLimit&&isLeaveRestDay(q))q.setDate(q.getDate()-1);
+        if(q>=backProbeLimit&&isVacationCode(codeAt(q))){ s=new Date(q); p=new Date(q); p.setDate(p.getDate()-1); continue; }
+      }
+      break;
+    }
+    return s;
+  };
+  // Aujourd'hui tombe dans le week-end qui prolonge un congé déjà fini ?
+  const trailingLeaveToday=(()=>{ if(!isLeaveRestDay(start))return false; const q=new Date(start); while(isLeaveRestDay(q))q.setDate(q.getDate()-1); return isVacationCode(codeAt(q)); })();
   let cursor=new Date(start);
 
   while(cursor<=end){
     const code=safeCode(employee.schedule[isoDate(cursor)]);
 
-    if(isVacationCode(code)){
+    if(isVacationCode(code) || (trailingLeaveToday&&cursor.getTime()===start.getTime())){
       const vacStart = cursor.getTime()===start.getTime()
-        ? findRealStart(cursor,isVacationCode,isLeaveBridgeCode)
+        ? leaveRealStart(cursor)
         : new Date(cursor);
       let vacEnd=new Date(cursor);
 
@@ -1360,26 +1373,14 @@ function buildUpcomingEvents(employee,opts={}){
           continue;
         }
 
-        // Trouver le prochain jour non-repos
-        if(isLeaveBridgeCode(probeCode)){
-          let bridgeEnd=new Date(probe);
-          let gapDays=0;
-          let exceededLimit=false;
-
-          while(bridgeEnd<=probeLimit && isLeaveBridgeCode(employee.schedule[isoDate(bridgeEnd)])){
-            bridgeEnd.setDate(bridgeEnd.getDate()+1);
-            gapDays++;
-            if(gapDays>MAX_BRIDGE_DAYS){ exceededLimit=true; break; }
-          }
-
-          // Si après quelques jours de repos seulement les vacances reprennent,
-          // on considère que c'est une seule période.
-          if(!exceededLimit && bridgeEnd<=probeLimit && isVacationCode(safeCode(employee.schedule[isoDate(bridgeEnd)]))){
-            vacEnd=new Date(bridgeEnd);
-            probe=new Date(bridgeEnd);
+        // Week-end / férié vide juste après : il fait partie du congé
+        // (et si le congé reprend ensuite, la boucle continue le même bloc).
+        if(isLeaveRestDay(probe)){
+          while(probe<=probeLimit && isLeaveRestDay(probe)){
+            vacEnd=new Date(probe);
             probe.setDate(probe.getDate()+1);
-            continue;
           }
+          continue;
         }
 
         break;
@@ -1404,8 +1405,9 @@ function buildUpcomingEvents(employee,opts={}){
 
       // Un ou plusieurs jours posés collés à un week-end (vendredi ou lundi) :
       // annoncés aussi, car ils rallongent le week-end.
-      const dowStart=vacStart.getDay(),dowEnd=vacEnd.getDay();
-      let touchesWeekend=dowEnd===5||dowStart===1;
+      // Seul le week-end qui SUIT un congé compte (il est alors dans le bloc) ;
+      // celui qui précède un congé commençant le lundi ne compte pas.
+      let touchesWeekend=false;
       for(let d=new Date(vacStart);d<=vacEnd&&!touchesWeekend;d.setDate(d.getDate()+1)){ if(d.getDay()===6||d.getDay()===0)touchesWeekend=true; }
       const hasWeekdayLeave=(()=>{for(let d=new Date(vacStart);d<=vacEnd;d.setDate(d.getDate()+1)){const c=safeCode(employee.schedule[isoDate(d)]);if(isVacationCode(c)&&d.getDay()!==0&&d.getDay()!==6)return true;}return false;})();
       const longWeekend=leaveDays<5&&touchesWeekend&&hasWeekdayLeave;
@@ -1418,12 +1420,12 @@ function buildUpcomingEvents(employee,opts={}){
           title:vacOnly?`Vacances ${range}`:`Congé ${range}`,
           calendarTitle:vacOnly?`🏖️ Vacances ${range}`:`🌴 Congé ${range}`,
           detail:longWeekend
-            ? `${leaveDays} jour${leaveDays>1?'s':''} ${vacOnly?'de congé':'de congé / récupération'} · week-end prolongé : ${totalDays+(dowEnd===5?2:0)+(dowStart===1?2:0)} jours de repos d'affilée`
+            ? `${leaveDays} jour${leaveDays>1?'s':''} ${vacOnly?'de congé':'de congé / récupération'} · week-end prolongé : ${totalDays} jours de repos d'affilée`
             : totalDays===1
             ? (vacOnly?'1 jour de vacances':'1 jour de congé / récupération')
             : vacOnly
-            ? `${totalDays} jours de vacances, week-ends compris · Profites-en bien !`
-            : `${totalDays} jours de congé, week-ends compris${(recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
+            ? `${totalDays} jours de vacances${touchesWeekend?', week-ends compris':''} · Profites-en bien !`
+            : `${totalDays} jours de congé${touchesWeekend?', week-ends compris':''}${(recupDays<leaveDays)?` (dont ${recupDays} récupération${recupDays>1?'s':''})`:''}`
         },`vacation-${isoDate(vacStart)}-${isoDate(vacEnd)}`);
       }
 
@@ -3682,9 +3684,9 @@ function stLeavePeriods(emp,monthSel){
   const year=String(stYear());
   const days=Object.keys(emp.schedule||{}).filter(iso=>iso.startsWith(year+'-') && ST_VAC.includes(safeCode(emp.schedule[iso]))).sort();
   const inSel=iso=>monthSel==='all'||Number(iso.slice(5,7))-1===monthSel;
-  // Jours qui relient deux congés (comme dans « Événements à 30 jours ») :
-  // week-end, férié, repos (R / RF) ou jour sans service.
-  const off=iso=>{ const d=parseISODateOnly(iso); if(!d)return false; const c=safeCode(emp.schedule[iso]); return d.getDay()===0||d.getDay()===6||!!swissHolidayName(iso)||c===''||c==='R'||c==='RF'; };
+  // Jours qui prolongent / relient des congés (même règle que « 30 prochains jours ») :
+  // week-end ou férié, vide (ou RF). Un jour de semaine vide ou une réserve (R) coupe la période.
+  const off=iso=>{ const d=parseISODateOnly(iso); if(!d)return false; const c=safeCode(emp.schedule[iso]); return (d.getDay()===0||d.getDay()===6||!!swissHolidayName(iso))&&(c===''||c==='RF'); };
   const out=[];
   let cur=null;
   for(const iso of days){
@@ -3698,6 +3700,8 @@ function stLeavePeriods(emp,monthSel){
     cur={start:iso,end:iso,list:[iso]};
   }
   if(cur)out.push(cur);
+  // Le week-end vide qui suit la période en fait partie (date de fin affichée).
+  for(const x of out){ const d=parseISODateOnly(x.end); d.setDate(d.getDate()+1); while(off(isoDate(d))){ x.end=isoDate(d); d.setDate(d.getDate()+1); } }
   return out.map(x=>({start:x.start,end:x.end,n:x.list.length,list:x.list})).filter(x=>x.list.some(inSel)).map(x=>({...x,n:x.list.filter(inSel).length}));
 }
 const ST_MON=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
