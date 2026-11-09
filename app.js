@@ -3244,7 +3244,9 @@ function renderCompareView(){
   document.body.classList.toggle('cmp-week',cmp.scale==='week');
   document.body.classList.toggle('cmp-year',isYear);
   document.body.classList.toggle('cmp-month',cmp.scale==='month');
-  $('cmpTitle').textContent=view.title;
+  // « Sem. 46 · 9–15 nov. 2026 » : dates en avant, numéro de semaine en petit (comme dans Individuel)
+  { const m=/^(Sem\. \d+) · (.*)$/.exec(view.title||'');
+    $('cmpTitle').innerHTML=m?`<span>${escapeHTML(m[2])}</span> <small class="cmp-title-week">${escapeHTML(m[1])}</small>`:escapeHTML(view.title||''); }
   $('cmpPrintYear').textContent=String(cmp.date.getFullYear());
   document.querySelectorAll('[data-cmp-scale]').forEach(b=>b.classList.toggle('active',b.dataset.cmpScale===cmp.scale));
   $('cmpCount').textContent=String(cmp.people.size);
@@ -4423,8 +4425,16 @@ function populateWeekJump(){
     `<option value="${isoDate(mon)}">${formatWeekOptionLabel(mon)}</option>`
   ).join('');
   select.value=isoDate(mondayOf(state.date));
+  // Titre affiché par-dessus le menu (qui reste le vrai sélecteur) : dates en
+  // avant, numéro de semaine discret.
+  const mon=mondayOf(state.date);
+  setPeriodJumpLabel(formatWeekOptionLabel(mon).replace(/^Semaine \d+ · /,''),`Sem. ${isoWeek(mon)}`);
   $('periodTitle').classList.add('hidden');
   $('periodJumpWrap').classList.remove('hidden');
+}
+function setPeriodJumpLabel(main,sub){
+  const el=$('periodJumpLabel');
+  if(el)el.innerHTML=`<b>${escapeHTML(main)}</b>${sub?`<small>${escapeHTML(sub)}</small>`:''}`;
 }
 
 function populateMonthJump(){
@@ -4435,6 +4445,7 @@ function populateMonthJump(){
     `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01">${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}</option>`
   ).join('');
   select.value=`${state.date.getFullYear()}-${String(state.date.getMonth()+1).padStart(2,'0')}-01`;
+  setPeriodJumpLabel(`${MONTH_NAMES[state.date.getMonth()]} ${state.date.getFullYear()}`,'');
   $('periodTitle').classList.add('hidden');
   $('periodJumpWrap').classList.remove('hidden');
 }
