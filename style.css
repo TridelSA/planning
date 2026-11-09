@@ -2313,7 +2313,9 @@ button:not(:disabled):active{transition-duration:.08s}
     box-shadow:0 1px 2px rgba(16,31,54,.05)!important}
 
   /* --- Bandeau supérieur ------------------------------------------- */
-  .hero{min-height:76px!important;padding:12px 14px!important}
+  /* Hauteur du bandeau calée sur les proportions du dessin de l'usine (497/2079) :
+     le bâtiment entier occupe toute la largeur, sans zoom ni rognage. */
+  .hero{min-height:max(76px,calc((100vw - 20px) * .239))!important;padding:12px 14px!important}
   /* Dégradé plus doux : lisibilité du titre sans écraser l'image */
   .hero-art::after{background:
      linear-gradient(180deg,rgba(6,22,13,.82) 0%,rgba(6,22,13,.45) 46%,rgba(6,22,13,.08) 100%),
