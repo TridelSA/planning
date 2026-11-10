@@ -1639,7 +1639,9 @@ function buildUpcomingEvents(employee,opts={}){
       }
 
       const cleanedRaw=stripEmployeeNamePrefix(raw,employee);
-      const trainingTitle=`${inferGenericEventTitle(cleanedRaw,'Formation')} — ${formatLongDate(eventDate)}`;
+      // Titre court et fixe (jamais coupé au milieu d'une phrase) ; le commentaire
+      // complet d'Excel est affiché en entier juste dessous.
+      const trainingTitle=`Formation — ${formatLongDate(eventDate)}`;
 
       pushUnique({
         type:'training',
@@ -1649,8 +1651,8 @@ function buildUpcomingEvents(employee,opts={}){
         title:trainingTitle,
         detail:[
           times ? trainingDate.toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}) : '',
-          location
-        ].filter(Boolean).join(' · ') || cleanedRaw,
+          cleanedRaw
+        ].filter(Boolean).join(' · '),
         location,
         originalDetail:cleanedRaw
       },`formation-${dateISO}`);

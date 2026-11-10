@@ -2480,3 +2480,8 @@ button:not(:disabled):active{transition-duration:.08s}
 .ics-add svg{width:14px;height:14px}
 .ics-add.is-done{background:var(--ok-bg);color:var(--ok-ink)}
 .ics-add:active{transform:scale(.97)}
+
+/* 30 prochains jours : titres et détails jamais coupés (ils passent à la ligne) */
+#upcomingEvents .upcoming-copy strong,#upcomingEvents .upcoming-copy small{
+  display:block!important;-webkit-line-clamp:unset!important;line-clamp:none!important;overflow:visible!important;
+  white-space:normal!important;text-overflow:clip!important;overflow-wrap:anywhere}
