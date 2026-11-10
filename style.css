@@ -2474,3 +2474,9 @@ button:not(:disabled):active{transition-duration:.08s}
   .week-row.is-current-day::before{top:8px!important;bottom:8px!important;width:3px!important;border-radius:3px}
   .week-row.is-off .week-shift .shift-mainline b{opacity:.55}
 }
+
+/* Export calendrier sur Android : ajout direct de chaque période dans l'appli Calendrier */
+.ics-add{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border:0;border-radius:10px;background:var(--accent-tint);color:var(--accent-ink);font:700 12px/1 var(--font-body);white-space:nowrap;cursor:pointer}
+.ics-add svg{width:14px;height:14px}
+.ics-add.is-done{background:var(--ok-bg);color:var(--ok-ink)}
+.ics-add:active{transform:scale(.97)}

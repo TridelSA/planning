@@ -1804,19 +1804,37 @@ function downloadCalendarICS(ev){
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
-// Android : Google Agenda n'importe pas les fichiers .ics, on ouvre donc
-// directement la fiche « nouvel événement » de Google Agenda (appli ou web).
+// Android : on demande au téléphone d'ouvrir SON application Calendrier
+// (Google Agenda, Samsung Calendrier, …) sur un nouvel événement déjà rempli,
+// comme l'ouverture d'un .ics sur iPhone. Pas de page web, pas de compte à saisir.
+// La page web de Google Agenda ne sert plus que de secours si aucune appli ne répond.
 const isAndroid=()=>/android/i.test(navigator.userAgent);
-function openGoogleCalendar(ev){
+function androidCalendarIntent(ev){
+  const d=calendarEventData(ev);
+  // Journée entière : dates à minuit UTC, fin exclusive (convention du calendrier Android).
+  const utc=x=>Date.UTC(x.getFullYear(),x.getMonth(),x.getDate());
+  const begin=d.allDay?utc(d.start):d.start.getTime();
+  const end=d.allDay?utc(d.end):d.end.getTime();
+  const enc=v=>encodeURIComponent(String(v||'')).replace(/;/g,'%3B');
+  const parts=['action=android.intent.action.INSERT','type=vnd.android.cursor.dir/event',
+    'S.title='+enc(d.title),'S.description='+enc(d.description),
+    'l.beginTime='+begin,'l.endTime='+end,'B.allDay='+(d.allDay?'true':'false')];
+  if(d.location)parts.push('S.eventLocation='+enc(d.location));
+  parts.push('S.browser_fallback_url='+encodeURIComponent(googleCalendarUrl(ev)));
+  return 'intent:#Intent;'+parts.join(';')+';end';
+}
+function openAndroidCalendar(ev){
+  window.location.href=androidCalendarIntent(ev);
+}
+function googleCalendarUrl(ev){
   const data=calendarEventData(ev);
   const dates=data.allDay
     ? `${calendarDateOnly(data.start)}/${calendarDateOnly(data.end)}`
     : `${calendarLocalDateTime(data.start)}/${calendarLocalDateTime(data.end)}`;
   const params=new URLSearchParams({action:'TEMPLATE',text:data.title,dates,details:data.description,ctz:'Europe/Zurich'});
   if(data.location)params.set('location',data.location);
-  window.open(`https://calendar.google.com/calendar/render?${params.toString()}`,'_blank','noopener');
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
-
 function openOutlookCalendar(ev){
   const data=calendarEventData(ev);
 
@@ -1865,7 +1883,7 @@ function addUpcomingEventToCalendar(index){
   calendarButtonFeedback(index);
 
   if(isAndroid()){
-    openGoogleCalendar(ev);
+    openAndroidCalendar(ev);
   }else if(isMobileCalendarDevice()){
     downloadCalendarICS(ev);
   }else{
@@ -1904,7 +1922,7 @@ function addTravauxToCalendar(){
   }
 
   if(isAndroid()){
-    openGoogleCalendar(ev);
+    openAndroidCalendar(ev);
   }else if(isMobileCalendarDevice()){
     downloadCalendarICS(ev);
   }else{
@@ -2416,6 +2434,26 @@ function applyTheme(){
   document.documentElement.setAttribute('data-theme',dark?'dark':'light');
 }
 // Installation sur l'écran d'accueil (Android : fenêtre native ; iPhone : mode d'emploi).
+// Mode d'emploi iPhone / iPad selon le navigateur et la version d'iOS :
+// - Safari 26 et plus (iOS 26) : le bouton Partager est rangé dans le menu « ··· » ;
+// - Safari plus ancien : bouton Partager directement dans la barre ;
+// - Chrome, Firefox, Edge… : leur propre bouton Partager (possible depuis iOS 16.4) ;
+//   avant iOS 16.4, seul Safari sait ajouter une page à l'écran d'accueil.
+const SHARE_ICON='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/></svg>';
+function iosInstallHint(){
+  const ua=navigator.userAgent;
+  const iosM=/OS (\d+)_(\d+)/.exec(ua), ios=iosM?(+iosM[1])+(+iosM[2])/100:0;
+  const autre=/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser|DuckDuckGo/i.exec(ua);
+  const ipad=/iPad/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const fin=' puis sur <b>« Sur l’écran d’accueil »</b> (fais défiler la liste si besoin) et confirme avec <b>Ajouter</b>.';
+  if(autre){
+    if(ios&&ios<16.04)return 'Sur cet iPhone, seul <b>Safari</b> peut ajouter le planning à l’écran d’accueil : ouvre cette page dans Safari, puis suis le mode d’emploi.';
+    return 'Appuie sur le bouton <b>Partager</b> '+SHARE_ICON+' (dans la barre d’adresse ou le menu du navigateur), puis sur <b>« Ajouter à l’écran d’accueil »</b> et confirme avec <b>Ajouter</b>.';
+  }
+  const safari=+((/Version\/(\d+)/.exec(ua)||[])[1]||0);
+  if(safari>=26)return 'Dans Safari, appuie sur <b>···</b> (en bas à droite'+(ipad?', ou en haut':'')+'), puis sur <b>Partager</b> '+SHARE_ICON+','+fin;
+  return 'Dans Safari, appuie sur le bouton <b>Partager</b> '+SHARE_ICON+' '+(ipad?'(en haut de l’écran)':'(en bas de l’écran, au milieu)')+','+fin;
+}
 let deferredInstall=null;
 const isStandalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
 const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -2493,7 +2531,7 @@ $('navMenuPanel').addEventListener('click',async event=>{
     }else{
       const h=$('installHint');
       if(h&&/android/i.test(navigator.userAgent)){ h.innerHTML="Ouvre le menu du navigateur (<b>⋮</b> en haut à droite), puis appuie sur <b>« Installer l'application »</b> ou <b>« Ajouter à l'écran d'accueil »</b>."; h.classList.toggle('hidden'); }
-      else if(h){ h.innerHTML="Dans Safari, appuie sur <b>le menu</b> (les trois traits ou points en bas de l'écran), puis sur <b>Partager</b>, puis sur <b>« Sur l'écran d'accueil »</b>."; h.classList.toggle('hidden'); }
+      else if(h){ h.innerHTML=iosInstallHint(); h.classList.toggle('hidden'); }
     }
     return;
   }
@@ -5118,6 +5156,7 @@ function openIcsModal(){
   const B=document.getElementById('icsModalB');
   if(!emp){ B.innerHTML='<p class="journal-empty">Choisis d’abord une personne dans le planning individuel.</p>'; document.getElementById('icsModalS').textContent=''; m.classList.add('open'); return; }
   const list=icsEventList(emp),services=icsServiceDays(emp);
+  const android=isAndroid();
   const cnt=k=>list.filter(x=>x.kind===k).length;
   const lastDay=Object.keys(emp.schedule).sort().pop();
   document.getElementById('icsModalS').textContent=`${cleanEmployeeName(emp.name)} · planning publié jusqu’au ${lastDay?parseYMD(lastDay).toLocaleDateString('fr-CH',{day:'numeric',month:'long',year:'numeric'}):'—'}`;
@@ -5133,18 +5172,21 @@ function openIcsModal(){
   </div>
   <ul class="ics-preview" aria-label="Aperçu"></ul>
   <button type="button" class="install-btn ics-go"><span>Ajouter au calendrier<small id="icsCount"></small></span></button>
-  <p class="leave-src">${isAndroid()?'Sur Android, ouvre le fichier avec ton agenda (ou importe-le dans Google Agenda sur ordinateur).':'Touche « Tout ajouter » dans ton calendrier. Sur iPhone, l’aperçu montre seulement le premier jour de chaque période, mais elle est ajoutée en entier.'} À refaire après une mise à jour du planning.</p>`;
+  <p class="leave-src">${isAndroid()?'Touche « Ajouter » à côté d’une période : elle s’ouvre déjà remplie dans l’application Calendrier du téléphone. Le bouton vert enregistre un fichier pour tout ajouter d’un coup (Samsung Calendrier, Outlook ou ordinateur).':'Touche « Tout ajouter » dans ton calendrier. Sur iPhone, l’aperçu montre seulement le premier jour de chaque période, mais elle est ajoutée en entier.'} À refaire après une mise à jour du planning.</p>`;
   const get=()=>{ const o={}; B.querySelectorAll('[data-ics]').forEach(i=>o[i.dataset.ics]=i.checked); return o; };
   const upd=()=>{
     const o=get(),shown=list.filter(x=>o[x.kind]);
     const total=buildPersonalICS(emp,o).count;
     B.querySelector('#icsCount').textContent=total?`${total} événement${total>1?'s':''}`:'Rien de sélectionné';
     B.querySelector('.ics-go').disabled=!total;
-    B.querySelector('.ics-preview').innerHTML=shown.map(it=>`<li class="ics-item ics-${it.ev.type}"><span class="ics-ico" aria-hidden="true">${it.icon}</span><span class="ics-txt"><strong>${escapeHTML(it.short)}</strong><small>${escapeHTML(icsRangeText(it))}</small></span>${it.days>1?`<em>${it.days} j</em>`:''}</li>`).join('')
+    B.querySelector('.ics-preview').innerHTML=shown.map((it,i)=>`<li class="ics-item ics-${it.ev.type}"><span class="ics-ico" aria-hidden="true">${it.icon}</span><span class="ics-txt"><strong>${escapeHTML(it.short)}</strong><small>${escapeHTML(icsRangeText(it))}${it.days>1?` · ${it.days} j`:''}</small></span>${android?`<button type="button" class="ics-add" data-ics-add="${list.indexOf(it)}" aria-label="Ajouter « ${escapeHTML(it.short)} » au calendrier">${CAL_ICON}<span>Ajouter</span></button>`:(it.days>1?`<em>${it.days} j</em>`:'')}</li>`).join('')
       +(o.services&&services.length?`<li class="ics-item"><span class="ics-ico" aria-hidden="true">🕐</span><span class="ics-txt"><strong>Services de rotation</strong><small>${services.length} jour${services.length>1?'s':''} avec horaires</small></span></li>`:'')
       ||'<li class="ics-empty">Aucun événement à venir.</li>';
   };
   B.onchange=upd;upd();
+  // Android : chaque période s'ajoute directement dans l'application Calendrier.
+  B.onclick=e=>{ const bt=e.target.closest('[data-ics-add]'); if(!bt)return; const it=list[+bt.dataset.icsAdd]; if(!it)return;
+    openAndroidCalendar(it.ev); bt.classList.add('is-done'); bt.querySelector('span').textContent='Ajouté'; };
   B.querySelector('.ics-go').onclick=()=>{
     const r=buildPersonalICS(emp,get());
     if(!r.count)return;
