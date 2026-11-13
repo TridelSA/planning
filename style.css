@@ -2485,3 +2485,21 @@ button:not(:disabled):active{transition-duration:.08s}
 #upcomingEvents .upcoming-copy strong,#upcomingEvents .upcoming-copy small{
   display:block!important;-webkit-line-clamp:unset!important;line-clamp:none!important;overflow:visible!important;
   white-space:normal!important;text-overflow:clip!important;overflow-wrap:anywhere}
+
+/* Bandeau sur tablette et ordinateur : loupe, mise à jour et menu dans un seul style
+   (verre fumé sur l'image), en thème clair comme en sombre. Avant : pastilles noires
+   à côté d'un menu blanc en thème clair. */
+@media (min-width:701px){
+  .hero .update-chip{background:rgba(8,24,15,.46)!important;border:1px solid rgba(255,255,255,.16)!important;box-shadow:none!important;
+    -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;padding:4px 9px!important;border-radius:9px!important}
+  .hero .update-chip,.hero .update-chip *{color:rgba(255,255,255,.82)!important}
+  .hero .hero-search,.hero-nav{background:rgba(8,24,15,.46)!important;border:1px solid rgba(255,255,255,.16)!important;
+    -webkit-backdrop-filter:blur(10px)!important;backdrop-filter:blur(10px)!important;box-shadow:none!important}
+  .hero .hero-search{color:#fff!important}
+  .hero-nav-btn{color:rgba(255,255,255,.82)!important;background:transparent!important}
+  .hero-nav-btn svg{color:inherit}
+  .hero-nav-btn.is-active,.hero-nav-btn[aria-expanded="true"]{background:rgba(255,255,255,.18)!important;color:#fff!important;box-shadow:none!important}
+  @media (hover:hover) and (pointer:fine){
+    .hero-nav-btn:not(.is-active):hover,.hero .hero-search:hover{background:rgba(255,255,255,.12)!important;color:#fff!important}
+  }
+}
