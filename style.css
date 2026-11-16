@@ -2503,3 +2503,43 @@ button:not(:disabled):active{transition-duration:.08s}
     .hero-nav-btn:not(.is-active):hover,.hero .hero-search:hover{background:rgba(255,255,255,.12)!important;color:#fff!important}
   }
 }
+
+/* =====================================================================
+   Météo de l'usine, incrustée dans l'image du bandeau : pas de cadre,
+   même blanc et même ombre que le titre, comme si elle faisait partie du dessin.
+   ===================================================================== */
+.hero-weather{position:relative;z-index:2;display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.9);
+  text-shadow:0 1px 10px rgba(0,0,0,.4);white-space:nowrap;pointer-events:auto;cursor:default}
+.hero-weather[hidden]{display:none!important}
+.hero-weather .hw-ico{display:inline-flex;filter:drop-shadow(0 1px 6px rgba(0,0,0,.4))}
+.hero-weather .hw-ico svg{width:22px;height:22px}
+.hero-weather .hw-t{font:700 22px/1 var(--font-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:#fff}
+.hero-weather .hw-txt{font:500 12.5px/1.2 var(--font-body);color:rgba(255,255,255,.82)}
+.hero-weather .hw-mm{font:500 11.5px/1 var(--font-body);color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
+
+/* Ordinateur et tablette : sous le titre, dans la partie sombre de l'image */
+@media (min-width:701px){
+  .hero-weather{margin-top:6px;gap:6px}
+  .hero-weather .hw-ico svg{width:18px;height:18px}
+  .hero-weather .hw-t{font-size:17px}
+  .hero-weather .hw-txt{font-size:12px}
+  .hero-weather .hw-mm{font-size:11px;padding-left:6px;margin-left:2px;border-left:1px solid rgba(255,255,255,.3)}
+}
+/* Téléphone : entre le titre et la loupe, compacte (icône + température) */
+@media (max-width:700px){
+  .hero .hero-inner{grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-areas:"titre meteo loupe" "maj meteo loupe"!important}
+  .hero .hero-copy{display:contents!important}
+  .hero h1{grid-area:titre;min-width:0}
+  .hero-weather{grid-area:meteo;gap:4px;margin-right:2px}
+  .hero-weather .hw-ico svg{width:20px;height:20px}
+  .hero-weather .hw-t{font-size:20px}
+  .hero-weather .hw-txt,.hero-weather .hw-mm{display:none}
+}
+@media (max-width:700px) and (min-width:400px){
+  /* Grands téléphones : on a la place pour min / max sous la température */
+  .hero-weather{display:grid;grid-template-columns:auto auto;grid-template-areas:"i t" "m m";column-gap:4px;row-gap:2px;justify-items:center}
+  .hero-weather[hidden]{display:none!important}
+  .hero-weather .hw-ico{grid-area:i}.hero-weather .hw-t{grid-area:t}
+  .hero-weather .hw-mm{display:block;grid-area:m;font-size:10px}
+}
+@media print{.hero-weather{display:none!important}}

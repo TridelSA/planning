@@ -5448,3 +5448,56 @@ document.addEventListener('click',e=>{
   sync();
   new MutationObserver(sync).observe(card,{attributes:true,attributeFilter:['class']});
 })();
+
+// ---------- Météo de l'usine (Lausanne) dans l'en-tête ----------
+// Service gratuit et sans clé (Open-Meteo), appelé par l'appareil de l'utilisateur.
+// Mise en cache 20 min ; en cas d'échec réseau, la météo est simplement masquée.
+(function(){
+  const LAT=46.526,LON=6.641,KEY='heroWeather2',FRAIS=20*60*1000;
+  const el=document.getElementById('heroWeather');
+  if(!el)return;
+  const svg=p=>`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const SOLEIL='<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>';
+  const LUNE='<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>';
+  const NUAGE='<path d="M7 18h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 9.5 4.25 4.25 0 0 0 7 18z"/>';
+  const ICONES={
+    clair:j=>svg(j?SOLEIL:LUNE),
+    voile:j=>svg((j?'<circle cx="8" cy="8" r="3"/><path d="M8 2.5v1.2M2.5 8h1.2M4.1 4.1l.9.9M11.9 4.1l-.9.9"/>':'<path d="M11.5 9A4.5 4.5 0 1 1 6 3.5a3.7 3.7 0 0 0 5.5 5.5z"/>')+'<path d="M9 20h8a3.5 3.5 0 0 0 .5-6.96A4.8 4.8 0 0 0 9 12.3 3.85 3.85 0 0 0 9 20z"/>'),
+    nuage:()=>svg(NUAGE),
+    brouillard:()=>svg('<path d="M4 9h16M3 13h18M5 17h14"/>'),
+    pluie:()=>svg('<path d="M7 14h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 5.5 4.25 4.25 0 0 0 7 14z"/><path d="M8 17l-1 3M12 17l-1 3M16 17l-1 3"/>'),
+    neige:()=>svg('<path d="M7 14h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 5.5 4.25 4.25 0 0 0 7 14z"/><path d="M8 18h.01M12 20h.01M16 18h.01M10 21h.01M14 22h.01"/>'),
+    orage:()=>svg('<path d="M7 14h10a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7 5.5 4.25 4.25 0 0 0 7 14z"/><path d="M13 15l-2.5 4h3L11 23"/>')
+  };
+  const decrire=c=>c===0?['clair','Ciel clair']:c<=2?['voile','Peu nuageux']:c===3?['nuage','Couvert']:c<=48?['brouillard','Brouillard']
+    :c<=57?['pluie','Bruine']:c<=67?['pluie','Pluie']:c<=77?['neige','Neige']:c<=82?['pluie','Averses']:c<=86?['neige','Averses de neige']:['orage','Orage'];
+  function afficher(d){
+    if(!d||typeof d.t!=='number'){ el.hidden=true; return; }
+    const [ico,txt]=decrire(d.code|0);
+    const mm=(typeof d.min==='number'&&typeof d.max==='number')?`<small class="hw-mm">${Math.round(d.min)}° / ${Math.round(d.max)}°</small>`:'';
+    el.innerHTML=`<span class="hw-ico">${ICONES[ico](d.jour!==0)}</span><b class="hw-t">${Math.round(d.t)}°</b><span class="hw-txt">${txt}</span>${mm}`;
+    el.title=`Météo à Lausanne : ${txt}, ${Math.round(d.t)}°C`+(mm?` (min ${Math.round(d.min)}°, max ${Math.round(d.max)}°)`:'');
+    el.setAttribute('aria-label',el.title);
+    el.hidden=false;
+  }
+  function lireCache(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+  async function charger(force){
+    const c=lireCache();
+    if(c&&c.data)afficher(c.data);
+    if(!force&&c&&Date.now()-c.at<FRAIS)return;
+    try{
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,weather_code,is_day&daily=temperature_2m_min,temperature_2m_max&forecast_days=1&timezone=Europe%2FZurich`;
+      const ctrl=new AbortController(); const minuterie=setTimeout(()=>ctrl.abort(),8000);
+      const r=await fetch(url,{signal:ctrl.signal,cache:'no-store'}); clearTimeout(minuterie);
+      if(!r.ok)throw new Error(r.status);
+      const j=await r.json(),cur=j.current||{},day=j.daily||{};
+      const data={t:cur.temperature_2m,code:cur.weather_code,jour:cur.is_day,min:(day.temperature_2m_min||[])[0],max:(day.temperature_2m_max||[])[0]};
+      if(typeof data.t!=='number')throw new Error('vide');
+      try{ localStorage.setItem(KEY,JSON.stringify({at:Date.now(),data})); }catch(e){}
+      afficher(data);
+    }catch(e){ if(!(c&&c.data))el.hidden=true; }
+  }
+  charger(false);
+  setInterval(()=>{ if(!document.hidden)charger(false); },FRAIS);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden)charger(false); });
+})();
