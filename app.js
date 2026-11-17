@@ -5501,3 +5501,36 @@ document.addEventListener('click',e=>{
   setInterval(()=>{ if(!document.hidden)charger(false); },FRAIS);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden)charger(false); });
 })();
+
+// ---------- PC : la page tient dans la hauteur de l'écran ----------
+// Si le contenu dépasse la fenêtre, toute la page est réduite juste assez
+// pour tenir (au minimum 72 % pour rester lisible). Jamais sur téléphone.
+(function(){
+  const app=document.querySelector('.app');
+  if(!app)return;
+  const MIN=0.72;
+  let attente=0;
+  function ajuster(){
+    attente=0;
+    if(window.innerWidth<=700||window.matchMedia('print').matches){ if(app.style.zoom)app.style.zoom=''; return; }
+    const avant=app.style.zoom;
+    app.style.zoom='';
+    const h=document.documentElement.scrollHeight;
+    const z=h>window.innerHeight+2?Math.max(MIN,Math.floor(window.innerHeight/h*1000)/1000):1;
+    app.style.zoom=z<1?String(z):'';
+    if(app.style.zoom!==avant){
+      // Les cadres « aujourd'hui » sont positionnés au pixel : on les recalcule.
+      try{ cmpYearTodayFrame(); }catch(e){}
+      try{ cmpDeskTodayFrame(); }catch(e){}
+    }
+  }
+  const planifier=()=>{ if(!attente)attente=requestAnimationFrame(()=>requestAnimationFrame(ajuster)); };
+  window.addEventListener('resize',planifier);
+  window.addEventListener('beforeprint',()=>{ app.style.zoom=''; });
+  window.addEventListener('afterprint',planifier);
+  const obs=new MutationObserver(planifier);
+  ['viewContainer','teamViewContainer','cmpGrid','stBody','upcomingEvents','rotationCard'].forEach(id=>{ const el=document.getElementById(id); if(el)obs.observe(el,{childList:true,subtree:true}); });
+  document.querySelectorAll('.app > section, .app > main').forEach(el=>obs.observe(el,{attributes:true,attributeFilter:['class']}));
+  try{ document.fonts&&document.fonts.ready.then(planifier); }catch(e){}
+  planifier();
+})();

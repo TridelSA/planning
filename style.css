@@ -2236,11 +2236,7 @@ button:not(:disabled):active{transition-duration:.08s}
 }
 /* Chiffres à largeur fixe là où ils s'alignent en colonne */
 .week-day span,.shift-time,.month-grid,.st-kpi b,.upcoming-when,.update-chip{font-variant-numeric:tabular-nums}
-/* Grands écrans de PC : tout un peu plus grand (le texte était petit et le bas de l'écran vide). */
-@media (min-width:1280px) and (min-height:760px){
-  .app{zoom:1.12}
-}
-@media print{.app{zoom:1}}
+@media print{.app{zoom:1!important}}
 /* Export calendrier : bouton principal plein, comme « Aujourd'hui » */
 .install-btn.ics-go{width:100%;margin:2px 0 10px;border:0;background:var(--accent-solid,var(--accent));color:#fff;justify-content:center;text-align:center;min-height:52px;border-radius:14px;transition:transform .12s cubic-bezier(.23,1,.32,1)}
 .install-btn.ics-go span,.install-btn.ics-go small{color:#fff}
@@ -2543,3 +2539,54 @@ button:not(:disabled):active{transition-duration:.08s}
   .hero-weather .hw-mm{display:block;grid-area:m;font-size:10px}
 }
 @media print{.hero-weather{display:none!important}}
+
+
+/* =====================================================================
+   PC : tout tient dans la hauteur de l'écran (pas besoin de défiler)
+   1) haut de page plus compact ; 2) vues Année sur 4 ou 6 colonnes ;
+   3) ajustement automatique de la taille en JS (fitDesktop) si ça dépasse encore.
+   ===================================================================== */
+@media (min-width:701px){
+  .app{padding-top:10px!important;padding-bottom:10px!important}
+  .hero{min-height:96px!important;padding-top:12px!important;padding-bottom:10px!important;margin-bottom:8px!important}
+  #rotationCard.rotation-strip{padding-top:6px!important;padding-bottom:6px!important;margin-bottom:8px!important}
+
+  /* Onglets, personne et boutons sur une seule ligne */
+  section.controls{display:flex!important;align-items:center;gap:10px;padding:8px!important;margin-bottom:8px!important}
+  section.controls .seg-wrap{margin:0!important;flex:0 0 auto}
+  section.controls .controls-grid{flex:1 1 auto;display:flex!important;align-items:center;gap:8px!important;margin:0!important}
+  section.controls .controls-grid .field{flex:1 1 auto;min-width:0}
+  section.controls .controls-grid .field>label{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  section.controls .employee-picker-button{min-height:38px!important;height:38px}
+  section.controls .controls-btns{flex:0 0 auto;display:flex!important;gap:8px}
+  section.controls #todayBtn,section.controls #icsBtn{height:38px!important;min-height:38px!important}
+
+  #upcomingEventsCard{padding:8px 10px!important;margin-bottom:8px!important}
+  main.main-card,#teamViewSection,#compareViewSection,#statsViewSection{padding:10px!important}
+  main.main-card .tabs{margin-bottom:8px!important}
+  .period-nav{margin-bottom:8px!important}
+  .month-cell{min-height:46px!important}
+}
+/* Vues Année : 4 mois par ligne, puis 6 sur grand écran (3 lignes ou 2 au lieu de 4) */
+@media (min-width:900px){
+  #viewContainer .year-calendar,#teamViewContainer .year-calendar{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px 22px!important}
+  #viewContainer .year-calendar .mini-cell,#teamViewContainer .year-calendar .mini-cell{height:24px!important;font-size:11px!important;border-radius:6px!important}
+  #viewContainer .year-calendar .mini-month h3,#teamViewContainer .year-calendar .mini-month h3{font-size:13px!important;padding:2px 2px 5px!important;margin-bottom:4px!important}
+}
+@media (min-width:1400px){
+  #viewContainer .year-calendar,#teamViewContainer .year-calendar{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:12px 18px!important}
+}
+/* Le bloc « Individuel / personne » reste caché sur les autres pages */
+@media (min-width:701px){ section.controls.hidden{display:none!important} }
+/* Statistiques sur PC : deux colonnes équilibrées, chiffres clés sur toute la largeur */
+@media (min-width:1100px){
+  #stBody{column-count:2;column-gap:14px}
+  #stBody>*{break-inside:avoid;margin:0 0 12px!important;display:block}
+  #stBody>.st-kpis{column-span:all;display:grid!important}
+  #stBody>.st-blocks{display:grid!important}
+}
+/* Écrans peu hauts (portables 768-900 px) : cases des vues Année un peu plus basses */
+@media (min-width:900px) and (max-height:900px){
+  #viewContainer .year-calendar .mini-cell,#teamViewContainer .year-calendar .mini-cell{height:21px!important}
+  #viewContainer .year-calendar,#teamViewContainer .year-calendar{row-gap:8px!important}
+}
