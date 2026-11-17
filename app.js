@@ -103,7 +103,7 @@ function swissHolidayName(dISO){
 // s'affiche. À retirer une fois les vraies dates publiées par Excel.
 const TRAVAUX_APERCU=[
   {start:'2026-05-17', end:'2026-06-17'},
-  {start:'2027-05-23', end:'2027-06-28'}
+  {start:'2027-05-17', end:'2027-06-20'}
 ];
 
 function travauxApercu(){
