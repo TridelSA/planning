@@ -5088,12 +5088,27 @@ function icsEventList(emp){
     const a=parseISODateOnly(t.start),b=parseISODateOnly(t.end);
     if(a&&b)evs.push({type:'travaux',date:a,endDate:b,allDay:true,title:'Travaux',detail:'Période de travaux : pas de congés durant cette période.'});
   }
-  return evs
+  // Rotations (remplacements) : un événement par service, avec ses vraies heures
+  // (RM 05:00–13:00, RA 13:00–21:00, RN 21:00–05:00 le lendemain) au lieu d'une journée entière.
+  const HEURES={RM:[5,13,'Matin'],RA:[13,21,'Après-midi'],RN:[21,5,'Nuit']};
+  const parService=[];
+  for(const ev of evs){
+    if(ev.type!=='rotation'){ parService.push(ev); continue; }
+    for(let d=new Date(ev.date);d<=ev.endDate;d.setDate(d.getDate()+1)){
+      const code=safeCode(emp.schedule[isoDate(d)]),h=HEURES[code];
+      if(!h)continue;
+      const debut=new Date(d);debut.setHours(h[0],0,0,0);
+      const fin=new Date(d);if(h[1]<h[0])fin.setDate(fin.getDate()+1);fin.setHours(h[1],0,0,0);
+      parService.push({type:'rotation',code,label:h[2],date:debut,endDate:fin,allDay:false,
+        title:`Rotation ${h[2].toLowerCase()} (${code})`,detail:`Remplacement · ${ev.detail}`});
+    }
+  }
+  return parService
     .filter(ev=>ICS_KIND[ev.type])
     .map(ev=>{
       const d=calendarEventData(ev);
       // Dans un calendrier, la date est déjà visible : titre court, sans « du … au … ».
-      const short=ev.type==='vacation'?(/^Vacances/.test(ev.title)?'Vacances':'Congé'):ev.type==='piquet'?'Piquet':ev.type==='travaux'?'Travaux':ev.type==='rotation'?'Rotation':ev.title;
+      const short=ev.type==='vacation'?(/^Vacances/.test(ev.title)?'Vacances':'Congé'):ev.type==='piquet'?'Piquet':ev.type==='travaux'?'Travaux':ev.type==='rotation'?`${ev.label} (${ev.code})`:ev.title;
       const days=d.allDay?Math.round((d.end-d.start)/86400000):0;
       return {ev,data:d,kind:ICS_KIND[ev.type],icon:ICS_ICON[ev.type]||'•',short,days};
     })
@@ -5126,6 +5141,8 @@ function buildPersonalICS(emp,opts){
   // Périodes : congés, piquets, formations… sur toute leur durée.
   for(const it of icsEventList(emp)){
     if(!opts[it.kind])continue;
+    // « Services » coché : ces jours de rotation y sont déjà (mêmes heures), pas de doublon.
+    if(it.kind==='rotations'&&opts.services)continue;
     const d=it.data;
     // Dates complètes en tête de description : visibles en touchant l'événement dans le calendrier.
     const desc=(d.allDay?`${icsRangeLong(it)}\n`:'')+d.description;
@@ -5135,11 +5152,17 @@ function buildPersonalICS(emp,opts){
     n++;lines.push('BEGIN:VEVENT',`UID:${it.ev.type}-${isoDate(d.start)}-${emp.id}@planning.tridelsa.ch`,`DTSTAMP:${stamp}`,...when,
       `SUMMARY:${escapeICS(it.icon+' '+it.short)}`,`DESCRIPTION:${escapeICS(desc)}`,
       ...(d.location?[`LOCATION:${escapeICS(d.location)}`]:[]),
-      it.kind==='piquets'?'TRANSP:OPAQUE':'TRANSP:TRANSPARENT',
-      ...(d.allDay?alarm(`${it.short} demain`,'-PT6H'):alarm(it.short,'-PT1H')),'END:VEVENT');
+      (it.kind==='piquets'||it.kind==='rotations')?'TRANSP:OPAQUE':'TRANSP:TRANSPARENT',
+      ...(d.allDay?alarm(`${it.short} demain`,'-PT6H')
+        :it.kind==='rotations'?alarm(`${it.short} demain`,veille18h(d.start)):alarm(it.short,'-PT1H')),'END:VEVENT');
   }
   lines.push('END:VCALENDAR');
   return {text:lines.map(icsFold).join('\r\n'),count:n};
+}
+// Délai du rappel « la veille à 18 h » avant un service qui commence à cette heure-là.
+function veille18h(debut){
+  const v=new Date(debut);v.setDate(v.getDate()-1);v.setHours(18,0,0,0);
+  return `-PT${Math.max(1,Math.round((debut-v)/60000))}M`;
 }
 function icsRangeLong(it){
   const d=it.data,f=x=>x.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
@@ -5148,7 +5171,8 @@ function icsRangeLong(it){
 }
 function icsRangeText(it){
   const d=it.data,f=x=>x.toLocaleDateString('fr-CH',{weekday:'short',day:'numeric',month:'short'});
-  if(!d.allDay)return `${f(d.start)} · ${d.start.toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'})}`;
+  const hm=x=>x.toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'});
+  if(!d.allDay)return `${f(d.start)} · ${hm(d.start)}–${hm(d.end)}`;
   const last=new Date(d.end);last.setDate(last.getDate()-1);
   return it.days<=1?f(d.start):`${f(d.start)} → ${f(last)}`;
 }
