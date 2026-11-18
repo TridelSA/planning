@@ -1474,8 +1474,9 @@ function buildUpcomingEvents(employee,opts={}){
         date:new Date(rStart),
         endDate:new Date(rEnd),
         allDay:true,
-        title:`Rotation ${range}`,
-        detail:parts.join(' · ')+(team?` · avec l’${team.replace(/ /g,'\u00a0')}`:'') // « Équipe 4 » jamais coupé
+        title:`Rotation (${parts.join(' · ')})`,
+        detail:range.charAt(0).toUpperCase()+range.slice(1)+(team?` · avec l’${team.replace(/ /g,'\u00a0')}`:''), // « Équipe 4 » jamais coupé
+        equipe:team
       },`rotation-${days[0]}`);
     }
   }
@@ -1881,6 +1882,7 @@ function calendarButtonFeedback(index){
 function addUpcomingEventToCalendar(index){
   const ev=upcomingCalendarEvents[index];
   if(!ev)return;
+  if(ev.type==='rotation'){ openIcsModal(); return; }
 
   calendarButtonFeedback(index);
 
@@ -5092,16 +5094,25 @@ function icsEventList(emp){
   // (RM 05:00–13:00, RA 13:00–21:00, RN 21:00–05:00 le lendemain) au lieu d'une journée entière.
   const HEURES={RM:[5,13,'Matin'],RA:[13,21,'Après-midi'],RN:[21,5,'Nuit']};
   const parService=[];
+  const service=(d,detail)=>{
+    const code=safeCode(emp.schedule[isoDate(d)]),h=HEURES[code];
+    if(!h)return;
+    const debut=new Date(d);debut.setHours(h[0],0,0,0);
+    const fin=new Date(d);if(h[1]<h[0])fin.setDate(fin.getDate()+1);fin.setHours(h[1],0,0,0);
+    if(fin<=new Date())return; // service déjà terminé
+    parService.push({type:'rotation',code,label:h[2],date:debut,endDate:fin,allDay:false,
+      title:`Rotation ${h[2].toLowerCase()} (${code})`,detail});
+  };
+  const enEquipe=/^[ÉE]quipe/i.test(presenceGroupOf(emp));
+  if(enEquipe){
+    // Équipes 1 à 5 : toutes les rotations publiées (rien dans « 30 prochains jours »)
+    for(const iso of icsServiceDays(emp))service(parseISODateOnly(iso),presenceGroupOf(emp));
+  }
   for(const ev of evs){
     if(ev.type!=='rotation'){ parService.push(ev); continue; }
-    for(let d=new Date(ev.date);d<=ev.endDate;d.setDate(d.getDate()+1)){
-      const code=safeCode(emp.schedule[isoDate(d)]),h=HEURES[code];
-      if(!h)continue;
-      const debut=new Date(d);debut.setHours(h[0],0,0,0);
-      const fin=new Date(d);if(h[1]<h[0])fin.setDate(fin.getDate()+1);fin.setHours(h[1],0,0,0);
-      parService.push({type:'rotation',code,label:h[2],date:debut,endDate:fin,allDay:false,
-        title:`Rotation ${h[2].toLowerCase()} (${code})`,detail:`Remplacement · ${ev.detail}`});
-    }
+    if(enEquipe)continue;
+    for(let d=new Date(ev.date);d<=ev.endDate;d.setDate(d.getDate()+1))
+      service(new Date(d),'Remplacement'+(ev.equipe?` avec l’${ev.equipe}`:''));
   }
   return parService
     .filter(ev=>ICS_KIND[ev.type])
@@ -5190,10 +5201,9 @@ function openIcsModal(){
   B.innerHTML=`<div class="ics-opts">
     ${opt('conges','Congés et vacances',cnt('conges'),true)}
     ${opt('piquets','Piquets',cnt('piquets'),true)}
-    ${opt('rotations','Rotations',cnt('rotations'),true)}
+    ${opt('rotations','Rotations (avec les horaires)',cnt('rotations'),true)}
     ${opt('autres','Formations, rendez-vous',cnt('autres'),true)}
     ${opt('travaux','Période de travaux',cnt('travaux'),true)}
-    ${cnt('rotations')?'':opt('services','Services (matin, après-midi, nuit)',services.length,false)}
     <label class="ics-opt"><input type="checkbox" data-ics="alarm" checked><span>Rappel la veille à 18 h</span></label>
   </div>
   <ul class="ics-preview" aria-label="Aperçu"></ul>
