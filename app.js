@@ -5193,7 +5193,7 @@ function openIcsModal(){
     ${opt('rotations','Rotations',cnt('rotations'),true)}
     ${opt('autres','Formations, rendez-vous',cnt('autres'),true)}
     ${opt('travaux','Période de travaux',cnt('travaux'),true)}
-    ${opt('services','Services (matin, après-midi, nuit)',services.length,false)}
+    ${cnt('rotations')?'':opt('services','Services (matin, après-midi, nuit)',services.length,false)}
     <label class="ics-opt"><input type="checkbox" data-ics="alarm" checked><span>Rappel la veille à 18 h</span></label>
   </div>
   <ul class="ics-preview" aria-label="Aperçu"></ul>
