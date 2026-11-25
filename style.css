@@ -2590,3 +2590,110 @@ button:not(:disabled):active{transition-duration:.08s}
   #viewContainer .year-calendar .mini-cell,#teamViewContainer .year-calendar .mini-cell{height:21px!important}
   #viewContainer .year-calendar,#teamViewContainer .year-calendar{row-gap:8px!important}
 }
+
+/* =====================================================================
+   CIEL VIVANT DU BANDEAU : couleur selon l'heure (aube, jour, crépuscule,
+   nuit) et la météo (couvert, pluie, neige, orage, brouillard).
+   Sans données météo, le bandeau garde son vert d'origine.
+   ===================================================================== */
+.hero-sky{position:absolute;inset:0;z-index:0;opacity:0;transition:opacity .8s ease;overflow:hidden;
+  background:linear-gradient(180deg,var(--sky1,#0E2818) 0%,var(--sky2,#1F5C2C) 62%,var(--sky3,#3C8A48) 100%)}
+.hero[data-sky] .hero-sky{opacity:1}
+.hero[data-sky="nuit"]{--sky1:#070f24;--sky2:#14254a;--sky3:#24365c;--shade:5,9,20}
+.hero[data-sky="aube"]{--sky1:#2a3766;--sky2:#c97a7a;--sky3:#f2b27f;--shade:24,20,40}
+.hero[data-sky="jour"]{--sky1:#2f78bd;--sky2:#69aee0;--sky3:#a9d4f0;--shade:10,30,50}
+.hero[data-sky="crepuscule"]{--sky1:#251f4d;--sky2:#b4527a;--sky3:#f09a5b;--shade:22,14,34}
+/* Temps couvert / pluvieux : ciel grisé ; orage : ardoise sombre */
+.hero-sky::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity .8s ease}
+.hero[data-meteo="nuage"] .hero-sky::after,.hero[data-meteo="pluie"] .hero-sky::after,
+.hero[data-meteo="neige"] .hero-sky::after,.hero[data-meteo="brouillard"] .hero-sky::after{opacity:1;background:linear-gradient(180deg,rgba(96,106,118,.72),rgba(150,160,170,.55))}
+.hero[data-meteo="neige"] .hero-sky::after{background:linear-gradient(180deg,rgba(150,160,175,.7),rgba(205,212,222,.6))}
+.hero[data-meteo="orage"] .hero-sky::after{opacity:1;background:linear-gradient(180deg,rgba(28,32,44,.86),rgba(70,74,92,.7))}
+.hero[data-sky="nuit"][data-meteo] .hero-sky::after{filter:brightness(.4)}
+/* Lisibilité du titre : voile sombre accordé au ciel au lieu du vert */
+.hero[data-sky] .hero-art::after{background:linear-gradient(90deg,rgba(var(--shade),.78) 0%,rgba(var(--shade),.48) 32%,rgba(var(--shade),.08) 60%,rgba(var(--shade),0) 78%)!important}
+@media (max-width:700px){
+  .hero[data-sky] .hero-art::after{background:linear-gradient(180deg,rgba(var(--shade),.72) 0%,rgba(var(--shade),.32) 48%,rgba(var(--shade),.04) 100%)!important}
+}
+/* Le bâtiment suit la lumière */
+.hero-art-stage{transition:filter 1s ease}
+.hero[data-sky="nuit"] .hero-art-stage{filter:brightness(.62) saturate(.8)}
+.hero[data-sky="aube"] .hero-art-stage,.hero[data-sky="crepuscule"] .hero-art-stage{filter:brightness(.86) sepia(.12) saturate(1.05)}
+.hero[data-sky="jour"][data-meteo="orage"] .hero-art-stage,.hero[data-sky="jour"][data-meteo="pluie"] .hero-art-stage{filter:brightness(.86) saturate(.85)}
+
+/* Soleil : halo doux (jour clair) ; bas et orangé à l'aube et au crépuscule */
+.sky-sun{position:absolute;width:260px;height:260px;right:6%;top:-120px;border-radius:50%;opacity:0;transition:opacity 1s ease;
+  background:radial-gradient(circle,rgba(255,246,214,.95) 0%,rgba(255,226,150,.45) 18%,rgba(255,210,120,.12) 42%,transparent 66%);animation:sunPulse 9s ease-in-out infinite}
+.hero[data-sky="jour"]:is([data-meteo="clair"],[data-meteo="voile"]) .sky-sun{opacity:1}
+.hero:is([data-sky="aube"],[data-sky="crepuscule"]):is([data-meteo="clair"],[data-meteo="voile"]) .sky-sun{opacity:.9;top:auto;bottom:-170px;right:18%;
+  background:radial-gradient(circle,rgba(255,214,160,.9) 0%,rgba(255,160,90,.4) 22%,rgba(240,110,70,.12) 46%,transparent 68%)}
+@keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+/* Étoiles : nuit dégagée */
+.sky-stars{position:absolute;left:0;top:0;width:2px;height:2px;border-radius:50%;background:#fff;opacity:0;transition:opacity 1.2s ease;
+  box-shadow:4vw 8px #fff,11vw 22px rgba(255,255,255,.7),17vw 6px #fff,24vw 30px rgba(255,255,255,.6),31vw 12px #fff,38vw 26px rgba(255,255,255,.8),
+    44vw 5px #fff,51vw 18px rgba(255,255,255,.6),57vw 34px #fff,63vw 10px rgba(255,255,255,.75),69vw 24px #fff,75vw 4px rgba(255,255,255,.6),
+    81vw 16px #fff,86vw 30px rgba(255,255,255,.7),91vw 9px #fff,96vw 21px rgba(255,255,255,.6),27vw 44px rgba(255,255,255,.5),59vw 48px rgba(255,255,255,.45);
+  animation:twinkle 4s ease-in-out infinite alternate}
+.hero[data-sky="nuit"]:is([data-meteo="clair"],[data-meteo="voile"]) .sky-stars{opacity:1}
+@keyframes twinkle{from{filter:brightness(.7)}to{filter:brightness(1.25)}}
+/* Nuages qui passent */
+.sky-cloud{position:absolute;border-radius:50%;opacity:0;transition:opacity 1s ease;filter:blur(14px);
+  background:radial-gradient(ellipse at center,rgba(255,255,255,.85),rgba(255,255,255,0) 70%)}
+.sky-cloud.c1{width:340px;height:90px;top:4px;left:-360px;animation:cloudDrift 95s linear infinite}
+.sky-cloud.c2{width:260px;height:70px;top:30px;left:-300px;animation:cloudDrift 130s linear infinite -45s}
+.sky-cloud.c3{width:420px;height:110px;top:-24px;left:-440px;animation:cloudDrift 160s linear infinite -100s}
+@keyframes cloudDrift{to{transform:translateX(calc(100vw + 900px))}}
+.hero[data-meteo="voile"] .sky-cloud.c1,.hero[data-meteo="voile"] .sky-cloud.c2{opacity:.5}
+.hero:is([data-meteo="nuage"],[data-meteo="pluie"],[data-meteo="neige"],[data-meteo="orage"]) .sky-cloud{opacity:.55}
+.hero[data-meteo="orage"] .sky-cloud{filter:blur(14px) brightness(.55)}
+.hero[data-sky="nuit"] .sky-cloud{filter:blur(14px) brightness(.45)}
+/* Brouillard : nappes qui glissent lentement */
+.sky-fog{position:absolute;left:-20%;width:140%;height:42%;opacity:0;transition:opacity 1s ease;filter:blur(10px);
+  background:linear-gradient(90deg,transparent,rgba(235,240,244,.55) 25%,rgba(235,240,244,.3) 55%,rgba(235,240,244,.55) 80%,transparent)}
+.sky-fog.f1{bottom:10%;animation:fogDrift 40s ease-in-out infinite alternate}
+.sky-fog.f2{bottom:36%;animation:fogDrift 55s ease-in-out infinite alternate-reverse}
+@keyframes fogDrift{to{transform:translateX(10%)}}
+.hero[data-meteo="brouillard"] .sky-fog{opacity:1}
+/* Pluie / neige (dessin sur canevas) et éclairs */
+.hero-fx{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;border-radius:inherit}
+.hero-flash{position:absolute;inset:0;z-index:0;pointer-events:none;background:rgba(235,240,255,.85);opacity:0;border-radius:inherit}
+.hero-flash.on{animation:flash .7s ease-out}
+@keyframes flash{0%{opacity:0}8%{opacity:.55}16%{opacity:.05}26%{opacity:.4}100%{opacity:0}}
+/* Réglage « réduire les animations » : couleurs gardées, mouvements coupés */
+@media (prefers-reduced-motion:reduce){
+  .sky-sun,.sky-stars,.sky-cloud,.sky-fog{animation:none!important}
+  .sky-cloud.c1{left:8%}.sky-cloud.c2{left:46%}.sky-cloud.c3{left:70%}
+  .hero-flash,.hero-fx{display:none}
+}
+@media print{.hero-sky,.hero-fx,.hero-flash{display:none!important}}
+
+/* Météo cliquable (discret : juste un curseur et un léger effet au survol) */
+.hero-weather{cursor:pointer;border-radius:10px;padding:2px 6px;margin-left:-6px;transition:background-color .15s ease}
+@media (hover:hover) and (pointer:fine){.hero-weather:hover{background:rgba(255,255,255,.12)}}
+.hero-weather:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:2px}
+.hero-weather:active{transform:scale(.97)}
+@media (max-width:700px){.hero-weather{margin-left:0;padding:4px 6px}}
+
+/* Fenêtre des prévisions sur 7 jours */
+.mt-list{list-style:none;margin:0 0 10px;padding:0}
+.mt-day{display:grid;grid-template-columns:minmax(78px,1fr) 30px minmax(0,1.4fr) minmax(118px,1.3fr);align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line)}
+.mt-day:last-child{border-bottom:0}
+.mt-day.is-today{background:color-mix(in srgb,var(--accent) 8%,transparent);border-radius:10px;border-bottom-color:transparent}
+.mt-name b{display:block;font:700 13.5px/1.2 var(--font-body);color:var(--ink);text-transform:capitalize}
+.mt-name small{font:500 11.5px/1.2 var(--font-body);color:var(--muted)}
+.mt-ico{display:grid;place-items:center;color:var(--ink-soft)}
+.mt-ico.mt-clair,.mt-ico.mt-voile{color:#e2a22b}.mt-ico.mt-pluie{color:#3f8fd0}.mt-ico.mt-neige{color:#7aa7c7}.mt-ico.mt-orage{color:#7a5fc4}
+.mt-txt{font:500 13px/1.25 var(--font-body);color:var(--ink-soft)}
+.mt-txt small{display:block;font-size:11.5px;color:#3f8fd0;font-weight:600}
+.mt-temps{display:flex;align-items:center;gap:7px;font-variant-numeric:tabular-nums}
+.mt-temps i{font-style:normal;font:600 12.5px/1 var(--font-body);color:var(--muted);min-width:26px;text-align:right}
+.mt-temps b{font:700 13.5px/1 var(--font-body);color:var(--ink);min-width:26px}
+.mt-bar{position:relative;flex:1;height:5px;border-radius:5px;background:var(--paper)}
+.mt-bar span{position:absolute;top:0;bottom:0;border-radius:5px;background:linear-gradient(90deg,#6db1e6,#f2b14c)}
+#meteoModalS{text-transform:none!important}
+/* Petit téléphone : on garde le risque de pluie, on retire seulement le libellé */
+@media (max-width:420px){
+  .mt-day{grid-template-columns:minmax(66px,1fr) 26px 34px minmax(96px,1.3fr);gap:8px}
+  .mt-txt{font-size:0}.mt-txt small{font-size:11px;line-height:1.1;text-align:center}
+}
+@media (max-width:420px){.mt-pl{display:none}}
