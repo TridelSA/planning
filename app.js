@@ -4046,8 +4046,8 @@ function heroFocusKeyFor(employee){
   return 'full';
 }
 function heroFocusKey(){
-  // Téléphone : toujours le bâtiment entier (le zoom par métier reste sur ordinateur et tablette).
-  if(window.innerWidth<=700)return 'full';
+  // Toujours l'usine entière, quelle que soit la personne choisie (plus de zoom par métier).
+  return 'full';
   const page=currentPage();
   if(page!=='individual' && page!=='stats')return 'full';
   const e=selectedEmployee();
