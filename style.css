@@ -2697,3 +2697,10 @@ button:not(:disabled):active{transition-duration:.08s}
   .mt-txt{font-size:0}.mt-txt small{font-size:11px;line-height:1.1;text-align:center}
 }
 @media (max-width:420px){.mt-pl{display:none}}
+
+/* Bandeau « En poste / Ensuite / Travaux » sur ordinateur et tablette : une seule ligne compacte */
+@media (min-width:701px){
+  #rotationCard.rotation-strip{display:flex!important;flex-wrap:wrap;align-items:center;column-gap:18px;row-gap:4px;
+    padding:6px 16px!important;min-height:0!important}
+  #rotationCard .rotation-travaux{margin:0 0 0 auto!important;padding:0!important;border:0!important;min-height:0!important;width:auto!important;flex:0 0 auto}
+}
